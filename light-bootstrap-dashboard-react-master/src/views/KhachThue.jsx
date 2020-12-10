@@ -11,7 +11,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from 'primereact/calendar'
-import KhuTroService from '../service/khutroService';
+import KhachThueService from '../service/khachthueService';
 import { RadioButton } from "primereact/radiobutton";
 import classNames from 'classnames';
 import '../index.css';
@@ -21,7 +21,7 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
 class KhachThue extends Component {
-  emptyProduct = {
+  emptyUser = {
     id: null,
     name: "",
     gender: "",
@@ -44,12 +44,12 @@ class KhachThue extends Component {
     super(props);
 
     this.state = {
-      products: null,
-      productDialog: false,
-      deleteProductDialog: false,
-      deleteProductsDialog: false,
-      product: this.emptyProduct,
-      selectedProducts: null,
+      users: null,
+      userDialog: false,
+      deleteUserDialog: false,
+      deleteUsersDialog: false,
+      user: this.emptyUser,
+      selectedusers: null,
       submitted: false,
       globalFilter: null,
       selectedKhuTro: null,
@@ -58,7 +58,7 @@ class KhachThue extends Component {
       startdate: null,
       dateCMND: null
     };
-    this.productService = new KhuTroService();
+    this.userService = new KhachThueService();
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
@@ -66,23 +66,23 @@ class KhachThue extends Component {
     this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
-    this.saveProduct = this.saveProduct.bind(this);
-    this.editProduct = this.editProduct.bind(this);
-    this.confirmDeleteProduct = this.confirmDeleteProduct.bind(this);
-    this.deleteProduct = this.deleteProduct.bind(this);
+    this.saveUser = this.saveUser.bind(this);
+    this.editUser = this.editUser.bind(this);
+    this.confirmDeleteUser = this.confirmDeleteUser.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
     this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-    this.deleteSelectedProducts = this.deleteSelectedProducts.bind(this);
+    this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this);
     this.onCityChange = this.onCityChange.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
-    this.hideDeleteProductDialog = this.hideDeleteProductDialog.bind(this);
-    this.hideDeleteProductsDialog = this.hideDeleteProductsDialog.bind(this);
+    this.hideDeleteUserDialog = this.hideDeleteUserDialog.bind(this);
+    this.hideDeleteUsersDialog = this.hideDeleteUsersDialog.bind(this);
   }
 
   componentDidMount() {
-    this.productService
-      .getProducts()
-      .then(data => this.setState({ products: data }));
+    this.userService
+      .getUsers()
+      .then(data => this.setState({ users: data }));
   }
 
   formatCurrency(value) {
@@ -96,92 +96,92 @@ class KhachThue extends Component {
   }
   openNew() {
     this.setState({
-      product: this.emptyProduct,
+      user: this.emptyUser,
       submitted: false,
-      productDialog: true
+      userDialog: true
     });
   }
   hideDialog() {
     this.setState({
       submitted: false,
-      productDialog: false
+      userDialog: false
     });
   }
-  hideDeleteProductDialog() {
-    this.setState({ deleteProductDialog: false });
+  hideDeleteUserDialog() {
+    this.setState({ deleteUserDialog: false });
   }
-  hideDeleteProductsDialog() {
-    this.setState({ deleteProductsDialog: false });
+  hideDeleteUsersDialog() {
+    this.setState({ deleteUsersDialog: false });
   }
-  saveProduct() {
+  saveUser() {
     let state = { submitted: true };
 
-    if (this.state.product.name.trim()) {
-      let products = [...this.state.products];
-      let product = { ...this.state.product };
-      if (this.state.product.id) {
-        const index = this.findIndexById(this.state.product.id);
+    if (this.state.user.name.trim()) {
+      let users = [...this.state.users];
+      let user = { ...this.state.user };
+      if (this.state.user.id) {
+        const index = this.findIndexById(this.state.user.id);
 
-        products[index] = product;
+        users[index] = user;
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Product Updated",
+          detail: "User Updated",
           life: 3000
         });
       } else {
-        product.id = this.createId();
-        products.push(product);
+        user.id = this.createId();
+        users.push(user);
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Product Created",
+          detail: "User Created",
           life: 3000
         });
       }
 
       state = {
         ...state,
-        products,
-        productDialog: false,
-        product: this.emptyProduct
+        users,
+        userDialog: false,
+        user: this.emptyUser
       };
     }
 
     this.setState(state);
   }
-  editProduct(product) {
+  editUser(user) {
     this.setState({
-      product: { ...product },
-      productDialog: true
+      user: { ...user },
+      userDialog: true
     });
   }
-  confirmDeleteProduct(product) {
+  confirmDeleteUser(user) {
     this.setState({
-      product,
-      deleteProductDialog: true
+      user,
+      deleteUserDialog: true
     });
   }
-  deleteProduct() {
-    let products = this.state.products.filter(
-      (val) => val.id !== this.state.product.id
+  deleteUser() {
+    let users = this.state.users.filter(
+      (val) => val.id !== this.state.user.id
     );
     this.setState({
-      products,
-      deleteProductDialog: false,
-      product: this.emptyProduct
+      users,
+      deleteUserDialog: false,
+      user: this.emptyUser
     });
     this.toast.show({
       severity: "success",
       summary: "Successful",
-      detail: "Product Deleted",
+      detail: "User Deleted",
       life: 3000
     });
   }
   findIndexById(id) {
     let index = -1;
-    for (let i = 0; i < this.state.products.length; i++) {
-      if (this.state.products[i].id === id) {
+    for (let i = 0; i < this.state.users.length; i++) {
+      if (this.state.users[i].id === id) {
         index = i;
         break;
       }
@@ -199,44 +199,43 @@ class KhachThue extends Component {
     return id;
   }
   confirmDeleteSelected() {
-    this.setState({ deleteProductsDialog: true });
+    this.setState({ deleteUsersDialog: true });
   }
 
-  deleteSelectedProducts() {
-    let products = this.state.products.filter(
-      (val) => !this.state.selectedProducts.includes(val)
+  deleteSelectedUsers() {
+    let users = this.state.users.filter(
+      (val) => !this.state.selectedUsers.includes(val)
     );
     this.setState({
-      products,
-      deleteProductsDialog: false,
-      selectedProducts: null
+      users,
+      deleteUsersDialog: false,
+      selectedUsers: null
     });
     this.toast.show({
       severity: "success",
       summary: "Successful",
-      detail: "Products Deleted",
+      detail: "Users Deleted",
       life: 3000
     });
   }
   onStatusChange(e) {
-    let product = { ...this.state.product };
-    product["gender"] = e.value;
-    this.setState({ product });
+    let user = { ...this.state.user };
+    user["gender"] = e.value;
+    this.setState({ user });
   }
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
-    let product = { ...this.state.product };
-    product[`${name}`] = val;
-
-    this.setState({ product });
+    let user = { ...this.state.user };
+    user[`${name}`] = val;
+    this.setState({ user });
   }
 
   onInputNumberChange(e, name) {
     const val = e.value || 0;
-    let product = { ...this.state.product };
-    product[`${name}`] = val;
+    let user = { ...this.state.user };
+    user[`${name}`] = val;
 
-    this.setState({ product });
+    this.setState({ user });
   }
 
   rightToolbarTemplate() {
@@ -255,7 +254,7 @@ class KhachThue extends Component {
           className="p-button-danger"
           onClick={this.confirmDeleteSelected}
           disabled={
-            !this.state.selectedProducts || !this.state.selectedProducts.length
+            !this.state.selectedUsers || !this.state.selectedUsers.length
           }
         />
       </React.Fragment>
@@ -280,12 +279,12 @@ class KhachThue extends Component {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
-          onClick={() => this.editProduct(rowData)}
+          onClick={() => this.editUser(rowData)}
         />
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-warning"
-          onClick={() => this.confirmDeleteProduct(rowData)}
+          onClick={() => this.confirmDeleteUser(rowData)}
         />
       </React.Fragment>
     );
@@ -305,7 +304,7 @@ class KhachThue extends Component {
         </span>
       </div>
     );
-    const productDialogFooter = (
+    const userDialogFooter = (
       <React.Fragment>
         <Button
           label="Cancel"
@@ -317,39 +316,39 @@ class KhachThue extends Component {
           label="Save"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.saveProduct}
+          onClick={this.saveUser}
         />
       </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const deleteUserDialogFooter = (
       <React.Fragment>
         <Button
           label="No"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteProductDialog}
+          onClick={this.hideDeleteUserDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteProduct}
+          onClick={this.deleteUser}
         />
       </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
+    const deleteUsersDialogFooter = (
       <React.Fragment>
         <Button
           label="No"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteProductsDialog}
+          onClick={this.hideDeleteUsersDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteSelectedProducts}
+          onClick={this.deleteSelectedUsers}
         />
       </React.Fragment>
     );
@@ -366,17 +365,17 @@ class KhachThue extends Component {
 
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.state.products}
-            selection={this.state.selectedProducts}
+            value={this.state.users}
+            selection={this.state.selectedUsers}
             onSelectionChange={(e) =>
-              this.setState({ selectedProducts: e.value })
+              this.setState({ selectedUsers: e.value })
             }
             dataKey="id"
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
             globalFilter={this.state.globalFilter}
             header={header}
           >
@@ -392,30 +391,28 @@ class KhachThue extends Component {
         </div>
 
         <Dialog
-          visible={this.state.productDialog}
+          visible={this.state.userDialog}
           style={{ width: "850px" }}
           header="Thông tin khách thuê"
           modal
           className="p-fluid"
-          footer={productDialogFooter}
+          footer={userDialogFooter}
           onHide={this.hideDialog}
         >
-
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
               <label htmlFor="name">Tên khách hàng</label>
               <InputText
                 id="name"
-                value={this.state.product.name}
+                value={this.state.user.name}
                 onChange={(e) => this.onInputChange(e, "name")}
                 required
                 autoFocus
                 className={classNames({
-                  "p-invalid": this.state.submitted && !this.state.product.name
+                  "p-invalid": this.state.submitted && !this.state.user.name
                 })}
-
               />
-              {this.state.submitted && !this.state.product.name && (
+              {this.state.submitted && !this.state.user.name && (
                 <small className="p-invalid">Tên không được để trống.</small>
               )}
             </div>
@@ -423,7 +420,7 @@ class KhachThue extends Component {
               <label htmlFor="cmnd">CMND/CCCD</label>
               <InputText
                 id="cmnd"
-                value={this.state.product.cmnd}
+                value={this.state.user.cmnd}
                 onChange={(e) => this.onInputChange(e, "cmnd")}
                 required
               /> </div>
@@ -437,7 +434,7 @@ class KhachThue extends Component {
                   name="gender"
                   value="nam"
                   onChange={this.onStatusChange}
-                  checked={this.state.product.gender === "nam"}
+                  checked={this.state.user.gender === "nam"}
                 />
                 <label htmlFor="gender1">Nam</label>
               </div>
@@ -447,7 +444,7 @@ class KhachThue extends Component {
                   name="gender"
                   value="nu"
                   onChange={this.onStatusChange}
-                  checked={this.state.product.gender === "nu"}
+                  checked={this.state.user.gender === "nu"}
                 />
                 <label htmlFor="gender2">Nữ</label>
               </div>
@@ -463,7 +460,7 @@ class KhachThue extends Component {
               <label htmlFor="phone">Điện thoại</label>
               <InputMask id="phone" mask="9999999999" value={this.state.valdt} onChange={(e) => this.setState({ valdt: e.value })}></InputMask>
 
-              {this.state.submitted && !this.state.product.phone && (
+              {this.state.submitted && !this.state.user.phone && (
                 <small className="p-invalid">Không bỏ trống điện thoại.</small>
               )}
             </div>
@@ -471,7 +468,7 @@ class KhachThue extends Component {
               <label htmlFor="address">Nơi cấp</label>
               <InputText
                 id="noicapCMND"
-                value={this.state.product.noicapCMND}
+                value={this.state.user.noicapCMND}
                 onChange={(e) => this.onInputChange(e, "noicapCMND")}
                 required
 
@@ -481,7 +478,7 @@ class KhachThue extends Component {
             <label htmlFor="address">Địa chỉ thường trú</label>
             <InputTextarea
               id="address"
-              value={this.state.product.address}
+              value={this.state.user.address}
               onChange={(e) => this.onInputChange(e, "address")}
               required
             />
@@ -495,7 +492,7 @@ class KhachThue extends Component {
               <label htmlFor="quequan">Nơi sinh</label>
               <InputText
                 id="quequan"
-                value={this.state.product.quequan}
+                value={this.state.user.quequan}
                 onChange={(e) => this.onInputChange(e, "quequan")}
                 required
 
@@ -507,7 +504,7 @@ class KhachThue extends Component {
               <Dropdown
                 className="p-mr-2"
                 value={this.state.selectedKhuTro}
-                options={this.state.products}
+                options={this.state.user}
                 onChange={this.onCityChange}
                 optionLabel="name"
                 placeholder="Chọn khu trọ"
@@ -518,7 +515,7 @@ class KhachThue extends Component {
               <Dropdown
                 className="p-mr-2"
                 value={this.state.selectedKhuTro}
-                options={this.state.products}
+                options={this.state.users}
                 onChange={this.onCityChange}
                 optionLabel="name"
                 placeholder="Chọn phòng trọ"
@@ -529,7 +526,7 @@ class KhachThue extends Component {
               <label htmlFor="price">Tiền phòng</label>
               <InputNumber
                 id="price"
-                value={this.state.product.price}
+                value={this.state.user.price}
                 onValueChange={(e) => this.onInputNumberChange(e, "price")}
                 mode="currency"
                 currency="Vnd"
@@ -545,7 +542,7 @@ class KhachThue extends Component {
             <label htmlFor="image">Hình ảnh</label>
             <InputTextarea
               id="image"
-              value={this.state.product.image}
+              value={this.state.user.image}
               onChange={(e) => this.onInputChange(e, "image")}
               required
             />
@@ -553,21 +550,21 @@ class KhachThue extends Component {
         </Dialog>
 
         <Dialog
-          visible={this.state.deleteProductDialog}
+          visible={this.state.deleteUserDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
-          footer={deleteProductDialogFooter}
-          onHide={this.hideDeleteProductDialog}
+          footer={deleteUserDialogFooter}
+          onHide={this.hideDeleteUserDialog}
         >
           <div className="confirmation-content">
             <i
               className="pi pi-exclamation-triangle p-mr-3"
               style={{ fontSize: "2rem" }}
             />
-            {this.state.product && (
+            {this.state.user && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.product.name}</b>
+                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.user.name}</b>
                     ?
               </span>
             )}
@@ -575,19 +572,19 @@ class KhachThue extends Component {
         </Dialog>
 
         <Dialog
-          visible={this.state.deleteProductsDialog}
+          visible={this.state.deleteUsersDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
-          footer={deleteProductsDialogFooter}
-          onHide={this.hideDeleteProductsDialog}
+          footer={deleteUsersDialogFooter}
+          onHide={this.hideDeleteUsersDialog}
         >
           <div className="confirmation-content">
             <i
               className="pi pi-exclamation-triangle p-mr-3"
               style={{ fontSize: "2rem" }}
             />
-            {this.state.product && (
+            {this.state.user && (
               <span>
                 Bạn chắc chắn muốn xóa tất cả đã chọn ??
               </span>
