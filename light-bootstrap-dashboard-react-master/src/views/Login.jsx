@@ -32,7 +32,6 @@ class Login extends Component {
 
     handleSubmit(event) {
         const { email, password } = this.state;
-
         axios
             .post(
                 "http://localhost:3001/sessions",
@@ -45,7 +44,7 @@ class Login extends Component {
                 { withCredentials: true }
             )
             .then(response => {
-                if (response.data.logged_in) {
+                if (response.data) {
                     this.props.handleSuccessfulAuth(response.data);
                 }
             })
@@ -56,10 +55,10 @@ class Login extends Component {
     }
     render() {
         return (
-            <div className="form">
+            <div className="form" onSubmit={this.handleSubmit}>
                 <h3>Sign In</h3>
 
-                <div className="form-group">
+                <div className="form-group" >
                     <label>Email</label>
                     <input
                         className="form-control"
@@ -85,7 +84,6 @@ class Login extends Component {
                 <button
                     type="submit"
                     className="btn"
-                    onClick={this.handleSubmit}
                 >
                     Submit</button>
                 <p className="forgot-password text-right">
