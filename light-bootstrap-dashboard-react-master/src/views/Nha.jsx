@@ -11,6 +11,7 @@ import { InputText } from 'primereact/inputtext';
 import NhaTroService from '../service/nhatroService';
 import { RadioButton } from "primereact/radiobutton";
 import classNames from 'classnames';
+import axios from "axios";
 import '../index.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -28,7 +29,7 @@ class Nha extends Component {
     super(props);
 
     this.state = {
-      houses: null,
+       houses: null,
       houseDialog: false,
       deleteHouseDialog: false,
       deleteHousesDialog: false,
@@ -56,9 +57,7 @@ class Nha extends Component {
     this.hideDeleteHousesDialog = this.hideDeleteHousesDialog.bind(this);
   }
   componentDidMount() {
-    this.houseService
-      .getHouses()
-      .then(data => this.setState({ houses: data }));
+    this.houseService.getHouses().then(data => this.setState({ houses: data }));
   }
   openNew() {
     this.setState({
@@ -125,20 +124,35 @@ class Nha extends Component {
     });
   }
   deleteHouse() {
-    let houses = this.state.houses.filter(
-      (val) => val.id !== this.state.house.id
-    );
-    this.setState({
-      houses,
-      deleteHouseDialog: false,
-      house: this.emptyHouse,
+    let houses = this.state.houses
+    console.log(this.state.house._id)
+    this.houseService.deleteHouse(this.state.house._id).then(data => {
+      console.log(data)
+      if(data["deletedCount"] === 1)
+      {
+      
+        this.setState({
+          houses,
+          deleteHouseDialog: false,
+          house: this.emptyHouse,
+        });
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "House Deleted",
+          life: 3000
+        });
+      }else{
+        this.toast.show({
+          severity: "success",
+          summary: "Fail",
+          detail: "House Deleted",
+          life: 3000
+        });
+      }
+
     });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "House Deleted",
-      life: 3000
-    });
+   
   }
   findIndexById(id) {
     let index = -1;
@@ -304,8 +318,8 @@ class Nha extends Component {
             header={header}>
 
             <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
-            <Column field="name" header="Tên nhà trọ" ></Column>
-            <Column field="address" header="Địa chỉ" ></Column>
+            <Column field="Name" header="Tên nhà trọ" ></Column>
+            <Column field="Address" header="Địa chỉ" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>
         </div>

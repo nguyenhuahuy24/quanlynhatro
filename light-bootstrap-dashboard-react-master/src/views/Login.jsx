@@ -32,27 +32,27 @@ class Login extends Component {
 
     handleSubmit(event) {
         const { email, password } = this.state;
-
+        event.preventDefault();
         axios
             .post(
-                "http://localhost:3001/sessions",
+                "http://localhost:8080/auth",
                 {
-                    user: {
-                        email: email,
-                        password: password
-                    }
+
+                    Email: this.state.email,
+                    PassWord: this.state.password
+
                 },
                 { withCredentials: true }
             )
             .then(response => {
-                if (response.data.logged_in) {
-                    this.props.handleSuccessfulAuth(response.data);
+                if (response.data) {
+                    console.log(response.data)
                 }
             })
             .catch(error => {
                 console.log("login error", error);
             });
-        event.preventDefault();
+        
     }
     render() {
         return (

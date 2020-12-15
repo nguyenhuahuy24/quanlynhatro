@@ -29,11 +29,10 @@ class Resigter extends Component {
             .post(
                 "http://localhost:3001/registrations",
                 {
-                    user: {
-                        email: email,
-                        password: password,
-                        password_confirmation: password_confirmation
-                    }
+                   
+                        Email: email,
+                        Password: password
+                    
                 },
                 { withCredentials: true }
             )
