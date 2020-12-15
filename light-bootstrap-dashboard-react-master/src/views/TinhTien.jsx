@@ -9,7 +9,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
-import KhuTroService from '../service/khutroService';
+import BillService from '../service/billService';
 import { RadioButton } from "primereact/radiobutton";
 import classNames from 'classnames';
 import '../index.css';
@@ -19,32 +19,39 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
 
-class DienNuoc extends Component {
-  emptyProduct = {
+class TinhTien extends Component {
+  emptyBill = {
     id: null,
-    name: "",
-    description: "",
-    price: 0,
-    address: "",
-    inventoryStatus: ""
+    RoomId: null,
+    RoomNumber: null,
+    ElectricFee: null,
+    WaterFree: null,
+    RoomPrice: 0,
+    TotalBill: 0,
+    DateCreate: "",
+    OtherCrosts: null,
+    StartDate:"",
+    EndDate:"",
+    Status:null
   };
 
   constructor(props) {
     super(props);
    
     this.state = {
-      products: null,
-      productDialog: false,
-      deleteProductDialog: false,
-      deleteProductsDialog: false,
-      product: this.emptyProduct,
-      selectedProducts: null,
+      bills: null,
+      billDialog: false,
+      deleteBillDialog: false,
+      deleteBillsDialog: false,
+      bill: this.emptyBill,
+      selectedBills: null,
       submitted: false,
       globalFilter: null,
-      selectedKhuTro: null
+      selectedHouse: null,
+      selectedRoom:null
     };
 
-    this.productService = new KhuTroService();
+    this.billService = new BillService();
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
    
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
@@ -53,25 +60,26 @@ class DienNuoc extends Component {
     this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
-    this.saveProduct = this.saveProduct.bind(this);
-    this.editProduct = this.editProduct.bind(this);
-    this.confirmDeleteProduct = this.confirmDeleteProduct.bind(this);
-    this.deleteProduct = this.deleteProduct.bind(this);
+    this.saveBill = this.saveBill.bind(this);
+    this.editBill = this.editBill.bind(this);
+    this.confirmDeleteBill = this.confirmDeleteBill.bind(this);
+    this.deleteBill = this.deleteBill.bind(this);
     this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-    this.deleteSelectedProducts = this.deleteSelectedProducts.bind(this);
+    this.deleteSelectedBills = this.deleteSelectedBills.bind(this);
 
-    this.onCityChange = this.onCityChange.bind(this);
+    this.onRoomsChange = this.onRoomsChange.bind(this);
+    this.onHousesChange = this.onHousesChange.bind(this);
 
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
-    this.hideDeleteProductDialog = this.hideDeleteProductDialog.bind(this);
-    this.hideDeleteProductsDialog = this.hideDeleteProductsDialog.bind(this);
+    this.hideDeleteBillDialog = this.hideDeleteBillDialog.bind(this);
+    this.hideDeleteBillsDialog = this.hideDeleteBillsDialog.bind(this);
   }
 
   componentDidMount() {
-    this.productService
-      .getProducts()
-      .then(data => this.setState({ products: data }));
+    this.billService
+      .getBills()
+      .then(data => this.setState({ bills: data }));
   }
 
   formatCurrency(value) {
@@ -80,105 +88,104 @@ class DienNuoc extends Component {
       currency: "VND"
     });
   }
-  onCityChange(e) {
-    this.setState({ selectedCity1: e.value });
+  onRoomsChange(e) {
+    this.setState({ selectedRoom: e.value });
+  }
+  onHousesChange(e) {
+    this.setState({ selectedHouse: e.value });
   }
   openNew() {
     this.setState({
-      product: this.emptyProduct,
+      bill: this.emptyBill,
       submitted: false,
-      productDialog: true
+      billDialog: true
     });
   }
 
   hideDialog() {
     this.setState({
       submitted: false,
-      productDialog: false
+      billDialog: false
     });
   }
 
-  hideDeleteProductDialog() {
-    this.setState({ deleteProductDialog: false });
+  hideDeleteBillDialog() {
+    this.setState({ deleteBillDialog: false });
   }
 
-  hideDeleteProductsDialog() {
-    this.setState({ deleteProductsDialog: false });
+  hideDeleteBillsDialog() {
+    this.setState({ deleteBillsDialog: false });
   }
 
-  saveProduct() {
+  saveBill() {
     let state = { submitted: true };
-
-    if (this.state.product.name.trim()) {
-      let products = [...this.state.products];
-      let product = { ...this.state.product };
-      if (this.state.product.id) {
-        const index = this.findIndexById(this.state.product.id);
-
-        products[index] = product;
+    if (this.state.bill.id) {
+      let bills = [...this.state.bills];
+      let bill = { ...this.state.bill };
+      if (this.state.bill.id) {
+        const index = this.findIndexById(this.state.bill.id);
+        bills[index] = bill;
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Product Updated",
+          detail: "Bill Updated",
           life: 3000
         });
       } else {
-        product.id = this.createId();
-        products.push(product);
+        bills.push(bill);
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Product Created",
+          detail: "Bill Created",
           life: 3000
         });
       }
 
       state = {
         ...state,
-        products,
+        bills,
         productDialog: false,
-        product: this.emptyProduct
+        bill: this.emptyBill
       };
     }
-
     this.setState(state);
   }
 
-  editProduct(product) {
+  editBill(bill) {
     this.setState({
-      product: { ...product },
-      productDialog: true
+      bill: { ...bill },
+      billDialog: true
     });
   }
 
-  confirmDeleteProduct(product) {
+  confirmDeleteBill(bill) {
     this.setState({
-      product,
-      deleteProductDialog: true
+      bill,
+      deleteBillDialog: true
     });
   }
 
-  deleteProduct() {
-    let products = this.state.products.filter(
-      (val) => val.id !== this.state.product.id
+  deleteBill() {
+    let bills = this.state.bills.filter(
+      (val) => val.id !== this.state.bill.id
     );
     this.setState({
-      products,
-      deleteProductDialog: false,
-      product: this.emptyProduct
+      bills,
+      deleteBillDialog: false,
+      bill: this.emptyBill
     });
     this.toast.show({
       severity: "success",
       summary: "Successful",
-      detail: "Product Deleted",
+      detail: "Bill Deleted",
       life: 3000
     });
   }
 
   findIndexById(id) {
     let index = -1;
-    for (let i = 0; i < this.state.products.length; i++) {
-      if (this.state.products[i].id === id) {
+    for (let i = 0; i < this.state.bills.length; i++) {
+      if (this.state.bills[i].id === id) {
         index = i;
         break;
       }
@@ -200,44 +207,44 @@ class DienNuoc extends Component {
   
 
   confirmDeleteSelected() {
-    this.setState({ deleteProductsDialog: true });
+    this.setState({ deleteBillsDialog: true });
   }
 
-  deleteSelectedProducts() {
-    let products = this.state.products.filter(
-      (val) => !this.state.selectedProducts.includes(val)
+  deleteSelectedBills() {
+    let bills = this.state.bills.filter(
+      (val) => !this.state.selectedBills.includes(val)
     );
     this.setState({
-      products,
-      deleteProductsDialog: false,
-      selectedProducts: null
+      bills,
+      deleteBillsDialog: false,
+      selectedBills: null
     });
     this.toast.show({
       severity: "success",
       summary: "Successful",
-      detail: "Products Deleted",
+      detail: "Bills Deleted",
       life: 3000
     });
   }
   onStatusChange(e) {
-    let product = { ...this.state.product };
-    product["inventoryStatus"] = e.value;
-    this.setState({ product });
+    let bill = { ...this.state.bill };
+    bill["Status"] = e.value;
+    this.setState({ bill });
   }
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
-    let product = { ...this.state.product };
-    product[`${name}`] = val;
+    let bill = { ...this.state.bill };
+    bill[`${name}`] = val;
 
-    this.setState({ product });
+    this.setState({ bill });
   }
 
   onInputNumberChange(e, name) {
     const val = e.value || 0;
-    let product = { ...this.state.product };
-    product[`${name}`] = val;
+    let bill = { ...this.state.bill };
+    bill[`${name}`] = val;
 
-    this.setState({ product });
+    this.setState({ bill });
   }
 
   leftToolbarTemplate() {
@@ -264,7 +271,7 @@ class DienNuoc extends Component {
           className="p-button-danger"
           onClick={this.confirmDeleteSelected}
           disabled={
-            !this.state.selectedProducts || !this.state.selectedProducts.length
+            !this.state.selectedBills || !this.state.selectedBills.length
           }
         />
       </React.Fragment>
@@ -277,9 +284,9 @@ class DienNuoc extends Component {
   statusBodyTemplate(rowData) {
     return (
       <span
-        className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}
+        className={`product-badge status-${rowData.Status.toLowerCase()}`}
       >
-        {rowData.inventoryStatus}
+        {rowData.Status}
       </span>
     );
   }
@@ -289,12 +296,12 @@ class DienNuoc extends Component {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
-          onClick={() => this.editProduct(rowData)}
+          onClick={() => this.editBill(rowData)}
         />
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-warning"
-          onClick={() => this.confirmDeleteProduct(rowData)}
+          onClick={() => this.confirmDeleteBill(rowData)}
         />
       </React.Fragment>
     );
@@ -303,15 +310,7 @@ class DienNuoc extends Component {
   render() {
     const header = (
       <div className="table-header">
-        <h5 className="p-m-0">Quản lý điện nước</h5>
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            type="search"
-            onInput={(e) => this.setState({ globalFilter: e.target.value })}
-            placeholder="Search..."
-          />
-        </span>
+        <h5 className="p-m-0">Tính tiền</h5>
       </div>
     );
     const productDialogFooter = (
@@ -326,39 +325,39 @@ class DienNuoc extends Component {
           label="Save"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.saveProduct}
+          onClick={this.saveBill}
         />
       </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const deleteBillDialogFooter = (
       <React.Fragment>
         <Button
           label="No"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteProductDialog}
+          onClick={this.hideDeleteBillDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteProduct}
+          onClick={this.deleteBill}
         />
       </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
+    const deleteBillsDialogFooter = (
       <React.Fragment>
         <Button
           label="No"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteProductsDialog}
+          onClick={this.hideDeleteBillsDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteSelectedProducts}
+          onClick={this.deleteSelectedBills}
         />
       </React.Fragment>
     );
@@ -377,9 +376,9 @@ class DienNuoc extends Component {
           <DataTable
             ref={(el) => (this.dt = el)}
             value={this.state.products}
-            selection={this.state.selectedProducts}
+            selection={this.state.selectedBills}
             onSelectionChange={(e) =>
-              this.setState({ selectedProducts: e.value })
+              this.setState({ selectedBills: e.value })
             }
             dataKey="id"
             paginator
@@ -507,12 +506,12 @@ class DienNuoc extends Component {
         </Dialog>
 
         <Dialog
-          visible={this.state.deleteProductDialog}
+          visible={this.state.deleteBillDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
-          footer={deleteProductDialogFooter}
-          onHide={this.hideDeleteProductDialog}
+          footer={deleteBillDialogFooter}
+          onHide={this.hideDeleteBillDialog}
         >
           <div className="confirmation-content">
             <i
@@ -529,12 +528,12 @@ class DienNuoc extends Component {
         </Dialog>
 
         <Dialog
-          visible={this.state.deleteProductsDialog}
+          visible={this.state.deleteBillsDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
-          footer={deleteProductsDialogFooter}
-          onHide={this.hideDeleteProductsDialog}
+          footer={deleteBillsDialogFooter}
+          onHide={this.hideDeleteBillsDialog}
         >
           <div className="confirmation-content">
             <i
@@ -553,4 +552,4 @@ class DienNuoc extends Component {
   }
   }
 
-export default DienNuoc;
+export default TinhTien;

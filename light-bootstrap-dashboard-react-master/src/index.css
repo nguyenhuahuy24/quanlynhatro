@@ -110,19 +110,14 @@ input[type="number"]::-webkit-inner-spin-button {
     background: #C8E6C9;
     color: #604125;
 }
-.product-badge.status-ConPhong {
+.product-badge.status-1 {
     background: #C8E6C9;
     color: #256029;
 }
 
-.product-badge.status-HetPhong {
+.product-badge.status-0 {
     background: #FFCDD2;
     color: #C63737;
-}
-
-.product-badge.status-SuaChua {
-    background: #FEEDAF;
-    color: #8A5340;
 }
 
 .order-badge {
@@ -231,4 +226,5 @@ img.flag {
     align-items: center;
     justify-content: center;
 }
+
                                     

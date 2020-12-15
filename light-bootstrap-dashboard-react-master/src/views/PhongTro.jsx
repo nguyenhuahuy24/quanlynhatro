@@ -10,6 +10,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
 import PhongTroService from '../service/phongtroService';
+import NhaTroService from '../service/nhatroService';
 import { RadioButton } from "primereact/radiobutton";
 import classNames from 'classnames';
 import '../index.css';
@@ -18,31 +19,40 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
+
 class PhongTro extends Component {
   emptyRoom = {
     id: null,
-    name: "",
-    description: "",
-    price: 0,
-    number: 0,
-    inventoryStatus: "",
-    datestart: "",
-    image:null
+    RoomNumber: "",
+    Length: null,
+    Width: null,
+    Price: 0,
+    Details: "",
+    Image: null,
+    HouseId: null,
+    Status: 0
   };
+  emptyHouse = {
+    houseId: null,
+    name: ""
+  }
   constructor(props) {
     super(props);
 
     this.state = {
+      houses: null,
       rooms: null,
       roomDialog: false,
       deleteRoomDialog: false,
       deleteRoomsDialog: false,
       room: this.emptyRoom,
+      house: this.emptyHouse,
       selectedRooms: null,
       submitted: false,
       globalFilter: null,
-      selectedKhuTro: null
+      onKhuTroChange: null
     };
+    this.nhatroService = new NhaTroService();
     this.phongtroService = new PhongTroService();
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
@@ -56,16 +66,20 @@ class PhongTro extends Component {
     this.deleteRoom = this.deleteRoom.bind(this);
     this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
     this.deleteSelectedRooms = this.deleteSelectedRooms.bind(this);
-    this.onCityChange = this.onCityChange.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.hideDeleteRoomDialog = this.hideDeleteRoomDialog.bind(this);
     this.hideDeleteRoomsDialog = this.hideDeleteRoomsDialog.bind(this);
+    this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
+    this.onKhuTroChange = this.onKhuTroChange.bind(this);
   }
   componentDidMount() {
     this.phongtroService
-      .getPhongTros()
+      .getRooms()
       .then(data => this.setState({ rooms: data }));
+    this.nhatroService
+      .getHouses()
+      .then(data => this.setState({ houses: data }));
   }
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
@@ -73,14 +87,24 @@ class PhongTro extends Component {
       currency: "VND"
     });
   }
-  onCityChange(e) {
+  onKhuTroChange(e) {
+   /*
+    let rooms = this.state.rooms.filter(
+      (val) => val.HouseId == this.state.house.houseId
+    );
+    this.setState({
+      rooms,
+      deleteRoomDialog: false,
+      room: this.emptyRoom
+    });
+    */
     this.setState({ selectedKhuTro: e.value });
   }
   openNew() {
     this.setState({
       room: this.emptyRoom,
       submitted: false,
-      RoomDialog: true
+      roomDialog: true
     });
   }
   hideDialog() {
@@ -95,10 +119,16 @@ class PhongTro extends Component {
   hideDeleteRoomsDialog() {
     this.setState({ deleteRoomsDialog: false });
   }
+  statusBodyTemplate(rowData) {
+    if (rowData.Status == "1") {
+      return <span className={`product-badge status-${rowData.Status}`}>{"Đã thuê"}</span>;
+    }
+    if (rowData.Status == "0") { return <span className={`product-badge status-${rowData.Status}`}>{"Trống"}</span>; }
+  }
   saveRoom() {
     let state = { submitted: true };
 
-    if (this.state.room.name.trim()) {
+    if (this.state.room.id) {
       let rooms = [...this.state.rooms];
       let room = { ...this.state.room };
       if (this.state.room.id) {
@@ -112,7 +142,6 @@ class PhongTro extends Component {
           life: 3000
         });
       } else {
-        room.id = this.createId();
         rooms.push(room);
         this.toast.show({
           severity: "success",
@@ -171,15 +200,6 @@ class PhongTro extends Component {
 
     return index;
   }
-  createId() {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
   confirmDeleteSelected() {
     this.setState({ deleteRoomsDialog: true });
   }
@@ -201,7 +221,7 @@ class PhongTro extends Component {
   }
   onStatusChange(e) {
     let room = { ...this.state.room };
-    room["inventoryStatus"] = e.value;
+    room["Status"] = e.value;
     this.setState({ room });
   }
   onInputChange(e, name) {
@@ -224,18 +244,18 @@ class PhongTro extends Component {
         <Dropdown
           className="p-mr-2"
           value={this.state.selectedKhuTro}
-          options={this.state.rooms}
-          onChange={this.onCityChange}
+          options={this.state.houses}
+          onChange={this.onKhuTroChange}
           optionLabel="name"
           placeholder="Chọn khu trọ"
 
         />
         <Button
-          label="New"
+          label="Thêm phòng"
           icon="pi pi-plus"
           className="p-button-success p-mr-2"
           onClick={this.openNew}
-         // disabled={!this.state.selectedKhuTro}
+        // disabled={!this.state.selectedKhuTro}
         />
         <Button
           label="Delete"
@@ -250,7 +270,7 @@ class PhongTro extends Component {
     );
   }
   priceBodyTemplate(rowData) {
-    return this.formatCurrency(rowData.price);
+    return this.formatCurrency(rowData.Price);
   }
   actionBodyTemplate(rowData) {
     return (
@@ -358,21 +378,23 @@ class PhongTro extends Component {
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
             ></Column>
-            <Column field="name" header="Tên Phòng" ></Column>
+            <Column field="RoomNumber" header="Phòng số" ></Column>
             <Column
-              field="price"
+              field="Price"
               header="Giá Phòng"
               body={this.priceBodyTemplate}
               sortable
             ></Column>
-
-            <Column field="description" header="Ghi chú" ></Column>
-            {/* <Column
-              field="inventoryStatus"
+            <Column 
+              field="HouseId" 
+              header="Nhà Trọ"
+              ></Column>
+            <Column field="Details" header="Ghi chú" ></Column>
+            <Column
+              field="Status"
               header="Tình Trạng"
               body={this.statusBodyTemplate}
-              
-            ></Column> */}
+            ></Column>
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>
         </div>
@@ -386,74 +408,84 @@ class PhongTro extends Component {
           onHide={this.hideDialog}
         >
           <div className="p-field">
-            <label htmlFor="name">Tên phòng</label>
+            <label htmlFor="RoomNumber">Phòng số</label>
             <InputText
-              id="name"
-              value={this.state.room.name}
-              onChange={(e) => this.onInputChange(e, "name")}
+              id="RoomNumber"
+              value={this.state.room.RoomNumber}
+              onChange={(e) => this.onInputChange(e, "RoomNumber")}
               required
               autoFocus
               className={classNames({
-                "p-invalid": this.state.submitted && !this.state.room.name
+                "p-invalid": this.state.submitted && !this.state.room.RoomNumber
               })}
             />
-            {this.state.submitted && !this.state.room.name && (
-              <small className="p-invalid">Name is required.</small>
+            {this.state.submitted && !this.state.room.RoomNumber && (
+              <small className="p-invalid">Không bỏ trống.</small>
             )}
           </div>
           <div className="p-field">
-            <label htmlFor="price">Giá phòng</label>
+            <label htmlFor="Price">Giá phòng</label>
             <InputNumber
               id="price"
-              value={this.state.room.price}
-              onValueChange={(e) => this.onInputNumberChange(e, "price")}
+              value={this.state.room.Price}
+              onValueChange={(e) => this.onInputNumberChange(e, "Price")}
               mode="currency"
               currency="Vnd"
             />
           </div>
-          <div className="p-field">
-            <label htmlFor="number">Số lượng người tối đa</label>
-            <InputNumber
-              id="number"
-              value={this.state.room.number}
-              onValueChange={(e) => this.onInputNumberChange(e, "number")}
-            />
-            
+          <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="Length">Chiều dài</label>
+              <InputText
+                id="Length"
+                value={this.state.room.Length}
+                onChange={(e) => this.onInputChange(e, "Length")}
+                required
+              />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="Width">Chiều rộng</label>
+              <InputText
+                id="Width"
+                value={this.state.room.Width}
+                onChange={(e) => this.onInputChange(e, "Width")}
+                required
+              /> </div>
           </div>
           <div className="p-field">
-            <label htmlFor="description">Ghi chú</label>
+            <label htmlFor="Details">Ghi chú</label>
             <InputText
-              id="description"
-              value={this.state.room.description}
-              onChange={(e) => this.onInputChange(e, "description")}
+              id="Details"
+              value={this.state.room.Details}
+              onChange={(e) => this.onInputChange(e, "Details")}
               required
-              
             />
-            
           </div>
           <div className="p-field">
             <label htmlFor="inventoryStatus">Tình trạng</label>
-            <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="inventoryStatus1"
-                  name="inventoryStatus"
-                  value="LOWSTOCK"
-                  onChange={this.onStatusChange}
-                  checked={this.state.room.inventoryStatus === "LOWSTOCK"}
-                />
-                <label htmlFor="inventoryStatus1">Hết Phòng</label>
-              </div>
+            <div className="p-formgrid p-grid">
               <div className="p-field-radiobutton p-col-6">
                 <RadioButton
-                  inputId="inventoryStatus2"
-                  name="inventoryStatus"
-                  value="OUTOFSTOCK"
+                  inputId="Status1"
+                  name="Status"
+                  value={1}
                   onChange={this.onStatusChange}
-                  checked={this.state.room.inventoryStatus === "OUTOFSTOCK"}
+                  checked={this.state.room.Status === 1}
                 />
-                <label htmlFor="inventoryStatus2">Còn phòng</label>
+                <label htmlFor="Status1">Đã thuê</label>
               </div>
-            
+
+              <div className="p-field-radiobutton p-col-6">
+                <RadioButton
+                  inputId="Status2"
+                  name="Status"
+                  value={0}
+                  onChange={this.onStatusChange}
+                  checked={this.state.room.Status === 0}
+                />
+                <label htmlFor="Status2">Trống</label>
+              </div>
+            </div>
           </div>
           <div className="p-field">
             <label htmlFor="image">Hình ảnh</label>
@@ -462,7 +494,7 @@ class PhongTro extends Component {
               value={this.state.room.name}
               onChange={(e) => this.onInputChange(e, "image")}
               required
-            />          
+            />
           </div>
         </Dialog>
         <Dialog
@@ -480,8 +512,7 @@ class PhongTro extends Component {
             />
             {this.state.room && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.room.name}</b>
-                ?
+                Bạn chắn chắn muốn xóa đã chọn ????
               </span>
             )}
           </div>

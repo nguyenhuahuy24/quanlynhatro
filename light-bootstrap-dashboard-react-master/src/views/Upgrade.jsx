@@ -1,10 +1,53 @@
 
 import React, { Component } from "react";
 import { Table, Grid, Row, Col } from "react-bootstrap";
-
+import axios from "axios";
 import Card from "components/Card/Card";
 
-class Icons extends Component {
+class Changpass extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+        email: "",
+        password: "",
+        loginErrors: ""
+    };
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+}
+
+handleChange(event) {
+    this.setState({
+        [event.target.name]: event.target.value
+    });
+}
+
+handleSubmit(event) {
+    const { email, password } = this.state;
+
+    axios
+        .post(
+            "http://localhost:3001/sessions",
+            {
+                user: {
+                    email: email,
+                    password: password
+                }
+            },
+            { withCredentials: true }
+        )
+        .then(response => {
+            if (response.data.logged_in) {
+                this.props.handleSuccessfulAuth(response.data);
+            }
+        })
+        .catch(error => {
+            console.log("login error", error);
+        });
+    event.preventDefault();
+}
   render() {
     return (
       <div className="content">
@@ -13,64 +56,41 @@ class Icons extends Component {
             <Col md={8} mdOffset={2}>
               <Card
                 hCenter
-                title="Light Bootstrap Dashboard PRO React"
-                category="Are you looking for more components? Please check our Premium Version of Light Bootstrap Dashboard React."
-                ctTableResponsive
-                ctTableFullWidth
-                ctTableUpgrade
+                title="Đổi mật khẩu"
                 content={
                   <Table>
-                    <thead>
-                      <tr>
-                        <th />
-                        <th className="text-center">Free</th>
-                        <th className="text-center">PRO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Components</td>
-                        <td>30</td>
-                        <td>60</td>
-                      </tr>
-                      <tr>
-                        <td>Plugins</td>
-                        <td>3</td>
-                        <td>13</td>
-                      </tr>
-                      <tr>
-                        <td>Example Pages</td>
-                        <td>7</td>
-                        <td>24</td>
-                      </tr>
-                      <tr>
-                        <td>Login/Register/Lock Pages</td>
-                        <td>
-                          <i className="fa fa-times text-danger" />
-                        </td>
-                        <td>
-                          <i className="fa fa-check text-success" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Premium Support</td>
-                        <td>
-                          <i className="fa fa-times text-danger" />
-                        </td>
-                        <td>
-                          <i className="fa fa-check text-success" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td />
-                        <td>Free</td>
-                        <td>Just $49</td>
-                      </tr>
-                      <tr>
-                        <td />
-                       
-                      </tr>
-                    </tbody>
+                    <div className="form">
+                      <div className="form-group">
+                        <label>Mật khẩu cũ</label>
+                        <input
+                          className="form-control"
+                          type="email"
+                          name="email"
+                          placeholder="Mật khẩu cũ"
+                          value={this.state.email}
+                          onChange={this.handleChange}
+                          required />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Mật khẩu mới</label>
+                        <input
+                          className="form-control"
+                          type="password"
+                          name="password"
+                          placeholder="Mật khẩu mới"
+                          value={this.state.password}
+                          onChange={this.handleChange}
+                          required />
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn"
+                        onClick={this.handleSubmit}
+                      >
+                        Submit</button>
+                    </div>
+
                   </Table>
                 }
               />
@@ -82,4 +102,4 @@ class Icons extends Component {
   }
 }
 
-export default Icons;
+export default Changpass;

@@ -1,13 +1,14 @@
 
 import Dashboard from "views/Dashboard.jsx";
 import PhongTro from "views/PhongTro.jsx";
-import KhuTro from "views/KhuTro.jsx";
+import Nha from "views/Nha.jsx";
 import KhachThue from "views/KhachThue.jsx";
-import Icons from "views/Icons.jsx";
-import DienNuoc from "views/DienNuoc.jsx";
-import Upgrade from "views/Upgrade.jsx";
+import Changpass from "views/Upgrade.jsx";
+import Dien from "views/Dien.jsx";
+import Nuoc from "views/Nuoc.jsx";
 import DichVu from "views/DichVu.jsx";
-
+import TinhTien from "views/TinhTien.jsx";
+import Icons from "views/Icons.jsx";
 
 const dashboardRoutes = [
   {
@@ -18,24 +19,17 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/khutro",
-    name: "Khu Trọ",
+    path: "/house",
+    name: "Nhà",
     icon: "pe-7s-home",
-    component: KhuTro,
+    component: Nha,
     layout: "/admin"
   },
   {
-    path: "/phongtro",
+    path: "/room",
     name: "Phòng Trọ",
     icon: "pe-7s-culture",
     component: PhongTro,
-    layout: "/admin"
-  },
-  {
-    path: "/khachthue",
-    name: "Khách Thuê",
-    icon: "pe-7s-user",
-    component: KhachThue,
     layout: "/admin"
   },
   {
@@ -46,6 +40,34 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
+    path: "/dien",
+    name: "Chỉ số Điện",
+    icon: "pe-7s-gleam",
+    component: Dien,
+    layout: "/admin"
+  },
+  {
+    path: "/nuoc",
+    name: "Chỉ số Nước",
+    icon: "pe-7s-drop",
+    component: Nuoc,
+    layout: "/admin"
+  },
+  {
+    path: "/tinhtien",
+    name: "Tính tiền",
+    icon: "pe-7s-cash",
+    component: TinhTien,
+    layout: "/admin"
+  },
+  {
+    path: "/khachthue",
+    name: "Khách Thuê",
+    icon: "pe-7s-user",
+    component: KhachThue,
+    layout: "/admin"
+  },
+  {
     path: "/icons",
     name: "Hóa đơn",
     icon: "pe-7s-news-paper",
@@ -53,18 +75,10 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/diennuoc",
-    name: "Điện nước",
-    icon: "pe-7s-attention",
-    component: DienNuoc,
-    layout: "/admin"
-  },
-  {
-    upgrade: true,
-    path: "/upgrade",
-    name: "Cài Đặt",
+    path: "/changpass",
+    name: "Đổi mật khẩu",
     icon: "pe-7s-config",
-    component: Upgrade,
+    component: Changpass,
     layout: "/admin"
   }
 ];

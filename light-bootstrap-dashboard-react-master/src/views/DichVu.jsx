@@ -1,3 +1,8 @@
+import '../index.css';
+import 'primeflex/primeflex.css';
+import 'primeicons/primeicons.css';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.css';
 import React, { Component } from "react";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -9,18 +14,12 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
-import KhuTroService from '../service/khutroService';
+import DichVuService from '../service/dichvuService';
 import { RadioButton } from "primereact/radiobutton";
 import classNames from 'classnames';
-import '../index.css';
-import 'primeflex/primeflex.css';
-import 'primeicons/primeicons.css';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.css';
-import '../index.css';
 
 class DichVu extends Component {
-  emptyProduct = {
+  emptyDV = {
     id: null,
     name: "",
     caterogy: "",
@@ -32,19 +31,19 @@ class DichVu extends Component {
     super(props);
 
     this.state = {
-      products: null,
-      productDialog: false,
-      deleteProductDialog: false,
-      deleteProductsDialog: false,
-      product: this.emptyProduct,
-      selectedProducts: null,
+      DVs: null,
+      DVDialog: false,
+      deleteDVDialog: false,
+      deleteDVsDialog: false,
+      DV: this.emptyDV,
+      selectedDVs: null,
       submitted: false,
       globalFilter: null,
       selectedCategory: null,
       
     };
 
-    this.productService = new KhuTroService();
+    this.DVService = new DichVuService();
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
 
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
@@ -53,132 +52,118 @@ class DichVu extends Component {
     this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
-    this.saveProduct = this.saveProduct.bind(this);
-    this.editProduct = this.editProduct.bind(this);
-    this.confirmDeleteProduct = this.confirmDeleteProduct.bind(this);
-    this.deleteProduct = this.deleteProduct.bind(this);
+    this.saveDV = this.saveDV.bind(this);
+    this.editDV = this.editDV.bind(this);
+    this.confirmDeleteDV = this.confirmDeleteDV.bind(this);
+    this.deleteDV = this.deleteDV.bind(this);
     this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-    this.deleteSelectedProducts = this.deleteSelectedProducts.bind(this);
-
-    this.onCityChange = this.onCityChange.bind(this);
-
+    this.deleteSelectedDVs = this.deleteSelectedDVs.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
-    this.hideDeleteProductDialog = this.hideDeleteProductDialog.bind(this);
-    this.hideDeleteProductsDialog = this.hideDeleteProductsDialog.bind(this);
+    this.hideDeleteDVDialog = this.hideDeleteDVDialog.bind(this);
+    this.hideDeleteDVsDialog = this.hideDeleteDVsDialog.bind(this);
+    this.onDichVuChange = this.onDichVuChange.bind(this);
   }
-
   componentDidMount() {
-    this.productService
-      .getProducts()
-      .then(data => this.setState({ products: data }));
+    this.DVService
+      .getDichVus()
+      .then(data => this.setState({ DVs: data }));
   }
-
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
       style: "currency",
       currency: "VND"
     });
   }
-  onCityChange(e) {
-    this.setState({ selectedCategory: e.value });
-  }
   openNew() {
     this.setState({
-      product: this.emptyProduct,
+      DV: this.emptyDV,
       submitted: false,
-      productDialog: true
+      DVDialog: true
     });
   }
-
+  onDichVuChange(e) {
+     this.setState({ selectedCategory: e.value });
+   }
   hideDialog() {
     this.setState({
       submitted: false,
-      productDialog: false
+      DVDialog: false
     });
   }
-
-  hideDeleteProductDialog() {
-    this.setState({ deleteProductDialog: false });
+  hideDeleteDVDialog() {
+    this.setState({ deleteDVDialog: false });
   }
-
-  hideDeleteProductsDialog() {
-    this.setState({ deleteProductsDialog: false });
+  hideDeleteDVsDialog() {
+    this.setState({ deleteDVsDialog: false });
   }
-
-  saveProduct() {
+  saveDV() {
     let state = { submitted: true };
 
-    if (this.state.product.name.trim()) {
-      let products = [...this.state.products];
-      let product = { ...this.state.product };
-      if (this.state.product.id) {
-        const index = this.findIndexById(this.state.product.id);
+    if (this.state.DV.name.trim()) {
+      let DVs = [...this.state.DVs];
+      let DV = { ...this.state.DV };
+      if (this.state.DV.id) {
+        const index = this.findIndexById(this.state.DV.id);
 
-        products[index] = product;
+        DVs[index] = DV;
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Product Updated",
+          detail: "Dịch Vụ Updated",
           life: 3000
         });
       } else {
-        product.id = this.createId();
-        products.push(product);
+        DVs.push(DV);
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Product Created",
+          detail: "Dịch Vụ Created",
           life: 3000
         });
       }
 
       state = {
         ...state,
-        products,
-        productDialog: false,
-        product: this.emptyProduct
+        DVs,
+        DVDialog: false,
+        DV: this.emptyDV
       };
     }
-
     this.setState(state);
   }
-
-  editProduct(product) {
+  editDV(DV) {
     this.setState({
-      product: { ...product },
-      productDialog: true
+      DV: { ...DV },
+      DVDialog: true
     });
   }
-
-  confirmDeleteProduct(product) {
+  confirmDeleteDV(DV) {
     this.setState({
-      product,
-      deleteProductDialog: true
+      DV,
+      deleteDVDialog: true
     });
   }
-
-  deleteProduct() {
-    let products = this.state.products.filter(
-      (val) => val.id !== this.state.product.id
+  deleteDV() {
+    let DVs = this.state.DVs.filter(
+      (val) => val.id !== this.state.DV.id
     );
     this.setState({
-      products,
-      deleteProductDialog: false,
-      product: this.emptyProduct
+      DVs,
+      deleteDVDialog: false,
+      DV: this.emptyDV
     });
     this.toast.show({
       severity: "success",
       summary: "Successful",
-      detail: "Product Deleted",
+      detail: "DV Deleted",
       life: 3000
     });
   }
-
   findIndexById(id) {
     let index = -1;
-    for (let i = 0; i < this.state.products.length; i++) {
-      if (this.state.products[i].id === id) {
+    for (let i = 0; i < this.state.DVs.length; i++) {
+      if (this.state.DVs[i].id === id) {
         index = i;
         break;
       }
@@ -186,65 +171,48 @@ class DichVu extends Component {
 
     return index;
   }
-
-  createId() {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
-
-
-
   confirmDeleteSelected() {
-    this.setState({ deleteProductsDialog: true });
+    this.setState({ deleteDVsDialog: true });
   }
-
-  deleteSelectedProducts() {
-    let products = this.state.products.filter(
-      (val) => !this.state.selectedProducts.includes(val)
+  deleteSelectedDVs() {
+    let DVs = this.state.DVs.filter(
+      (val) => !this.state.selectedDVs.includes(val)
     );
     this.setState({
-      products,
-      deleteProductsDialog: false,
-      selectedProducts: null
+      DVs,
+      deleteDVsDialog: false,
+      selectedDVs: null
     });
     this.toast.show({
       severity: "success",
       summary: "Successful",
-      detail: "Products Deleted",
+      detail: "DVs Deleted",
       life: 3000
     });
   }
   onStatusChange(e) {
-    let product = { ...this.state.product };
-    product["status"] = e.value;
-    this.setState({ product });
+    let DV = { ...this.state.DV };
+    DV["status"] = e.value;
+    this.setState({ DV });
   }
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
-    let product = { ...this.state.product };
-    product[`${name}`] = val;
-
-    this.setState({ product });
+    let DV = { ...this.state.DV };
+    DV[`${name}`] = val;
+    this.setState({ DV });
   }
-
   onInputNumberChange(e, name) {
     const val = e.value || 0;
-    let product = { ...this.state.product };
-    product[`${name}`] = val;
+    let DV = { ...this.state.DV };
+    DV[`${name}`] = val;
 
-    this.setState({ product });
+    this.setState({ DV });
   }
-
   rightToolbarTemplate() {
     return (
       <React.Fragment>
         <Button
-          label="Thêm"
+          label="Thêm dịch vụ"
           icon="pi pi-plus"
           className="p-button-success p-mr-2"
           onClick={this.openNew}
@@ -255,7 +223,7 @@ class DichVu extends Component {
           className="p-button-danger"
           onClick={this.confirmDeleteSelected}
           disabled={
-            !this.state.selectedProducts || !this.state.selectedProducts.length
+            !this.state.selectedDVs || !this.state.selectedDVs.length
           }
         />
       </React.Fragment>
@@ -264,15 +232,11 @@ class DichVu extends Component {
   priceBodyTemplate(rowData) {
     return this.formatCurrency(rowData.price);
   }
-
   statusBodyTemplate(rowData) {
-    return (
-      <span
-        className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}
-      >
-        {rowData.inventoryStatus}
-      </span>
-    );
+    if (rowData.status == "1") {
+      return <span className={`product-badge status-1`}>{"Đang Sử dụng"}</span>;
+    }
+    if (rowData.status == "0") { return <span className={`product-badge status-0`}>{"Hết Sử Dụng"}</span>; }
   }
   actionBodyTemplate(rowData) {
     return (
@@ -280,12 +244,12 @@ class DichVu extends Component {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
-          onClick={() => this.editProduct(rowData)}
+          onClick={() => this.editDV(rowData)}
         />
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-warning"
-          onClick={() => this.confirmDeleteProduct(rowData)}
+          onClick={() => this.confirmDeleteDV(rowData)}
         />
       </React.Fragment>
     );
@@ -305,7 +269,7 @@ class DichVu extends Component {
         </span>
       </div>
     );
-    const productDialogFooter = (
+    const DVDialogFooter = (
       <React.Fragment>
         <Button
           label="Cancel"
@@ -317,39 +281,39 @@ class DichVu extends Component {
           label="Save"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.saveProduct}
+          onClick={this.saveDV}
         />
       </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const deleteDVDialogFooter = (
       <React.Fragment>
         <Button
           label="No"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteProductDialog}
+          onClick={this.hideDeleteDVDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteProduct}
+          onClick={this.deleteDV}
         />
       </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
+    const deleteDVsDialogFooter = (
       <React.Fragment>
         <Button
           label="No"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteProductsDialog}
+          onClick={this.hideDeleteDVsDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteSelectedProducts}
+          onClick={this.deleteSelectedDVs}
         />
       </React.Fragment>
     );
@@ -357,27 +321,24 @@ class DichVu extends Component {
     return (
       <div className="datatable-crud-demo">
         <Toast ref={(el) => (this.toast = el)} />
-
         <div className="card">
           <Toolbar
             className="p-mb-4"
-
             right={this.rightToolbarTemplate}
           ></Toolbar>
-
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.state.products}
-            selection={this.state.selectedProducts}
+            value={this.state.DVs}
+            selection={this.state.selectedDVs}
             onSelectionChange={(e) =>
-              this.setState({ selectedProducts: e.value })
+              this.setState({ selectedDVs: e.value })
             }
             dataKey="id"
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} DVs"
             globalFilter={this.state.globalFilter}
             header={header}
           >
@@ -393,7 +354,7 @@ class DichVu extends Component {
               sortable
             ></Column>
             <Column
-              field="inventoryStatus"
+              field="status"
               header="Tình Trạng"
               body={this.statusBodyTemplate}
               sortable
@@ -403,27 +364,27 @@ class DichVu extends Component {
         </div>
 
         <Dialog
-          visible={this.state.productDialog}
+          visible={this.state.DVDialog}
           style={{ width: "450px" }}
           header="Thông tin khu trọ"
           modal
           className="p-fluid"
-          footer={productDialogFooter}
+          footer={DVDialogFooter}
           onHide={this.hideDialog}
         >
           <div className="p-field">
             <label htmlFor="name">Tên dịch vụ</label>
             <InputText
               id="name"
-              value={this.state.product.name}
+              value={this.state.DV.name}
               onChange={(e) => this.onInputChange(e, "name")}
               required
               autoFocus
               className={classNames({
-                "p-invalid": this.state.submitted && !this.state.product.name
+                "p-invalid": this.state.submitted && !this.state.DV.name
               })}
             />
-            {this.state.submitted && !this.state.product.name && (
+            {this.state.submitted && !this.state.DV.name && (
               <small className="p-invalid">Tên không được để trống.</small>
             )}
           </div>
@@ -431,7 +392,7 @@ class DichVu extends Component {
             <label htmlFor="price">Giá cả</label>
             <InputNumber
               id="price"
-              value={this.state.product.price}
+              value={this.state.DV.price}
               onValueChange={(e) => this.onInputNumberChange(e, "price")}
               mode="currency"
               currency="Vnd"
@@ -442,20 +403,17 @@ class DichVu extends Component {
             <Dropdown
               className="p-mr-2"
               value={this.state.selectedCategory}
-              options={this.state.product.caterogy}
-              onChange={this.onCityChange}
+              options={this.state.DV.caterogy}
+              onChange={this.selectedCategory}
               optionLabel="name"
               placeholder="Chọn loại dịch vụ"
-
             />
           </div>
-
-
           <div className="p-field">
             <label htmlFor="description">Ghi chú</label>
             <InputTextarea
               id="description"
-              value={this.state.product.description}
+              value={this.state.DV.description}
               onChange={(e) => this.onInputChange(e, "description")}
               required
             />
@@ -467,64 +425,61 @@ class DichVu extends Component {
                 <RadioButton
                   inputId="status1"
                   name="status"
-                  value="INSTOCK"
+                  value={1}
                   onChange={this.onStatusChange}
-                  checked={this.state.product.status === "INSTOCK"}
+                  checked={this.state.DV.status === 1}
                 />
-                <label htmlFor="status1">Sử dụng</label>
+                <label htmlFor="status1">Đang Sử dụng</label>
               </div>
               <div className="p-field-radiobutton p-col-6">
                 <RadioButton
                   inputId="status2"
                   name="status"
-                  value="LOWSTOCK"
+                  value={0}
                   onChange={this.onStatusChange}
-                  checked={this.state.product.status === "LOWSTOCK"}
+                  checked={this.state.DV.status === 0}
                 />
                 <label htmlFor="status2">Không sử dụng</label>
               </div>
 
             </div>
           </div>
-
-
         </Dialog>
-
         <Dialog
-          visible={this.state.deleteProductDialog}
+          visible={this.state.deleteDVDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
-          footer={deleteProductDialogFooter}
-          onHide={this.hideDeleteProductDialog}
+          footer={deleteDVDialogFooter}
+          onHide={this.hideDeleteDVDialog}
         >
           <div className="confirmation-content">
             <i
               className="pi pi-exclamation-triangle p-mr-3"
               style={{ fontSize: "2rem" }}
             />
-            {this.state.product && (
+            {this.state.DV && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.product.name}</b>
-                ?
+                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.DV.name}</b>
+                 ?
               </span>
             )}
           </div>
         </Dialog>
         <Dialog
-          visible={this.state.deleteProductsDialog}
+          visible={this.state.deleteDVsDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
-          footer={deleteProductsDialogFooter}
-          onHide={this.hideDeleteProductsDialog}
+          footer={deleteDVsDialogFooter}
+          onHide={this.hideDeleteDVsDialog}
         >
           <div className="confirmation-content">
             <i
               className="pi pi-exclamation-triangle p-mr-3"
               style={{ fontSize: "2rem" }}
             />
-            {this.state.product && (
+            {this.state.DV && (
               <span>
                 Bạn chắc chắn muốn xóa tất cả đã chọn ??
               </span>

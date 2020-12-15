@@ -81,7 +81,7 @@ class KhachThue extends Component {
 
   componentDidMount() {
     this.userService
-      .getUsers()
+      .getKhachThue()
       .then(data => this.setState({ users: data }));
   }
 

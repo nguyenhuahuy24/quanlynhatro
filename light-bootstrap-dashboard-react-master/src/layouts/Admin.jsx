@@ -88,7 +88,6 @@ class Admin extends Component {
       autoDismiss: 15
     });
   }
- 
   render() {
     return (
       <div className="wrapper">
