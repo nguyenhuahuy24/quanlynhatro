@@ -4,14 +4,14 @@ import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { InputNumber } from 'primereact/inputnumber';
+import { Calendar } from 'primereact/calendar'
+import { RadioButton } from 'primereact/radiobutton'
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
 import BillService from '../service/billService';
-import { RadioButton } from "primereact/radiobutton";
-import classNames from 'classnames';
+import PhongTroService from '../service/phongtroService';
+import NhaTroService from '../service/nhatroService';
+import UserContext from "../context/UserContext";
 import '../index.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -20,27 +20,30 @@ import 'primereact/resources/primereact.css';
 import '../index.css';
 
 class TinhTien extends Component {
+  static contextType = UserContext
   emptyBill = {
-    id: null,
     RoomId: null,
     RoomNumber: null,
     ElectricFee: null,
     WaterFree: null,
     RoomPrice: 0,
     TotalBill: 0,
-    DateCreate: "",
+    DateCreate: new Date(),
     OtherCrosts: null,
-    StartDate:"",
-    EndDate:"",
-    Status:null
+    StartDate: "",
+    EndDate: "",
+    Status: null
   };
-
   constructor(props) {
     super(props);
-   
+
     this.state = {
+     // loginuserID: localStorage.getItem("userIDlogin"),
+      houses:null,
+      room:null,
       bills: null,
       billDialog: false,
+      ConfirmBillDialog:false,
       deleteBillDialog: false,
       deleteBillsDialog: false,
       bill: this.emptyBill,
@@ -48,51 +51,96 @@ class TinhTien extends Component {
       submitted: false,
       globalFilter: null,
       selectedHouse: null,
-      selectedRoom:null
+      selectedShowHouse: null,
+      selectedShowRoom:null,
+      selectedRoom: null,
+      selectedMonth: "",
+      
     };
 
     this.billService = new BillService();
+    this.nhatroService = new NhaTroService();
+    this.phongtroService = new PhongTroService();
+    this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
+  
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
-   
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
-    this.saveBill = this.saveBill.bind(this);
-    this.editBill = this.editBill.bind(this);
+    this.hideConfirmBillDialog = this.hideConfirmBillDialog.bind(this);
+    this.ThanhToan = this.ThanhToan.bind(this);
+    this.TinhBill = this.TinhBill.bind(this);
+    this.ThanhToanBill = this.ThanhToanBill.bind(this);
     this.confirmDeleteBill = this.confirmDeleteBill.bind(this);
     this.deleteBill = this.deleteBill.bind(this);
     this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-    this.deleteSelectedBills = this.deleteSelectedBills.bind(this);
-
     this.onRoomsChange = this.onRoomsChange.bind(this);
     this.onHousesChange = this.onHousesChange.bind(this);
-
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.hideDeleteBillDialog = this.hideDeleteBillDialog.bind(this);
     this.hideDeleteBillsDialog = this.hideDeleteBillsDialog.bind(this);
   }
-
   componentDidMount() {
-    this.billService
-      .getBills()
-      .then(data => this.setState({ bills: data }));
+    const{userData,setUserData}= this.context;
+    this.nhatroService
+      .getHouseByUserId(userData.user)
+      .then(data => this.setState({ houses: data }));
   }
-
+  componentDidUpdate(prevProps, prevState){
+    if( prevState.selectedHouse!==this.state.selectedHouse){
+      const{userData,setUserData}= this.context;
+      this.phongtroService
+        .getRoomByHouseId(this.state.selectedHouse)
+        .then(data=> this.setState({rooms:data}));
+      this.billService
+        .getBillInMonthOfUser(this.state.selectedHouse,userData.user)
+        .then(response => {
+          console.log(response)
+          const bills = Object.values(response.Rooms);
+          let data = [];
+          console.log(bills)
+          bills.forEach(bill => {
+            if (bill.ListBill.length !== 0) {
+              data.push({
+               _id: bill.ListBill[0]._id,
+                RoomNumber: bill.RoomNumber,
+                TotalBill: bill.ListBill[0].TotalBill,
+                Status: bill.ListBill[0].Status
+              })
+            }
+          })  
+        
+          this.setState({ bills: { ...data } })
+        }).catch(err => console.log(err));
+    }
+  }
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
       style: "currency",
       currency: "VND"
     });
   }
+  onStatusChange(e) {
+    let bill = { ...this.state.bill };
+    bill["Status"] = e.value;
+    this.setState({ bill });
+  }
+  statusBodyTemplate(rowData) {
+    if (rowData.Status == "1") {
+      return <span className={`product-badge status-1`}>{"Đã thanh toán"}</span>;
+    }
+    if (rowData.Status == "0") { return <span className={`product-badge status-0`}>{"Chưa thanh toán"}</span>; }
+  }
   onRoomsChange(e) {
-    this.setState({ selectedRoom: e.value });
+    this.setState({ selectedRoom: e.value._id,selectedShowRoom:e.value });
   }
   onHousesChange(e) {
-    this.setState({ selectedHouse: e.value });
+    this.setState({ selectedHouse: e.value._id,selectedShowHouse:e.value });
+    
   }
   openNew() {
     this.setState({
@@ -108,7 +156,12 @@ class TinhTien extends Component {
       billDialog: false
     });
   }
-
+  hideConfirmBillDialog() {
+    this.setState({
+      submitted: false,
+      ConfirmBillDialog: false
+    });
+  }
   hideDeleteBillDialog() {
     this.setState({ deleteBillDialog: false });
   }
@@ -116,45 +169,54 @@ class TinhTien extends Component {
   hideDeleteBillsDialog() {
     this.setState({ deleteBillsDialog: false });
   }
-
-  saveBill() {
-    let state = { submitted: true };
-    if (this.state.bill.id) {
-      let bills = [...this.state.bills];
-      let bill = { ...this.state.bill };
-      if (this.state.bill.id) {
-        const index = this.findIndexById(this.state.bill.id);
-        bills[index] = bill;
+  ThanhToan() {
+    let state = { submitted: true }; 
+   
+    let a ={Status:this.state.bill.Status}
+    this.billService.updateBill(this.state.bill._id,a).then();
         this.toast.show({
           severity: "success",
           summary: "Successful",
-          detail: "Bill Updated",
+          detail: "Bill Update",
           life: 3000
         });
-      } else {
-        bills.push(bill);
+    state = {
+        ...state,
+        bills:null,
+        selectedShowHouse:null,
+        selectedHouse:null,
+        ConfirmBillDialog: false,
+        bill: this.emptyBill
+      };
+    this.setState(state);
+  }
+  TinhBill() {
+    let state = { submitted: true }; 
+    let a ={RoomId:this.state.selectedRoom}
+    this.billService.createBill(a).then();
         this.toast.show({
           severity: "success",
           summary: "Successful",
           detail: "Bill Created",
           life: 3000
         });
-      }
-
-      state = {
+    state = {
         ...state,
-        bills,
-        productDialog: false,
+        bills:null,
+        selectedShowHouse:null,
+        selectedHouse:null,
+        selectedRoom:null,
+        selectedHouse: null,
+        billDialog: false,
         bill: this.emptyBill
       };
-    }
     this.setState(state);
   }
 
-  editBill(bill) {
+  ThanhToanBill(bill) {
     this.setState({
       bill: { ...bill },
-      billDialog: true
+      ConfirmBillDialog: true
     });
   }
 
@@ -164,73 +226,30 @@ class TinhTien extends Component {
       deleteBillDialog: true
     });
   }
-
   deleteBill() {
-    let bills = this.state.bills.filter(
-      (val) => val.id !== this.state.bill.id
-    );
-    this.setState({
-      bills,
-      deleteBillDialog: false,
-      bill: this.emptyBill
-    });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Bill Deleted",
-      life: 3000
-    });
-  }
-
-  findIndexById(id) {
-    let index = -1;
-    for (let i = 0; i < this.state.bills.length; i++) {
-      if (this.state.bills[i].id === id) {
-        index = i;
-        break;
+    this.state.billService.deleteBill(this.state.bill._id).then(data => {
+      if (data["deletedCount" === 1]) {
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Xóa Bill",
+          life: 3000
+        });
       }
-    }
-
-    return index;
+      else {
+        this.toast.show({
+          severity: "success",
+          summary: "Fail",
+          detail: "Xóa Bill",
+          life: 3000
+        });
+      }
+    })
   }
-
-  createId() {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
-
-  
-
   confirmDeleteSelected() {
     this.setState({ deleteBillsDialog: true });
   }
-
-  deleteSelectedBills() {
-    let bills = this.state.bills.filter(
-      (val) => !this.state.selectedBills.includes(val)
-    );
-    this.setState({
-      bills,
-      deleteBillsDialog: false,
-      selectedBills: null
-    });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Bills Deleted",
-      life: 3000
-    });
-  }
-  onStatusChange(e) {
-    let bill = { ...this.state.bill };
-    bill["Status"] = e.value;
-    this.setState({ bill });
-  }
+ 
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
     let bill = { ...this.state.bill };
@@ -250,20 +269,50 @@ class TinhTien extends Component {
   leftToolbarTemplate() {
     return (
       <React.Fragment>
-        <Dropdown
+        <label className="p-mr-2" htmlFor="datestart">Tháng/Năm </label>
+        <Calendar
+          id="monthpicker"
           className="p-mr-2"
-          value={this.state.selectedCity1}
-          options={this.state.products}
-          onChange={this.onCityChange}
-          optionLabel="name"
-          placeholder="Select a City"
-          disabled={!this.state.selectedKhuTro}
-        />
+          value={this.state.bill.DateCreate}
+          onChange={(e) => this.setState({ selectedMonth: e.value })}
+          view="month" dateFormat="mm/yy"
+          showIcon
+          yearNavigator
+          yearRange="2010:2030" />
+        <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowHouse}
+              options={this.state.houses}
+              onChange={this.onHousesChange}
+              optionLabel="Name"
+              placeholder="Chọn nhà trọ"
+            />
         <Button
-          label="New"
-          icon="pi pi-plus"
+          label="Tính tiền"
+          icon="pi pi-dollar"
           className="p-button-success p-mr-2"
           onClick={this.openNew}
+        />
+        <Button
+          label="SMS"
+          icon="pi pi-phone"
+          className="p-button-info p-mr-2"
+          onClick={"this.confirmDeleteSelected"}
+
+        />
+        <Button
+          label="Email"
+          icon="pi pi-envelope"
+          className="p-button-primary p-mr-2"
+          onClick={""}
+
+        />
+        <Button
+          label="In danh sách"
+          icon="pi pi-file-o"
+          className="p-button-success p-mr-2"
+          onClick={"this.confirmDeleteSelected"}
+
         />
         <Button
           label="Delete"
@@ -278,17 +327,7 @@ class TinhTien extends Component {
     );
   }
   priceBodyTemplate(rowData) {
-    return this.formatCurrency(rowData.price);
-  }
-
-  statusBodyTemplate(rowData) {
-    return (
-      <span
-        className={`product-badge status-${rowData.Status.toLowerCase()}`}
-      >
-        {rowData.Status}
-      </span>
-    );
+    return this.formatCurrency(rowData.TotalBill);
   }
   actionBodyTemplate(rowData) {
     return (
@@ -296,7 +335,7 @@ class TinhTien extends Component {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
-          onClick={() => this.editBill(rowData)}
+          onClick={() => this.ThanhToanBill(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -313,7 +352,7 @@ class TinhTien extends Component {
         <h5 className="p-m-0">Tính tiền</h5>
       </div>
     );
-    const productDialogFooter = (
+    const BillDialogFooter = (
       <React.Fragment>
         <Button
           label="Cancel"
@@ -322,10 +361,26 @@ class TinhTien extends Component {
           onClick={this.hideDialog}
         />
         <Button
-          label="Save"
+          label="Tính"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.saveBill}
+          onClick={this.TinhBill}
+        />
+      </React.Fragment>
+    );
+    const ConfrimDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          className="p-button-text"
+          onClick={this.hideConfirmBillDialog}
+        />
+        <Button
+          label="Xác nhận"
+          icon="pi pi-check"
+          className="p-button-text"
+          onClick={this.ThanhToan}
         />
       </React.Fragment>
     );
@@ -345,38 +400,20 @@ class TinhTien extends Component {
         />
       </React.Fragment>
     );
-    const deleteBillsDialogFooter = (
-      <React.Fragment>
-        <Button
-          label="No"
-          icon="pi pi-times"
-          className="p-button-text"
-          onClick={this.hideDeleteBillsDialog}
-        />
-        <Button
-          label="Yes"
-          icon="pi pi-check"
-          className="p-button-text"
-          onClick={this.deleteSelectedBills}
-        />
-      </React.Fragment>
-    );
 
     return (
       <div className="datatable-crud-demo">
         <Toast ref={(el) => (this.toast = el)} />
-
         <div className="card">
           <Toolbar
             className="p-mb-4"
             left={this.leftToolbarTemplate}
             right={this.rightToolbarTemplate}
           ></Toolbar>
-
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.state.products}
-            selection={this.state.selectedBills}
+            value={this.state.bills ? Object.values(this.state.bills) : null}
+           
             onSelectionChange={(e) =>
               this.setState({ selectedBills: e.value })
             }
@@ -393,118 +430,90 @@ class TinhTien extends Component {
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
             ></Column>
-            <Column field="name" header="Tên Phòng" sortable></Column>
+            <Column field="RoomNumber" header="Phòng" ></Column>
             <Column
-              field="price"
-              header="Giá Phòng"
+              field="TotalBill"
+              header="Tổng tiền"
               body={this.priceBodyTemplate}
               sortable
             ></Column>
-            <Column field="address" header="Địa Chỉ" sortable></Column>
-            <Column field="description" header="Ghi chú" sortable></Column>
-            <Column
-              field="inventoryStatus"
-              header="Tình Trạng"
-              body={this.statusBodyTemplate}
-              sortable
-            ></Column>
+            <Column 
+            field="Status" 
+            header="Tình trạng"
+            body={this.statusBodyTemplate} >
+            
+            </Column>
+          
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>
         </div>
-
         <Dialog
-          visible={this.state.productDialog}
+          visible={this.state.billDialog}
           style={{ width: "450px" }}
-          header="Thông tin khu trọ"
+          header="Tính tiền phòng"
           modal
           className="p-fluid"
-          footer={productDialogFooter}
+          footer={BillDialogFooter}
           onHide={this.hideDialog}
         >
+          
           <div className="p-field">
-            <label htmlFor="name">Tên Khu Trọ</label>
-            <InputText
-              id="name"
-              value={this.state.product.name}
-              onChange={(e) => this.onInputChange(e, "name")}
-              required
-              autoFocus
-              className={classNames({
-                "p-invalid": this.state.submitted && !this.state.product.name
-              })}
-            />
-            {this.state.submitted && !this.state.product.name && (
-              <small className="p-invalid">Name is required.</small>
-            )}
-          </div>
-          <div className="p-field">
-            <label htmlFor="address">Địa chỉ</label>
-            <InputTextarea
-              id="address"
-              value={this.state.product.address}
-              onChange={(e) => this.onInputChange(e, "address")}
-              required
-              rows={3}
-              cols={10}
+            <label htmlFor="">Nhà</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowHouse}
+              options={this.state.houses}
+              onChange={this.onHousesChange}
+              optionLabel="Name"
+              placeholder="Chọn nhà trọ"
             />
           </div>
           <div className="p-field">
-            <label htmlFor="description">Ghi chú</label>
-            <InputTextarea
-              id="description"
-              value={this.state.product.description}
-              onChange={(e) => this.onInputChange(e, "description")}
-              required
-            />
-          </div>
-          <div className="p-field">
-            <label className="p-mb-3">Tình trang</label>
-            <div className="p-formgrid p-grid">
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="inventoryStatus1"
-                  name="inventoryStatus"
-                  value="INSTOCK"
-                  onChange={this.onStatusChange}
-                  checked={this.state.product.inventoryStatus === "INSTOCK"}
-                />
-                <label htmlFor="inventoryStatus1">Còn phòng</label>
-              </div>
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="inventoryStatus2"
-                  name="inventoryStatus"
-                  value="LOWSTOCK"
-                  onChange={this.onStatusChange}
-                  checked={this.state.product.inventoryStatus === "LOWSTOCK"}
-                />
-                <label htmlFor="inventoryStatus2">Hết Phòng</label>
-              </div>
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="inventoryStatus3"
-                  name="inventoryStatus"
-                  value="OUTOFSTOCK"
-                  onChange={this.onStatusChange}
-                  checked={this.state.product.inventoryStatus === "OUTOFSTOCK"}
-                />
-                <label htmlFor="inventoryStatus4">Đang sửa chữa</label>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-field">
-            <label htmlFor="price">Giá cả</label>
-            <InputNumber
-              id="price"
-              value={this.state.product.price}
-              onValueChange={(e) => this.onInputNumberChange(e, "price")}
-              mode="currency"
-              currency="Vnd"
+            <label htmlFor="RoomNumber">Phòng</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowRoom}
+              options={this.state.rooms}
+              onChange={this.onRoomsChange}
+              optionLabel="RoomNumber"
+              placeholder="Chọn phòng trọ"
             />
           </div>
         </Dialog>
-
+        <Dialog
+          visible={this.state.ConfirmBillDialog}
+          style={{ width: "450px" }}
+          header="Xác định thanh toán"
+          modal
+          className="p-fluid"
+          footer={ConfrimDialogFooter}
+          onHide={this.hideConfirmBillDialog}
+        >
+          <div className="p-field">
+            <div className="p-formgrid p-grid">
+              <div className="p-field-radiobutton p-col-6">
+                <RadioButton
+                  inputId="Status1"
+                  name="Status"
+                  value={1}
+                  onChange={this.onStatusChange}
+                  checked={this.state.bill.Status === 1}
+                />
+                <label htmlFor="Status1">Đã thanh toán</label>
+              </div>
+              <div className="p-field-radiobutton p-col-6">
+                <RadioButton
+                  inputId="Status2"
+                  name="Status"
+                  value={0}
+                  onChange={this.onStatusChange}
+                  checked={this.state.bill.Status === 0}
+                />
+                <label htmlFor="Status2">Chưa thanh toán</label>
+              </div>
+            </div>
+          </div>
+        </Dialog>
         <Dialog
           visible={this.state.deleteBillDialog}
           style={{ width: "450px" }}
@@ -520,36 +529,16 @@ class TinhTien extends Component {
             />
             {this.state.product && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.product.name}</b>
-                ?
+                Bạn chắn chắn muốn xóa đã chọn ???
               </span>
             )}
           </div>
         </Dialog>
 
-        <Dialog
-          visible={this.state.deleteBillsDialog}
-          style={{ width: "450px" }}
-          header="Confirm"
-          modal
-          footer={deleteBillsDialogFooter}
-          onHide={this.hideDeleteBillsDialog}
-        >
-          <div className="confirmation-content">
-            <i
-              className="pi pi-exclamation-triangle p-mr-3"
-              style={{ fontSize: "2rem" }}
-            />
-            {this.state.product && (
-              <span>
-                Bạn chắc chắn muốn xóa tất cả đã chọn ??
-              </span>
-            )}
-          </div>
-        </Dialog>
+     
       </div>
     );
   }
-  }
+}
 
 export default TinhTien;

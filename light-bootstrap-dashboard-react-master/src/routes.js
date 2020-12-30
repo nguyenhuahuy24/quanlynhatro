@@ -5,10 +5,9 @@ import Nha from "views/Nha.jsx";
 import KhachThue from "views/KhachThue.jsx";
 import Changpass from "views/Upgrade.jsx";
 import Dien from "views/Dien.jsx";
-import Nuoc from "views/Nuoc.jsx";
 import DichVu from "views/DichVu.jsx";
 import TinhTien from "views/TinhTien.jsx";
-import Icons from "views/Icons.jsx";
+import InformationOfUser from "views/InformationOfUser.jsx"
 
 const dashboardRoutes = [
   {
@@ -41,16 +40,9 @@ const dashboardRoutes = [
   },
   {
     path: "/dien",
-    name: "Chỉ số Điện",
+    name: "Chỉ số Điện/Nước",
     icon: "pe-7s-gleam",
     component: Dien,
-    layout: "/admin"
-  },
-  {
-    path: "/nuoc",
-    name: "Chỉ số Nước",
-    icon: "pe-7s-drop",
-    component: Nuoc,
     layout: "/admin"
   },
   {
@@ -68,18 +60,19 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/icons",
-    name: "Hóa đơn",
-    icon: "pe-7s-news-paper",
-    component: Icons,
-    layout: "/admin"
-  },
-  {
     path: "/changpass",
     name: "Đổi mật khẩu",
     icon: "pe-7s-config",
     component: Changpass,
     layout: "/admin"
+  },
+  {
+    path: "/info",
+    name: "Thông tin cá nhân",
+    icon: "pe-7s-users",
+    component: InformationOfUser,
+    layout: "/admin"
   }
+
 ];
 export default dashboardRoutes;

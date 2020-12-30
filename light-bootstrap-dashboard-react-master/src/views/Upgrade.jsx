@@ -2,18 +2,18 @@
 import React, { Component } from "react";
 import { Table, Grid, Row, Col } from "react-bootstrap";
 import axios from "axios";
+import UserService from '../service/userService';
 import Card from "components/Card/Card";
-
+import "App.scss";
 class Changpass extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-        email: "",
-        password: "",
-        loginErrors: ""
+        currentPassWord: "",
+        newPassWord:""
     };
-
+    this.userService = new UserService();
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
 }
@@ -25,27 +25,21 @@ handleChange(event) {
 }
 
 handleSubmit(event) {
-    const { email, password } = this.state;
-
-    axios
-        .post(
-            "http://localhost:3001/sessions",
-            {
-                user: {
-                    email: email,
-                    password: password
-                }
-            },
-            { withCredentials: true }
-        )
+    const { Email, PassWord } = this.state;
+    let data={
+      currentPassWord: this.state.currentPassWord,
+      newPassWord: this.state.newPassWord
+    };
+  
+   this.userService.changePassWord(data)
         .then(response => {
-            if (response.data.logged_in) {
-                this.props.handleSuccessfulAuth(response.data);
-            }
+          if(response.err)
+          {return alert(response.err)}
+          else{
+            alert("Đổi mật khẩu thành công")
+          }
+         
         })
-        .catch(error => {
-            console.log("login error", error);
-        });
     event.preventDefault();
 }
   render() {
@@ -59,38 +53,35 @@ handleSubmit(event) {
                 title="Đổi mật khẩu"
                 content={
                   <Table>
-                    <div className="form">
                       <div className="form-group">
                         <label>Mật khẩu cũ</label>
                         <input
                           className="form-control"
-                          type="email"
-                          name="email"
+                          type="currentPassWord"
+                          name="currentPassWord"
                           placeholder="Mật khẩu cũ"
-                          value={this.state.email}
+                          value={this.state.currentPassWord}
                           onChange={this.handleChange}
                           required />
                       </div>
 
                       <div className="form-group">
-                        <label>Mật khẩu mới</label>
+                      <label>Mật khẩu mới</label>
                         <input
                           className="form-control"
-                          type="password"
-                          name="password"
+                          type="newPassWord"
+                          name="newPassWord"
                           placeholder="Mật khẩu mới"
-                          value={this.state.password}
+                          value={this.state.newPassWord}
                           onChange={this.handleChange}
                           required />
                       </div>
                       <button
                         type="submit"
-                        className="btn"
+                        className="btn btn-primary btn-block"
                         onClick={this.handleSubmit}
                       >
                         Submit</button>
-                    </div>
-
                   </Table>
                 }
               />

@@ -4,7 +4,7 @@ html {
 }
 
 body {
-    background-color: #ffffff;
+    background-color: #e27c7c;
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
     font-weight: normal;
     color: #495057;
@@ -204,27 +204,43 @@ img.flag {
 }
 
    
-.datatable-crud-demo .table-header {
+.table-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.datatable-crud-demo .product-image {
+.product-image {
     width: 100px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-.datatable-crud-demo .p-dialog .product-image {
+.p-dialog .product-image {
     width: 150px;
     margin: 0 auto 2rem auto;
     display: block;
 }
 
-.datatable-crud-demo .confirmation-content {
+.confirmation-content {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
-                                    
+.fileInput{
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  cursor: pointer;
+}    
+.img-holder{
+    margin: auto;
+    width: 150px;
+    height: 150px;
+    margin-top: 1rem;
+  }
+  .img{
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+  }                             

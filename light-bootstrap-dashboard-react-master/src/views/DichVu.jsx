@@ -12,19 +12,18 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
 import DichVuService from '../service/dichvuService';
-import { RadioButton } from "primereact/radiobutton";
 import classNames from 'classnames';
-
+import { InputText } from 'primereact/inputtext';
+import UserContext from "../context/UserContext";
 class DichVu extends Component {
+  static contextType = UserContext
   emptyDV = {
-    id: null,
-    name: "",
-    caterogy: "",
-    price: 0,
-    status: ""
+    ServiceName: "",
+    Description: "",
+    Price: 0,
+    UserId:null
   };
 
   constructor(props) {
@@ -36,37 +35,42 @@ class DichVu extends Component {
       deleteDVDialog: false,
       deleteDVsDialog: false,
       DV: this.emptyDV,
+     // loginuserID: localStorage.getItem("userIDlogin"),
       selectedDVs: null,
       submitted: false,
       globalFilter: null,
       selectedCategory: null,
       
     };
-
     this.DVService = new DichVuService();
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
-
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
-    this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
-    this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
     this.saveDV = this.saveDV.bind(this);
     this.editDV = this.editDV.bind(this);
     this.confirmDeleteDV = this.confirmDeleteDV.bind(this);
     this.deleteDV = this.deleteDV.bind(this);
-    this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-    this.deleteSelectedDVs = this.deleteSelectedDVs.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.hideDeleteDVDialog = this.hideDeleteDVDialog.bind(this);
     this.hideDeleteDVsDialog = this.hideDeleteDVsDialog.bind(this);
     this.onDichVuChange = this.onDichVuChange.bind(this);
   }
+  componentWillMount(){
+    const{userData,setUserData}= this.context;
+    this.emptyDV.UserId = userData.user;
+    this.state.house=this.emptyDV;
+  }
   componentDidMount() {
     this.DVService
-      .getDichVus()
+      .getServiceOfUser()
+      .then(data => this.setState({ DVs: data }));
+  }
+  componentDidUpdate(){
+    this.DVService
+      .getServiceOfUser()
       .then(data => this.setState({ DVs: data }));
   }
   formatCurrency(value) {
@@ -99,14 +103,13 @@ class DichVu extends Component {
   }
   saveDV() {
     let state = { submitted: true };
-
-    if (this.state.DV.name.trim()) {
-      let DVs = [...this.state.DVs];
+    if (this.state.DV.ServiceName.trim()) {
+     // let DVs = [...this.state.DVs];
       let DV = { ...this.state.DV };
-      if (this.state.DV.id) {
-        const index = this.findIndexById(this.state.DV.id);
-
-        DVs[index] = DV;
+      if (this.state.DV._id) {
+        //const index = this.findIndexById(this.state.DV._id);
+        this.DVService.updateDichVu(this.state.DV._id,DV).then();
+       // DVs[index] = DV;
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -114,7 +117,8 @@ class DichVu extends Component {
           life: 3000
         });
       } else {
-        DVs.push(DV);
+        this.DVService.createDichVu(DV).then();
+       // DVs.push(DV);
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -122,10 +126,9 @@ class DichVu extends Component {
           life: 3000
         });
       }
-
       state = {
         ...state,
-        DVs,
+       // DVs,
         DVDialog: false,
         DV: this.emptyDV
       };
@@ -145,55 +148,40 @@ class DichVu extends Component {
     });
   }
   deleteDV() {
-    let DVs = this.state.DVs.filter(
-      (val) => val.id !== this.state.DV.id
-    );
-    this.setState({
-      DVs,
-      deleteDVDialog: false,
-      DV: this.emptyDV
-    });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "DV Deleted",
-      life: 3000
-    });
+    let DVs =this.DVService.deleteDichVu(this.state.DV._id).then(data=>{
+      if(data["deletedCount"] === 1)
+      {
+        this.setState({
+        //  DVs,
+          deleteDVDialog: false,
+          DV: this.emptyDV
+        });
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Dịch Vụ Deleted",
+          life: 3000
+        });
+      }else{
+        this.toast.show({
+          severity: "success",
+          summary: "Fail",
+          detail: "Dich Vụ Deleted",
+          life: 3000
+        });
+      }
+    })
+    
   }
-  findIndexById(id) {
+  findIndexById(_id) {
     let index = -1;
     for (let i = 0; i < this.state.DVs.length; i++) {
-      if (this.state.DVs[i].id === id) {
+      if (this.state.DVs[i]._id === _id) {
         index = i;
         break;
       }
     }
-
     return index;
-  }
-  confirmDeleteSelected() {
-    this.setState({ deleteDVsDialog: true });
-  }
-  deleteSelectedDVs() {
-    let DVs = this.state.DVs.filter(
-      (val) => !this.state.selectedDVs.includes(val)
-    );
-    this.setState({
-      DVs,
-      deleteDVsDialog: false,
-      selectedDVs: null
-    });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "DVs Deleted",
-      life: 3000
-    });
-  }
-  onStatusChange(e) {
-    let DV = { ...this.state.DV };
-    DV["status"] = e.value;
-    this.setState({ DV });
   }
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
@@ -230,13 +218,7 @@ class DichVu extends Component {
     );
   }
   priceBodyTemplate(rowData) {
-    return this.formatCurrency(rowData.price);
-  }
-  statusBodyTemplate(rowData) {
-    if (rowData.status == "1") {
-      return <span className={`product-badge status-1`}>{"Đang Sử dụng"}</span>;
-    }
-    if (rowData.status == "0") { return <span className={`product-badge status-0`}>{"Hết Sử Dụng"}</span>; }
+    return this.formatCurrency(rowData.Price);
   }
   actionBodyTemplate(rowData) {
     return (
@@ -254,7 +236,6 @@ class DichVu extends Component {
       </React.Fragment>
     );
   }
-
   render() {
     const header = (
       <div className="table-header">
@@ -333,32 +314,27 @@ class DichVu extends Component {
             onSelectionChange={(e) =>
               this.setState({ selectedDVs: e.value })
             }
-            dataKey="id"
+            dataKey="_id"
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} DVs"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Dịch vụ"
             globalFilter={this.state.globalFilter}
             header={header}
           >
-            <Column
+             <Column
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
             ></Column>
-            <Column field="name" header="Tên Dịch Vụ" sortable></Column>
+            <Column field="ServiceName" header="Tên Dịch Vụ" ></Column>
             <Column
-              field="price"
+              field="Price"
               header="Giá dịch vụ"
               body={this.priceBodyTemplate}
               sortable
             ></Column>
-            <Column
-              field="status"
-              header="Tình Trạng"
-              body={this.statusBodyTemplate}
-              sortable
-            ></Column>
+            <Column field="Description" header="Ghi chú" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>
         </div>
@@ -373,76 +349,39 @@ class DichVu extends Component {
           onHide={this.hideDialog}
         >
           <div className="p-field">
-            <label htmlFor="name">Tên dịch vụ</label>
+            <label htmlFor="ServiceName">Tên dịch vụ</label>
             <InputText
-              id="name"
-              value={this.state.DV.name}
-              onChange={(e) => this.onInputChange(e, "name")}
+              id="ServiceName"
+              value={this.state.DV.ServiceName}
+              onChange={(e) => this.onInputChange(e, "ServiceName")}
               required
               autoFocus
               className={classNames({
-                "p-invalid": this.state.submitted && !this.state.DV.name
+                "p-invalid": this.state.submitted && !this.state.DV.ServiceName
               })}
             />
-            {this.state.submitted && !this.state.DV.name && (
+            {this.state.submitted && !this.state.DV.ServiceName && (
               <small className="p-invalid">Tên không được để trống.</small>
             )}
           </div>
           <div className="p-field">
-            <label htmlFor="price">Giá cả</label>
+            <label htmlFor="Price">Giá cả</label>
             <InputNumber
-              id="price"
-              value={this.state.DV.price}
-              onValueChange={(e) => this.onInputNumberChange(e, "price")}
+              id="Price"
+              value={this.state.DV.Price}
+              onValueChange={(e) => this.onInputNumberChange(e, "Price")}
               mode="currency"
               currency="Vnd"
             />
           </div>
           <div className="p-field">
-            <label htmlFor="price">Loại</label>
-            <Dropdown
-              className="p-mr-2"
-              value={this.state.selectedCategory}
-              options={this.state.DV.caterogy}
-              onChange={this.selectedCategory}
-              optionLabel="name"
-              placeholder="Chọn loại dịch vụ"
-            />
-          </div>
-          <div className="p-field">
-            <label htmlFor="description">Ghi chú</label>
+            <label htmlFor="Description">Ghi chú</label>
             <InputTextarea
-              id="description"
-              value={this.state.DV.description}
-              onChange={(e) => this.onInputChange(e, "description")}
+              id="Description"
+              value={this.state.DV.Description}
+              onChange={(e) => this.onInputChange(e, "Description")}
               required
             />
-          </div>
-          <div className="p-field">
-            <label className="p-mb-3">Tình trang</label>
-            <div className="p-formgrid p-grid">
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="status1"
-                  name="status"
-                  value={1}
-                  onChange={this.onStatusChange}
-                  checked={this.state.DV.status === 1}
-                />
-                <label htmlFor="status1">Đang Sử dụng</label>
-              </div>
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="status2"
-                  name="status"
-                  value={0}
-                  onChange={this.onStatusChange}
-                  checked={this.state.DV.status === 0}
-                />
-                <label htmlFor="status2">Không sử dụng</label>
-              </div>
-
-            </div>
           </div>
         </Dialog>
         <Dialog
@@ -460,28 +399,8 @@ class DichVu extends Component {
             />
             {this.state.DV && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.DV.name}</b>
+                Bạn chắn chắn muốn xóa đã chọn <b>{this.state.DV.ServiceName}</b>
                  ?
-              </span>
-            )}
-          </div>
-        </Dialog>
-        <Dialog
-          visible={this.state.deleteDVsDialog}
-          style={{ width: "450px" }}
-          header="Confirm"
-          modal
-          footer={deleteDVsDialogFooter}
-          onHide={this.hideDeleteDVsDialog}
-        >
-          <div className="confirmation-content">
-            <i
-              className="pi pi-exclamation-triangle p-mr-3"
-              style={{ fontSize: "2rem" }}
-            />
-            {this.state.DV && (
-              <span>
-                Bạn chắc chắn muốn xóa tất cả đã chọn ??
               </span>
             )}
           </div>

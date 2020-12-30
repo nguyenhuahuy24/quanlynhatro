@@ -1,25 +1,22 @@
-import React, { Component, useState } from "react";
-import { Link, Switch, Route, Redirect } from 'react-router-dom';
+import React, { Component, useState, useContext } from "react";
+import { Link, Switch, Route, Redirect, useHistory } from 'react-router-dom';
 import axios from "axios";
 import "App.scss";
-/*import AdminLayout from "layouts/Admin.jsx";
-<Switch>
-                    <Route path="/admin" render={props => <AdminLayout {...props} />} />
-                    <Redirect from="/" to="/admin/dashboard" />
-                  </Switch>
+import UserContext from "../context/UserContext"
 
 
-*/
 class Login extends Component {
+    static contextType = UserContext
+   
     constructor(props) {
-        super(props);
-
+        super(props);     
         this.state = {
             email: "",
             password: "",
             loginErrors: ""
         };
-
+     
+       
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
@@ -32,34 +29,44 @@ class Login extends Component {
 
     handleSubmit(event) {
         const { email, password } = this.state;
+        event.preventDefault();
         axios
             .post(
-                "http://localhost:3001/sessions",
+                "http://localhost:8080/auth",
                 {
-                    user: {
-                        email: email,
-                        password: password
-                    }
+
+                    Email: this.state.email,
+                    PassWord: this.state.password
+
                 },
                 { withCredentials: true }
             )
             .then(response => {
                 if (response.data) {
-                    this.props.handleSuccessfulAuth(response.data);
+                    localStorage.setItem("auth-token",response.data.accessToken)
+                    localStorage.setItem("userIDlogin",response.data.userId)
+                    this.context.setUserData({
+                        token: response.data.accessToken,
+                        user: response.data.userId
+                    })
+                    this.props.history.push("/admin/dashboard")
                 }
             })
             .catch(error => {
                 console.log("login error", error);
             });
-        event.preventDefault();
+        
     }
     render() {
+      
         return (
-            <div className="form" onSubmit={this.handleSubmit}>
-                <h3>Sign In</h3>
+           
+            <div className="login-form">
+                 <form>
+                <h2 className="text-center">Sign In</h2>
 
-                <div className="form-group" >
-                    <label>Email</label>
+                <div className="form-group">
+               
                     <input
                         className="form-control"
                         type="email"
@@ -71,7 +78,7 @@ class Login extends Component {
                 </div>
 
                 <div className="form-group">
-                    <label>Password</label>
+                  
                     <input
                         className="form-control"
                         type="password"
@@ -83,15 +90,17 @@ class Login extends Component {
                 </div>
                 <button
                     type="submit"
-                    className="btn"
+                    className="btn btn-primary btn-block"
+                    onClick={this.handleSubmit}
                 >
                     Submit</button>
-                <p className="forgot-password text-right">
-                    Forgot <a href="#">password?</a>
-                </p><p className="forgot-password text-right">
+               
+                <p className="forgot-password text-center">
                     Đăng kí thành viên <Link to="/signup">Sign Up</Link>
                 </p>
+                </form>
             </div>
+           
         );
     }
 }

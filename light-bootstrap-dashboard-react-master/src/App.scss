@@ -1,31 +1,10 @@
-.App {
-  text-align: center;
-}
 
-.App-logo {
-  height: 40vmin;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #09d3ac;
-}
 .btn {
   font-size: 21px;
   padding: 5px 20px;
   border: 0;
-  background-color: #3498db;
-  color: #fff;
+  background-color: #0cb8d6;
+  color: rgb(0, 0, 0);
   border-radius: 3px;
   transition: all 250ms ease-in-out;
   cursor: pointer;
@@ -36,41 +15,21 @@
     outline: none;
   }
 }
-.form {
-  margin-top: 2em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: fit-content;
-    label {
-      font-size: 20px;
-    }
-    input {
-      margin-top: 6px;
-      min-width: 18em;
-      height: 37px;
-      padding: 0px 10px;
-      font-size: 16px;
-      font-family: "Open Sans", sans-serif;
-      background-color: #f3f3f3;
-      border: 0;
-      border-radius: 4px;
-      margin-bottom: 31px;
-      transition: all 250ms ease-in-out;
-      &:hover {
-        //background-color: #ffffff;
-        //box-shadow: 0px 0px 14px 0.3px #0e81ce96;
-      }
-
-      &:focus {
-        outline: none;
-        box-shadow: 0px 0px 12px 0.8px #3474dbb2;
-      }
-    }
-  }
+.login-form {
+  width: 340px;
+  margin: 50px auto;
+  font-size: 15px;
+}
+.login-form form {
+  margin-bottom: 15px;
+  background: #f7f7f7;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+}
+.login-form h2 {
+  margin: 0 0 15px;
+}
+.form-control, .btn {
+  min-height: 38px;
+  border-radius: 2px;
 }

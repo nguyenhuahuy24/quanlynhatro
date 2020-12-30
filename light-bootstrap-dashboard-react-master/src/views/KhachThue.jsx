@@ -12,7 +12,9 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from 'primereact/calendar'
 import KhachThueService from '../service/khachthueService';
-import { RadioButton } from "primereact/radiobutton";
+import PhongTroService from '../service/phongtroService';
+import NhaTroService from '../service/nhatroService';
+import UserContext from "../context/UserContext";
 import classNames from 'classnames';
 import '../index.css';
 import 'primeflex/primeflex.css';
@@ -21,23 +23,18 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
 class KhachThue extends Component {
+  static contextType = UserContext
   emptyUser = {
-    id: null,
-    name: "",
-    gender: "",
-    cmnd: null,
-    phone: null,
-    quequan: "",
-    address: "",
-    noicapCMND: "",
-    bdate: "",
-    datestart: "",
-    dateCMND: "",
-    phone: null,
-    idPhong: null,
-    idKhuTro: null,
-    price:0,
-    image:null
+    Name: "",
+    Age: "",
+    Email: "",
+    Phone: null,
+    PermanentAddress: "",
+    Cmnd: null,
+    DateCmnd: "",
+    PlaceCmnd: "",
+    Image: null,
+    UserId:null,
   };
 
   constructor(props) {
@@ -45,54 +42,93 @@ class KhachThue extends Component {
 
     this.state = {
       users: null,
+      houses: null,
+      rooms: null,
       userDialog: false,
       deleteUserDialog: false,
-      deleteUsersDialog: false,
+      AddtoRoomDialog: false,
       user: this.emptyUser,
       selectedusers: null,
       submitted: false,
+      AddPhone:null,
+      selectedDateCMND:null,
       globalFilter: null,
-      selectedKhuTro: null,
-      valdt: null,
-      bdate: null,
-      startdate: null,
-      dateCMND: null
+      selectedHouse: null,
+      selectedShowHouse:"",
+      selectedRoom: null,
+      selectedShowRoom:"",
+      selectedFile: null,
+      profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     };
     this.userService = new KhachThueService();
+    this.nhatroService = new NhaTroService();
+    this.phongtroService = new PhongTroService();
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
-    this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
-    this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
-    this.onStatusChange = this.onStatusChange.bind(this);
+    this.editUser = this.editUser.bind(this);
     this.openNew = this.openNew.bind(this);
+    this.AddtoRoom=this.AddtoRoom.bind(this);
+    this.openAddtoRoom = this.openAddtoRoom.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
     this.saveUser = this.saveUser.bind(this);
-    this.editUser = this.editUser.bind(this);
     this.confirmDeleteUser = this.confirmDeleteUser.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
-    this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-    this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this);
-    this.onCityChange = this.onCityChange.bind(this);
+    this.onHouseChange = this.onHouseChange.bind(this);
+    this.onRoomChange = this.onRoomChange.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.hideDeleteUserDialog = this.hideDeleteUserDialog.bind(this);
-    this.hideDeleteUsersDialog = this.hideDeleteUsersDialog.bind(this);
-  }
+    this.hideAddtoRoomUserDialog = this.hideAddtoRoomUserDialog.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
 
+  }
+  componentWillMount(){
+    const{userData,setUserData}= this.context;
+    this.emptyUser.UserId = userData.user;
+    this.state.user=this.emptyUser;
+
+  }
   componentDidMount() {
-    this.userService
-      .getKhachThue()
+    const { userData, setUserData } = this.context;
+    this.nhatroService
+    .getHouseByUserId(userData.user)
+    .then(data => this.setState({ houses: data }));
+    this.userService.getAllCustomerOfUser()
       .then(data => this.setState({ users: data }));
   }
-
+  componentDidUpdate(prevProps, prevState) {
+    if( prevState.selectedHouse!==this.state.selectedHouse){
+      this.phongtroService
+      .getRoomByHouseId(this.state.selectedHouse)
+      .then(data => this.setState({ rooms: data }));
+     
+    }
+    this.userService.getAllCustomerOfUser()
+    .then(data => this.setState({ users: data }));
+    
+  }
+  onHouseChange(e) {
+    this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value });
+  }
+  onRoomChange(e) {
+    this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
+    
+  }
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
       style: "currency",
       currency: "VND"
     });
   }
-  onCityChange(e) {
-    this.setState({ selectedCity1: e.value });
+  handleImageChange(e) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        this.setState({ profileImg: reader.result })
+      }
+    }
+    reader.readAsDataURL(e.target.files[0])
+    this.setState({ selectedFile: e.target.files[0] })
   }
   openNew() {
     this.setState({
@@ -100,6 +136,13 @@ class KhachThue extends Component {
       submitted: false,
       userDialog: true
     });
+  }
+  openAddtoRoom(user) {
+    this.setState({
+      user,
+      AddtoRoomDialog: true
+    });
+
   }
   hideDialog() {
     this.setState({
@@ -110,19 +153,30 @@ class KhachThue extends Component {
   hideDeleteUserDialog() {
     this.setState({ deleteUserDialog: false });
   }
-  hideDeleteUsersDialog() {
-    this.setState({ deleteUsersDialog: false });
+  hideAddtoRoomUserDialog() {
+    this.setState({ AddtoRoomDialog: false });
   }
   saveUser() {
     let state = { submitted: true };
-
-    if (this.state.user.name.trim()) {
-      let users = [...this.state.users];
+    
+    if (this.state.user.Name.trim()) {
+      // let users = [...this.state.users];
       let user = { ...this.state.user };
-      if (this.state.user.id) {
-        const index = this.findIndexById(this.state.user.id);
-
-        users[index] = user;
+      const fd = new FormData();
+      fd.append("Name", this.state.user.Name);
+      fd.append("Age", this.state.user.Age);
+      fd.append("Email", this.state.user.Email);
+      fd.append("Phone", this.state.AddPhone);
+      fd.append("PermanentAddress", this.state.user.PermanentAddress);
+      fd.append("Cmnd", this.state.user.Cmnd);
+      fd.append("DateCmnd", this.state.selectedDateCMND);
+      fd.append("PlaceCmnd", this.state.user.PlaceCmnd);
+      fd.append("Image", this.state.selectedFile);
+      fd.append("RoomId", this.state.selectedRoom);
+      if (this.state.user._id) {
+      //  this.state.user = this.userService.getCustomerById(this.state.user._id)
+        this.userService.updateCustomer(this.state.user._id, fd).then();
+        // users[index] = user;
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -130,8 +184,8 @@ class KhachThue extends Component {
           life: 3000
         });
       } else {
-        user.id = this.createId();
-        users.push(user);
+        this.userService.createCustomer(fd).then();
+        //   users.push(user);
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -142,7 +196,10 @@ class KhachThue extends Component {
 
       state = {
         ...state,
-        users,
+        //  users,
+        AddPhone:null,
+        selectedDateCMND:null,
+        selectedFile:null,
         userDialog: false,
         user: this.emptyUser
       };
@@ -163,25 +220,30 @@ class KhachThue extends Component {
     });
   }
   deleteUser() {
-    let users = this.state.users.filter(
-      (val) => val.id !== this.state.user.id
-    );
-    this.setState({
-      users,
-      deleteUserDialog: false,
-      user: this.emptyUser
-    });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "User Deleted",
-      life: 3000
-    });
+
+    this.userService.deleteCustomer(this.state.user._id).then(data => {
+      if (data["deletedCount"] === 1) {
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Xóa Bill",
+          life: 3000
+        });
+      }
+      else {
+        this.toast.show({
+          severity: "success",
+          summary: "Fail",
+          detail: "Xóa Bill",
+          life: 3000
+        });
+      }
+    })
   }
-  findIndexById(id) {
+  findIndexById(_id) {
     let index = -1;
     for (let i = 0; i < this.state.users.length; i++) {
-      if (this.state.users[i].id === id) {
+      if (this.state.users[i]._id === _id) {
         index = i;
         break;
       }
@@ -189,40 +251,38 @@ class KhachThue extends Component {
 
     return index;
   }
-  createId() {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
-  confirmDeleteSelected() {
-    this.setState({ deleteUsersDialog: true });
-  }
-
-  deleteSelectedUsers() {
-    let users = this.state.users.filter(
-      (val) => !this.state.selectedUsers.includes(val)
-    );
-    this.setState({
-      users,
-      deleteUsersDialog: false,
-      selectedUsers: null
+  AddtoRoom() {
+    let state = { submitted: true };
+    this.phongtroService.addPersonToRoom(this.state.selectedRoom,this.state.user._id).then(data=>{
+      if(data.err)
+      {
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: data.err,
+          life: 6000
+        });
+      }else
+      this.toast.show({
+        severity: "success",
+        summary: "Successful",
+        detail: "Thêm khách thuê",
+        life: 3000
+      });
     });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Users Deleted",
-      life: 3000
-    });
+    state = {
+        
+      ...state,
+     // rooms,
+      AddtoRoomDialog: false
+    };
+    this.setState(state);
   }
-  onStatusChange(e) {
-    let user = { ...this.state.user };
-    user["gender"] = e.value;
-    this.setState({ user });
-  }
+  // onStatusChange(e) {
+  //   let user = { ...this.state.user };
+  //   user["gender"] = e.value;
+  //   this.setState({ user });
+  // }
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
     let user = { ...this.state.user };
@@ -241,7 +301,7 @@ class KhachThue extends Component {
   rightToolbarTemplate() {
     return (
       <React.Fragment>
-
+       
         <Button
           label="New"
           icon="pi pi-plus"
@@ -260,19 +320,6 @@ class KhachThue extends Component {
       </React.Fragment>
     );
   }
-  priceBodyTemplate(rowData) {
-    return this.formatCurrency(rowData.price);
-  }
-
-  statusBodyTemplate(rowData) {
-    return (
-      <span
-        className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}
-      >
-        {rowData.inventoryStatus}
-      </span>
-    );
-  }
   actionBodyTemplate(rowData) {
     return (
       <React.Fragment>
@@ -283,14 +330,21 @@ class KhachThue extends Component {
         />
         <Button
           icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
+          className="p-button-rounded p-button-danger p-mr-2"
           onClick={() => this.confirmDeleteUser(rowData)}
+        />
+        <Button
+          icon="pi pi-plus"
+          className="p-button-rounded p-button-warning p-mr-2"
+          onClick={()=>this.openAddtoRoom(rowData)}
         />
       </React.Fragment>
     );
   }
 
   render() {
+  
+    const { profileImg } = this.state
     const header = (
       <div className="table-header">
         <h5 className="p-m-0">Quản lý khách thuê</h5>
@@ -336,19 +390,19 @@ class KhachThue extends Component {
         />
       </React.Fragment>
     );
-    const deleteUsersDialogFooter = (
+    const AddtoRoomDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Cancel"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteUsersDialog}
+          onClick={this.hideAddtoRoomUserDialog}
         />
         <Button
-          label="Yes"
+          label="Add"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteSelectedUsers}
+          onClick={this.AddtoRoom}
         />
       </React.Fragment>
     );
@@ -383,10 +437,12 @@ class KhachThue extends Component {
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
             ></Column>
-            <Column field="name" header="Tên Khách Hàng" ></Column>
-            <Column field="idPhong" header="Thuê Phòng" ></Column>
-            <Column field="datestart" header="Ngày bắt đầu " sortable></Column>
+            <Column field="Name" header="Tên Khách Hàng" ></Column>
+            <Column field="Phone" header="Số điện thoại" ></Column>
+            <Column field="Age" header="Tuổi" ></Column>
+            <Column field="PermanentAddress" header="Địa chỉ thường trú" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
+         
           </DataTable>
         </div>
 
@@ -401,154 +457,99 @@ class KhachThue extends Component {
         >
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
-              <label htmlFor="name">Tên khách hàng</label>
+              <label htmlFor="Name">Tên khách hàng</label>
               <InputText
-                id="name"
-                value={this.state.user.name}
-                onChange={(e) => this.onInputChange(e, "name")}
+                id="Name"
+                value={this.state.user.Name}
+                onChange={(e) => this.onInputChange(e, "Name")}
                 required
                 autoFocus
                 className={classNames({
-                  "p-invalid": this.state.submitted && !this.state.user.name
+                  "p-invalid": this.state.submitted && !this.state.user.Name
                 })}
               />
-              {this.state.submitted && !this.state.user.name && (
+              {this.state.submitted && !this.state.user.Name && (
                 <small className="p-invalid">Tên không được để trống.</small>
               )}
             </div>
             <div className="p-field p-col">
-              <label htmlFor="cmnd">CMND/CCCD</label>
-              <InputText
-                id="cmnd"
-                value={this.state.user.cmnd}
-                onChange={(e) => this.onInputChange(e, "cmnd")}
-                required
-              /> </div>
-          </div>
-          <div className="p-formgrid p-grid">
-            <div className="p-field p-col">
-              <label className="p-mb-3">Giới tính</label>
-              <div className="p-field-radiobutton p-col">
-                <RadioButton
-                  inputId="gender1"
-                  name="gender"
-                  value="nam"
-                  onChange={this.onStatusChange}
-                  checked={this.state.user.gender === "nam"}
-                />
-                <label htmlFor="gender1">Nam</label>
-              </div>
-              <div className="p-field-radiobutton p-col">
-                <RadioButton
-                  inputId="gender2"
-                  name="gender"
-                  value="nu"
-                  onChange={this.onStatusChange}
-                  checked={this.state.user.gender === "nu"}
-                />
-                <label htmlFor="gender2">Nữ</label>
-              </div>
-            </div>
-            <div className="p-field p-col">
-              <label htmlFor="datestart">Ngày cấp</label>
-              <Calendar value={this.state.dateCMND} onChange={(e) => this.setState({ dateCMND: e.value })} showIcon />
-            </div>
-          </div>
-          <div className="p-formgrid p-grid">
-            <div className="p-field p-col">
-
-              <label htmlFor="phone">Điện thoại</label>
-              <InputMask id="phone" mask="9999999999" value={this.state.valdt} onChange={(e) => this.setState({ valdt: e.value })}></InputMask>
-
-              {this.state.submitted && !this.state.user.phone && (
-                <small className="p-invalid">Không bỏ trống điện thoại.</small>
-              )}
-            </div>
-            <div className="p-field p-col">
-              <label htmlFor="address">Nơi cấp</label>
-              <InputText
-                id="noicapCMND"
-                value={this.state.user.noicapCMND}
-                onChange={(e) => this.onInputChange(e, "noicapCMND")}
-                required
-
-              /> </div>
-          </div>
-          <div className="p-field">
-            <label htmlFor="address">Địa chỉ thường trú</label>
-            <InputTextarea
-              id="address"
-              value={this.state.user.address}
-              onChange={(e) => this.onInputChange(e, "address")}
-              required
-            />
-          </div>
-          <div className="p-formgrid p-grid">
-            <div className="p-field p-col">
-              <label htmlFor="bdate">Ngày sinh</label>
-              <Calendar value={this.state.bdate} onChange={(e) => this.setState({ bdate: e.value })} showIcon />
-            </div>
-            <div className="p-field p-col">
-              <label htmlFor="quequan">Nơi sinh</label>
-              <InputText
-                id="quequan"
-                value={this.state.user.quequan}
-                onChange={(e) => this.onInputChange(e, "quequan")}
-                required
-
-              /> </div>
-          </div>
-          <div className="p-formgrid p-grid">
-            <div className="p-field p-col">
-              <label htmlFor="idKhuTro">Thuê khu trọ</label>
-              <Dropdown
-                className="p-mr-2"
-                value={this.state.selectedKhuTro}
-                options={this.state.user}
-                onChange={this.onCityChange}
-                optionLabel="name"
-                placeholder="Chọn khu trọ"
-              />
-            </div>
-            <div className="p-field p-col">
-              <label htmlFor="idPhong">Thuê phòng số</label>
-              <Dropdown
-                className="p-mr-2"
-                value={this.state.selectedKhuTro}
-                options={this.state.users}
-                onChange={this.onCityChange}
-                optionLabel="name"
-                placeholder="Chọn phòng trọ"
-              /> </div>
-          </div>
-          <div className="p-formgrid p-grid">
-            <div className="p-field p-col">
-              <label htmlFor="price">Tiền phòng</label>
+              <label htmlFor="Age">Tuổi</label>
               <InputNumber
-                id="price"
-                value={this.state.user.price}
-                onValueChange={(e) => this.onInputNumberChange(e, "price")}
-                mode="currency"
-                currency="Vnd"
+                id="Age"
+                value={this.state.user.Age}
+                onChange={(e) => this.onInputNumberChange(e, "Age")}
+                required
+              /> </div>
+          </div>
+          <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="Email" >Email</label>
+              <InputText
+                id="Email"
+                value={this.state.user.Email}
+                onChange={(e) => this.onInputChange(e, "Email")}
               />
             </div>
+          </div>
+          <div className="p-formgrid p-grid">
             <div className="p-field p-col">
-              <label htmlFor="datestart">Ngày bắt đầu</label>
-              <Calendar value={this.state.datestart} onChange={(e) => this.setState({ datestart: e.value })} showIcon />
-
+              <label htmlFor="Phone">Điện thoại</label>
+              <InputMask
+                id="Phone"
+                mask="9999999999"
+                value={this.state.AddPhone}
+                onChange={(e) => this.setState({ AddPhone: e.value })}
+              ></InputMask>
             </div>
+            <div className="p-field p-col">
+              <label htmlFor="Cmnd">CMND/thẻ căn cước</label>
+              <InputText
+                id="Cmnd"
+                value={this.state.user.Cmnd}
+                onChange={(e) => this.onInputChange(e, "Cmnd")}
+                required
+
+              /> </div>
           </div>
           <div className="p-field">
-            <label htmlFor="image">Hình ảnh</label>
+            <label htmlFor="PermanentAddress">Địa chỉ thường trú</label>
             <InputTextarea
-              id="image"
-              value={this.state.user.image}
-              onChange={(e) => this.onInputChange(e, "image")}
+              id="PermanentAddress"
+              value={this.state.user.PermanentAddress}
+              onChange={(e) => this.onInputChange(e, "PermanentAddress")}
               required
             />
+          </div>
+          <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="DateCmnd">Ngày cấp</label>
+              <Calendar 
+              value={this.state.selectedDateCMND} 
+              onChange={(e) => this.setState({ selectedDateCMND: e.value })} showIcon />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="PlaceCmnd">Nơi cấp</label>
+              <InputText
+                id="PlaceCmnd"
+                value={this.state.user.noicapCMND}
+                onChange={(e) => this.onInputChange(e, "PlaceCmnd")}
+                required
+              /> </div>
+          </div>
+          <div className="p-field">
+            <label htmlFor="Image">Hình ảnh</label>
+            <input
+              id="Image"
+              className="fileInput"
+              type="file"
+              onChange={(e) => this.handleImageChange(e, "Image")}
+            />
+            <div className="img-holder">
+              <img src={profileImg} alt="" id="Image" className="img" />
+              {/* `http://localhost:8080/` + this.state.user.Image */}
+            </div>
           </div>
         </Dialog>
-
         <Dialog
           visible={this.state.deleteUserDialog}
           style={{ width: "450px" }}
@@ -564,7 +565,7 @@ class KhachThue extends Component {
             />
             {this.state.user && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.user.name}</b>
+                Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.user.Name}</b>
                     ?
               </span>
             )}
@@ -572,23 +573,35 @@ class KhachThue extends Component {
         </Dialog>
 
         <Dialog
-          visible={this.state.deleteUsersDialog}
+          visible={this.state.AddtoRoomDialog}
           style={{ width: "450px" }}
-          header="Confirm"
+          header="Thêm vào phòng"
           modal
-          footer={deleteUsersDialogFooter}
-          onHide={this.hideDeleteUsersDialog}
+          className="p-fluid"
+          footer={AddtoRoomDialogFooter}
+          onHide={this.hideAddtoRoomUserDialog}
         >
-          <div className="confirmation-content">
-            <i
-              className="pi pi-exclamation-triangle p-mr-3"
-              style={{ fontSize: "2rem" }}
+          <div className="p-field">
+            <label htmlFor="">Nhà</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowHouse}
+              options={this.state.houses}
+              onChange={this.onHouseChange}
+              optionLabel="Name"
+              placeholder="Chọn nhà trọ"
             />
-            {this.state.user && (
-              <span>
-                Bạn chắc chắn muốn xóa tất cả đã chọn ??
-              </span>
-            )}
+          </div>
+          <div className="p-field">
+            <label htmlFor="">Phòng</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowRoom}
+              options={this.state.rooms}
+              onChange={this.onRoomChange}
+              optionLabel="RoomNumber"
+              placeholder="Chọn phòng trọ"
+            />
           </div>
         </Dialog>
       </div>

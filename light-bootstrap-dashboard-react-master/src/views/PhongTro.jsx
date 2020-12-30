@@ -6,12 +6,12 @@ import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { InputNumber } from 'primereact/inputnumber';
-import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { Dialog } from 'primereact/dialog';
 import { Dropdown } from "primereact/dropdown";
 import PhongTroService from '../service/phongtroService';
 import NhaTroService from '../service/nhatroService';
-import { RadioButton } from "primereact/radiobutton";
+import DichVuService from '../service/dichvuService';
 import classNames from 'classnames';
 import '../index.css';
 import 'primeflex/primeflex.css';
@@ -20,9 +20,11 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
 
+import UserContext from "../context/UserContext";
+
 class PhongTro extends Component {
+  static contextType = UserContext
   emptyRoom = {
-    id: null,
     RoomNumber: "",
     Length: null,
     Width: null,
@@ -30,30 +32,33 @@ class PhongTro extends Component {
     Details: "",
     Image: null,
     HouseId: null,
-    Status: 0
+    Status: 0,
+    ListPerson: "",
+    ListService: "",
   };
-  emptyHouse = {
-    houseId: null,
-    name: ""
-  }
+
   constructor(props) {
     super(props);
-
     this.state = {
       houses: null,
       rooms: null,
+      DVs: null,
       roomDialog: false,
       deleteRoomDialog: false,
       deleteRoomsDialog: false,
+      //loginuserID: localStorage.getItem("userIDlogin"),
       room: this.emptyRoom,
-      house: this.emptyHouse,
-      selectedRooms: null,
       submitted: false,
+      selectedServices: null,
       globalFilter: null,
-      onKhuTroChange: null
+      selectedKhuTro: "",
+      selectedShow:"",
+      selectedFile: null,
+      profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     };
     this.nhatroService = new NhaTroService();
     this.phongtroService = new PhongTroService();
+    this.DVService = new DichVuService();
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
@@ -72,14 +77,28 @@ class PhongTro extends Component {
     this.hideDeleteRoomsDialog = this.hideDeleteRoomsDialog.bind(this);
     this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
     this.onKhuTroChange = this.onKhuTroChange.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
   }
   componentDidMount() {
-    this.phongtroService
-      .getRooms()
-      .then(data => this.setState({ rooms: data }));
+    const { userData, setUserData } = this.context;
     this.nhatroService
-      .getHouses()
+      .getHouseByUserId(userData.user)
       .then(data => this.setState({ houses: data }));
+  }
+  componentDidUpdate() {
+    this.phongtroService
+      .getRoomByHouseId(this.state.selectedKhuTro)
+      .then(data => this.setState({ rooms: data }));
+  }
+  handleImageChange(e) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        this.setState({ profileImg: reader.result })
+      }
+    }
+    reader.readAsDataURL(e.target.files[0])
+    this.setState({ selectedFile: e.target.files[0] })
   }
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
@@ -88,18 +107,9 @@ class PhongTro extends Component {
     });
   }
   onKhuTroChange(e) {
-   /*
-    let rooms = this.state.rooms.filter(
-      (val) => val.HouseId == this.state.house.houseId
-    );
-    this.setState({
-      rooms,
-      deleteRoomDialog: false,
-      room: this.emptyRoom
-    });
-    */
-    this.setState({ selectedKhuTro: e.value });
+    this.setState({ selectedKhuTro: e.value._id,selectedShow:e.value });
   }
+
   openNew() {
     this.setState({
       room: this.emptyRoom,
@@ -121,20 +131,26 @@ class PhongTro extends Component {
   }
   statusBodyTemplate(rowData) {
     if (rowData.Status == "1") {
-      return <span className={`product-badge status-${rowData.Status}`}>{"Đã thuê"}</span>;
+      return <span className={`product-badge status-1`}>{"Đã thuê"}</span>;
     }
-    if (rowData.Status == "0") { return <span className={`product-badge status-${rowData.Status}`}>{"Trống"}</span>; }
+    if (rowData.Status == "0") { return <span className={`product-badge status-0`}>{"Trống"}</span>; }
   }
   saveRoom() {
     let state = { submitted: true };
-
-    if (this.state.room.id) {
-      let rooms = [...this.state.rooms];
-      let room = { ...this.state.room };
-      if (this.state.room.id) {
-        const index = this.findIndexById(this.state.room.id);
-
-        rooms[index] = room;
+      const fd = new FormData();
+      fd.append("RoomNumber", this.state.room.RoomNumber);
+      fd.append("Length", this.state.room.Length);
+      fd.append("Width", this.state.room.Width);
+      fd.append("Price", this.state.room.Price);
+      fd.append("Details", this.state.room.Details);
+      fd.append("Image", this.state.selectedFile);
+      fd.append("HouseId", this.state.selectedKhuTro);
+    //  fd.append("Status", this.state.room.Status);
+      if (this.state.room._id) {
+       //   this.state.room= this.phongtroService.getRoomById(this.state.room._id)
+       this.phongtroService.updateRoom(this.state.room._id, fd).then();
+    
+       // rooms[index] = room;
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -142,7 +158,8 @@ class PhongTro extends Component {
           life: 3000
         });
       } else {
-        rooms.push(room);
+        this.phongtroService.createRoom(fd).then();
+       // rooms.push(room);
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -150,14 +167,16 @@ class PhongTro extends Component {
           life: 3000
         });
       }
-
       state = {
+        
         ...state,
-        rooms,
+       // rooms,
+       profileImg:null,
+       selectedFile:null,
         roomDialog: false,
         room: this.emptyRoom
       };
-    }
+    
 
     this.setState(state);
   }
@@ -174,30 +193,37 @@ class PhongTro extends Component {
     });
   }
   deleteRoom() {
-    let rooms = this.state.rooms.filter(
-      (val) => val.id !== this.state.room.id
-    );
-    this.setState({
-      rooms,
-      deleteRoomDialog: false,
-      room: this.emptyRoom
-    });
-    this.toast.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Room Deleted",
-      life: 3000
-    });
+    this.phongtroService.deleteRoom(this.state.room._id).then(data => {
+      if (data["deletedCount"] === 1) {
+        this.setState({ 
+          deleteRoomDialog: false,
+           room: this.emptyRoom });
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Phòng Deleted",
+          life: 3000
+        });
+      }
+      else {
+        this.toast.show({
+          severity: "success",
+          summary: "Fail",
+          detail: "Phòng Deleted",
+          life: 3000
+        });
+      }
+    })
+
   }
-  findIndexById(id) {
+  findIndexById(_id) {
     let index = -1;
     for (let i = 0; i < this.state.rooms.length; i++) {
-      if (this.state.rooms[i].id === id) {
+      if (this.state.rooms[i]._id === _id) {
         index = i;
         break;
       }
     }
-
     return index;
   }
   confirmDeleteSelected() {
@@ -228,7 +254,6 @@ class PhongTro extends Component {
     const val = (e.target && e.target.value) || "";
     let room = { ...this.state.room };
     room[`${name}`] = val;
-
     this.setState({ room });
   }
   onInputNumberChange(e, name) {
@@ -241,21 +266,21 @@ class PhongTro extends Component {
   leftToolbarTemplate() {
     return (
       <React.Fragment>
+        <h7  className="p-mr-2">Chọn nhà: </h7>
         <Dropdown
           className="p-mr-2"
-          value={this.state.selectedKhuTro}
+          value={this.state.selectedShow}
           options={this.state.houses}
           onChange={this.onKhuTroChange}
-          optionLabel="name"
+          optionLabel="Name"
           placeholder="Chọn khu trọ"
-
         />
         <Button
           label="Thêm phòng"
           icon="pi pi-plus"
           className="p-button-success p-mr-2"
           onClick={this.openNew}
-        // disabled={!this.state.selectedKhuTro}
+          disabled={!this.state.selectedKhuTro}
         />
         <Button
           label="Delete"
@@ -289,6 +314,8 @@ class PhongTro extends Component {
     );
   }
   render() {
+    
+    const { profileImg } = this.state
     const header = (
       <div className="table-header">
         <h5 className="p-m-0">Quản lý phòng</h5>
@@ -334,22 +361,6 @@ class PhongTro extends Component {
         />
       </React.Fragment>
     );
-    const deleteRoomsDialogFooter = (
-      <React.Fragment>
-        <Button
-          label="No"
-          icon="pi pi-times"
-          className="p-button-text"
-          onClick={this.hideDeleteRoomsDialog}
-        />
-        <Button
-          label="Yes"
-          icon="pi pi-check"
-          className="p-button-text"
-          onClick={this.deleteSelectedRooms}
-        />
-      </React.Fragment>
-    );
     return (
       <div className="datatable-crud-demo">
         <Toast ref={(el) => (this.toast = el)} />
@@ -361,10 +372,6 @@ class PhongTro extends Component {
           <DataTable
             ref={(el) => (this.dt = el)}
             value={this.state.rooms}
-            selection={this.state.selectedRooms}
-            onSelectionChange={(e) =>
-              this.setState({ selectedRooms: e.value })
-            }
             dataKey="id"
             paginator
             rows={10}
@@ -385,15 +392,12 @@ class PhongTro extends Component {
               body={this.priceBodyTemplate}
               sortable
             ></Column>
-            <Column 
-              field="HouseId" 
-              header="Nhà Trọ"
-              ></Column>
             <Column field="Details" header="Ghi chú" ></Column>
             <Column
               field="Status"
               header="Tình Trạng"
               body={this.statusBodyTemplate}
+              sortable
             ></Column>
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>
@@ -401,7 +405,7 @@ class PhongTro extends Component {
         <Dialog
           visible={this.state.roomDialog}
           style={{ width: "450px" }}
-          header="Thông tin khu trọ"
+          header="Thông tin phòng"
           modal
           className="p-fluid"
           footer={roomDialogFooter}
@@ -462,45 +466,23 @@ class PhongTro extends Component {
             />
           </div>
           <div className="p-field">
-            <label htmlFor="inventoryStatus">Tình trạng</label>
-            <div className="p-formgrid p-grid">
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="Status1"
-                  name="Status"
-                  value={1}
-                  onChange={this.onStatusChange}
-                  checked={this.state.room.Status === 1}
-                />
-                <label htmlFor="Status1">Đã thuê</label>
-              </div>
-
-              <div className="p-field-radiobutton p-col-6">
-                <RadioButton
-                  inputId="Status2"
-                  name="Status"
-                  value={0}
-                  onChange={this.onStatusChange}
-                  checked={this.state.room.Status === 0}
-                />
-                <label htmlFor="Status2">Trống</label>
-              </div>
-            </div>
-          </div>
-          <div className="p-field">
-            <label htmlFor="image">Hình ảnh</label>
-            <InputText
-              id="image"
-              value={this.state.room.name}
-              onChange={(e) => this.onInputChange(e, "image")}
-              required
+            <label htmlFor="Image">Hình ảnh</label>
+            <input
+              id="Image"
+              className="fileInput"
+              type="file"
+              onChange={(e) => this.handleImageChange(e, "Image")}
             />
+            <div className="img-holder">
+              <img src={profileImg} alt="" id="img" className="img" />
+              {/* `http://localhost:8080/`+ this.state.room.Image */}
+            </div>
           </div>
         </Dialog>
         <Dialog
           visible={this.state.deleteRoomDialog}
           style={{ width: "450px" }}
-          header="Confirm"
+          header="Xóa thông tin phòng"
           modal
           footer={deleteRoomDialogFooter}
           onHide={this.hideDeleteRoomDialog}
@@ -513,26 +495,6 @@ class PhongTro extends Component {
             {this.state.room && (
               <span>
                 Bạn chắn chắn muốn xóa đã chọn ????
-              </span>
-            )}
-          </div>
-        </Dialog>
-        <Dialog
-          visible={this.state.deleteRoomsDialog}
-          style={{ width: "450px" }}
-          header="Confirm"
-          modal
-          footer={deleteRoomsDialogFooter}
-          onHide={this.hideDeleteRoomsDialog}
-        >
-          <div className="confirmation-content">
-            <i
-              className="pi pi-exclamation-triangle p-mr-3"
-              style={{ fontSize: "2rem" }}
-            />
-            {this.state.room && (
-              <span>
-                Bạn chắc chắn muốn xóa tất cả đã chọn ??
               </span>
             )}
           </div>

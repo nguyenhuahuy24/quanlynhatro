@@ -23,37 +23,44 @@ class Resigter extends Component {
     }
 
     handleSubmit(event) {
+        console.log("a")
         const { email, password, password_confirmation } = this.state;
-
+        if(password === password_confirmation)
+        {
         axios
             .post(
-                "http://localhost:3001/registrations",
+                "http://localhost:8080/register",
                 {
-                    user: {
-                        email: email,
-                        password: password,
-                        password_confirmation: password_confirmation
-                    }
+                   
+                        Email: email,
+                        PassWord: password
+                    
                 },
                 { withCredentials: true }
             )
             .then(response => {
-                if (response.data.status === "created") {
-                    this.props.handleSuccessfulAuth(response.data);
+                console.log(response)
+                if (response.data.Status === 0) {
+                    alert("Vui lòng xác thực bằng Email")
+                    
                 }
             })
             .catch(error => {
                 console.log("registration error", error);
             });
+        }
+        else{
+            alert("Vui lòng nhập lại mật khẩu!")
+        }
         event.preventDefault();
     }
     render() {
+       
         return (
-            <div className="form">
-                <h3>Sign Up</h3>
-
+            <div className="login-form">
+                <form>
+                <h2 className="text-center">Sign Up</h2>
                 <div className="form-group">
-                    <label>Email address</label>
                     <input
                         className="form-control"
                         type="email"
@@ -63,9 +70,7 @@ class Resigter extends Component {
                         onChange={this.handleChange}
                         required />
                 </div>
-
                 <div className="form-group">
-                    <label>Password</label>
                     <input
                         className="form-control"
                         type="password"
@@ -77,7 +82,6 @@ class Resigter extends Component {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Password</label>
                     <input
                         className="form-control"
                         type="password"
@@ -88,10 +92,11 @@ class Resigter extends Component {
                         required
                     />
                 </div>
-                <button type="submit" className="btn">Sign Up</button>
+                <button type="submit" className="btn btn-primary btn-block" onClick = {this.handleSubmit}>Sign Up</button>
                 <p className="forgot-password text-right">
                     Already registered <Link to="/">Sign In</Link>
                 </p>
+                </form>
             </div>
         );
     }

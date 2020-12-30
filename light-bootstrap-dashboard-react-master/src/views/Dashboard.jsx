@@ -1,20 +1,38 @@
 
 import React, { Component } from "react";
 import { Grid, Row, Col } from "react-bootstrap";
-
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
-
-
+import PhongTroService from '../service/phongtroService';
+import UserContext from "../context/UserContext";
+import KhachThueService from '../service/khachthueService';
 class Dashboard extends Component {
-  createLegend(json) {
-    var legend = [];
-    for (var i = 0; i < json["names"].length; i++) {
-      var type = "fa fa-circle text-" + json["types"][i];
-      legend.push(<i className={type} key={i} />);
-      legend.push(" ");
-      legend.push(json["names"][i]);
+
+
+  static contextType = UserContext
+  constructor(props){
+    super(props);
+    this.state ={
+      EmptyRoom:0,
+      NotemtyRoom: 0,
+      AmountofCustomer:0
     }
-    return legend;
+    this.phongtroService = new PhongTroService();
+    
+    this.userService = new KhachThueService();
+    this.userService.getAllCustomerOfUser().then(response => this.setState({AmountofCustomer : response.length}))
+  }
+  componentDidMount(){
+    const{userData,setUserData}= this.context;
+    
+      
+      this.phongtroService
+      .getemtyRoom()
+      .then(data => this.setState({ EmptyRoom: data.AmountOfRoom }));
+    
+
+    this.phongtroService
+      .getNotemtyRoom()
+      .then(data => this.setState({ NotemtyRoom: data.AmountOfRoom }));
   }
   render() {
     return (
@@ -24,58 +42,27 @@ class Dashboard extends Component {
             <Col lg={3} sm={6}>
               <StatsCard
                 bigIcon={<i className="pe-7s-server text-warning" />}
-                statsText="Capacity"
-                statsValue="105GB"
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
+                statsText="Đã thuê"
+                statsValue={this.state.NotemtyRoom}
               />
             </Col>
             <Col lg={3} sm={6}>
               <StatsCard
                 bigIcon={<i className="pe-7s-wallet text-success" />}
-                statsText="Revenue"
-                statsValue="$1,345"
-                statsIcon={<i className="fa fa-calendar-o" />}
-                statsIconText="Last day"
+                statsText="Phòng trống"
+                statsValue={this.state.EmptyRoom}
               />
             </Col>
-            <Col lg={3} sm={6}>
-              <StatsCard
-                bigIcon={<i className="pe-7s-graph1 text-danger" />}
-                statsText="Errors"
-                statsValue="23"
-                statsIcon={<i className="fa fa-clock-o" />}
-                statsIconText="In the last hour"
-              />
-            </Col>
+           
             <Col lg={3} sm={6}>
               <StatsCard
                 bigIcon={<i className="fa fa-twitter text-info" />}
-                statsText="Followers"
-                statsValue="+45"
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
+                statsText="Khách Thuê"
+                statsValue={this.state.AmountofCustomer}
               />
             </Col>
           </Row>
-          <Row>
-            <Col md={8}>
-             
-            </Col>
-            <Col md={4}>
-            
-            </Col>
-          </Row>
 
-          <Row>
-            <Col md={6}>
-              
-            </Col>
-
-            <Col md={6}>
-             
-            </Col>
-          </Row>
         </Grid>
       </div>
     );
