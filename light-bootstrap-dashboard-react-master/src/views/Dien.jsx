@@ -44,7 +44,7 @@ class Dien extends Component {
       selectedHouse: "",
       selectedRoom: "",
       selectedShowRoom: null,
-      selectedMonth: null,
+      selectedMonth: new Date(),
       test: [],
     };
 
@@ -118,6 +118,10 @@ class Dien extends Component {
     //  }
     state = {
       ...state,
+      selectedHouse:null,
+      test:null,
+      selectedMonth: new Date(),
+      selectedShowHouse:null,
       DienDialog: false,
       Dien: this.emptyDien
     };
@@ -186,7 +190,7 @@ class Dien extends Component {
             id="monthpicker"
             className="p-mr-2"
             value={this.state.selectedMonth}
-            onChange={(e) => this.setState({ selectedMonth: e.value, Time: e.val })}
+            onChange={(e) => this.setState({ selectedMonth: e.value })}
             view="month" dateFormat="mm/yy"
             showIcon
             yearNavigator

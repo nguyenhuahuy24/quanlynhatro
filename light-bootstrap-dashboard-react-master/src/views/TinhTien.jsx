@@ -8,6 +8,10 @@ import { Calendar } from 'primereact/calendar'
 import { RadioButton } from 'primereact/radiobutton'
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from "primereact/dropdown";
+
+import { InputNumber } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
+
 import BillService from '../service/billService';
 import PhongTroService from '../service/phongtroService';
 import NhaTroService from '../service/nhatroService';
@@ -24,12 +28,12 @@ class TinhTien extends Component {
   emptyBill = {
     RoomId: null,
     RoomNumber: null,
-    ElectricFee: null,
-    WaterFree: null,
+    ElectricFee: 0,
+    WaterFree: 0,
     RoomPrice: 0,
     TotalBill: 0,
     DateCreate: new Date(),
-    OtherCrosts: null,
+    OtherCrosts: "",
     StartDate: "",
     EndDate: "",
     Status: null
@@ -44,6 +48,7 @@ class TinhTien extends Component {
       bills: null,
       billDialog: false,
       ConfirmBillDialog:false,
+      ViewBillDialog:false,
       deleteBillDialog: false,
       deleteBillsDialog: false,
       bill: this.emptyBill,
@@ -69,8 +74,10 @@ class TinhTien extends Component {
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
+    this.openViewBill = this.openViewBill.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
     this.hideConfirmBillDialog = this.hideConfirmBillDialog.bind(this);
+    this.hideViewBillDialog = this.hideViewBillDialog.bind(this);
     this.ThanhToan = this.ThanhToan.bind(this);
     this.TinhBill = this.TinhBill.bind(this);
     this.ThanhToanBill = this.ThanhToanBill.bind(this);
@@ -109,7 +116,10 @@ class TinhTien extends Component {
                _id: bill.ListBill[0]._id,
                 RoomNumber: bill.RoomNumber,
                 TotalBill: bill.ListBill[0].TotalBill,
-                Status: bill.ListBill[0].Status
+                Status: bill.ListBill[0].Status,
+                OtherCosts: bill.ListBill[0].OtherCosts,
+                WaterFee: bill.ListBill[0].WaterFee,
+                ElectricFee:bill.ListBill[0].ElectricFee
               })
             }
           })  
@@ -162,6 +172,16 @@ class TinhTien extends Component {
       ConfirmBillDialog: false
     });
   }
+  hideViewBillDialog() {
+    this.setState({
+      submitted: false,
+      ViewBillDialog: false
+    });
+  }
+
+
+
+
   hideDeleteBillDialog() {
     this.setState({ deleteBillDialog: false });
   }
@@ -216,7 +236,14 @@ class TinhTien extends Component {
   ThanhToanBill(bill) {
     this.setState({
       bill: { ...bill },
-      ConfirmBillDialog: true
+     ConfirmBillDialog: true
+    
+    });
+  }
+  openViewBill(bill) {
+    this.setState({
+      bill: { ...bill },
+     ViewBillDialog: true
     });
   }
 
@@ -332,6 +359,11 @@ class TinhTien extends Component {
   actionBodyTemplate(rowData) {
     return (
       <React.Fragment>
+        <Button
+          icon="pi pi-plus"
+          className="p-button-rounded p-button-warning p-mr-2"
+          onClick={()=>this.openViewBill(rowData)}
+        />
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
@@ -455,8 +487,7 @@ class TinhTien extends Component {
           className="p-fluid"
           footer={BillDialogFooter}
           onHide={this.hideDialog}
-        >
-          
+        >        
           <div className="p-field">
             <label htmlFor="">Nhà</label>
             <Dropdown
@@ -513,6 +544,69 @@ class TinhTien extends Component {
               </div>
             </div>
           </div>
+        </Dialog>
+        <Dialog
+          visible={this.state.ViewBillDialog}
+          style={{ width: "450px" }}
+          header="Chi tiết hóa đơn"
+          modal
+          className="p-fluid"
+          onHide={this.hideViewBillDialog}
+        >
+           <div className="p-field">
+            <label htmlFor="RoomNumber">Phòng số</label>
+            <InputText
+              id="RoomNumber"
+              value={this.state.bill.RoomNumber}
+              onChange={(e) => this.onInputChange(e, "TotalBill")}
+              disabled
+            />
+          </div>
+          <div className="p-field">
+            <label htmlFor="TotalBill">Tổng tiền</label>
+            <InputNumber
+              id="TotalBill"
+              value={this.state.bill.TotalBill}
+              onValueChange={(e) => this.onInputNumberChange(e, "TotalBill")}
+              mode="currency"
+              currency="Vnd"
+              disabled
+            />
+          </div>
+          <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="WaterFee">Tiền Nước</label>
+              <InputNumber
+              id="WaterFee"
+              value={this.state.bill.WaterFee}
+              onValueChange={(e) => this.onInputNumberChange(e, "WaterFee")}
+              mode="currency"
+              currency="Vnd"
+              disabled
+            />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="ElectricFee">Tiền Điện</label>
+              <InputNumber
+              id="ElectricFee"
+              value={this.state.bill.ElectricFee}
+              onValueChange={(e) => this.onInputNumberChange(e, "ElectricFee")}
+              mode="currency"
+              currency="Vnd"
+              disabled
+            /> </div>
+          </div>
+          <div className="p-field">
+            <label htmlFor="OtherCosts">Ghi chú</label>
+            <InputText
+              id="OtherCosts"
+              value={this.state.bill.OtherCosts}
+              onChange={(e) => this.onInputChange(e, "OtherCosts")}
+              required
+              disabled
+            />
+          </div>
+        
         </Dialog>
         <Dialog
           visible={this.state.deleteBillDialog}

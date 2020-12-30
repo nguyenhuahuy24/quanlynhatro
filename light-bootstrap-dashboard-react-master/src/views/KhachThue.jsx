@@ -94,7 +94,8 @@ class KhachThue extends Component {
     .getHouseByUserId(userData.user)
     .then(data => this.setState({ houses: data }));
     this.userService.getAllCustomerOfUser()
-      .then(data => this.setState({ users: data }));
+      .then(data =>console.log(data));
+      
   }
   componentDidUpdate(prevProps, prevState) {
     if( prevState.selectedHouse!==this.state.selectedHouse){
