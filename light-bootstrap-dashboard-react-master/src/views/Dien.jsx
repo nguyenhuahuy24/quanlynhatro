@@ -78,10 +78,11 @@ class Dien extends Component {
           const rooms = Object.values(response)[0];
          
           let data = [];
+          console.log(rooms)
           rooms.forEach(room => {
             if (room.ListUtilityBill.length !== 0) {
               data.push({
-                Id: room.ListUtilityBill[0]._id,
+                _id: room.ListUtilityBill[0]._id,
                 RoomNumber: room.RoomNumber,
                 WaterNumber: room.ListUtilityBill[0].WaterNumber,
                 ElectricNumber: room.ListUtilityBill[0].ElectricNumber
@@ -96,7 +97,8 @@ class Dien extends Component {
         .then(data => this.setState({ rooms: data }));
     }
     this.state.Dien.Time = this.state.selectedMonth;
-      this.state.Dien.RoomId = this.state.selectedRoom;
+    this.state.Dien.RoomId = this.state.selectedRoom;
+      
   }
   // searchTime(){
   //   this.utilityService
@@ -105,8 +107,10 @@ class Dien extends Component {
   // }
   saveDien() {
     let state = { submitted: true };
-    console.log(this.state.Dien)
+ 
+   
     let Dien = { ...this.state.Dien };
+    console.log(Dien)
     this.utilityService.createUtilityBill(Dien).then();
     // Diens[index] = Dien;
     this.toast.show({
