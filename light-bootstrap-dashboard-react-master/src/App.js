@@ -13,6 +13,7 @@ import UserContext from "./context/UserContext"
 import Axios from "axios";
 import VerifyEmail from "views/VerifyEmail"
 import AdminLayout from "layouts/Admin"
+import PrivateRoute from "PrivateRoute";
 export default function App() {
 
     const [userData, setUserData] = useState({
@@ -50,9 +51,9 @@ export default function App() {
                         <Route path="/signup" exact component={Resigter} />
                         <Route path="/verify" component={VerifyEmail} />
                         <Switch>
-                        <Route path="/admin" render={props => <AdminLayout {...props} />} />
-                        <Redirect from="/" to="/admin/dashboard" />
-                    </Switch>
+                        <PrivateRoute path="/admin" component={AdminLayout} />
+                            
+                        </Switch>
                     </Switch>
                     {/* <Switch>
                             <Route path="/admin" render={props => <AdminLayout {...props} />} />

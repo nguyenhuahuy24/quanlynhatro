@@ -53,7 +53,7 @@ class Login extends Component {
                 }
             })
             .catch(error => {
-                console.log("login error", error);
+                alert("Sai tên đăng nhập hoặc mật khẩu!")
             });
         
     }
