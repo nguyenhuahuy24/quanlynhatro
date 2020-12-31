@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 export default class UtilityBillService {  
-    getAllUtilityBillByHouseId(houseId,userId) {
+    getAllUtilityBillByHouseId(houseId) {
         return axios
-        .get(`http://localhost:8080/utilitybills?HouseId=`+houseId+`&UserId=`+userId)
+        .get(`http://localhost:8080/utilitybills?HouseId=`+houseId,{headers:{
+            Authorization:'Bearer ' + localStorage.getItem("auth-token")
+        }})
         .then((res) => res.data[0]);
     }
     deleteUtilityBill(id){
