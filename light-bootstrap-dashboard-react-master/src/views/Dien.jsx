@@ -71,7 +71,7 @@ class Dien extends Component {
     if (prevState.selectedHouse !== this.state.selectedHouse) {
       const { userData, setUserData } = this.context;
       this.utilityService
-        .getAllUtilityBillByHouseId(this.state.selectedHouse, userData.user)
+        .getAllUtilityBillByHouseId(this.state.selectedHouse)
         .then(response => {
           this.setState({ Diens: response });
           //test
@@ -80,6 +80,7 @@ class Dien extends Component {
           let data = [];
           rooms.forEach(room => {
             if (room.ListUtilityBill.length !== 0) {
+              console.log(room)
               data.push({
                 Id: room.ListUtilityBill[0]._id,
                 RoomNumber: room.RoomNumber,
