@@ -147,8 +147,10 @@ class PhongTro extends Component {
       fd.append("HouseId", this.state.selectedKhuTro);
     //  fd.append("Status", this.state.room.Status);
       if (this.state.room._id) {
-       //   this.state.room= this.phongtroService.getRoomById(this.state.room._id)
-       this.phongtroService.updateRoom(this.state.room._id, fd).then();
+  
+      // this.phongtroService.getRoomById(this.state.room._id).then(data => this.setState({room:data}))
+      
+      this.phongtroService.updateRoom(this.state.room._id, fd).then();
     
        // rooms[index] = room;
         this.toast.show({

@@ -86,7 +86,6 @@ class KhachThue extends Component {
     const{userData,setUserData}= this.context;
     this.emptyUser.UserId = userData.user;
     this.state.user=this.emptyUser;
-
   }
   componentDidMount() {
     const { userData, setUserData } = this.context;
@@ -94,11 +93,11 @@ class KhachThue extends Component {
     .getHouseByUserId(userData.user)
     .then(data => this.setState({ houses: data }));
     this.userService.getAllCustomerOfUser()
-      .then(data =>console.log(data));
+      .then(response => console.log(response));
       
   }
   componentDidUpdate(prevProps, prevState) {
-    if( prevState.selectedHouse!==this.state.selectedHouse){
+    if( prevState.selectedHouse !==this.state.selectedHouse){
       this.phongtroService
       .getRoomByHouseId(this.state.selectedHouse)
       .then(data => this.setState({ rooms: data }));

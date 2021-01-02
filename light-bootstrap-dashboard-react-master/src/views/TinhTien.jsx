@@ -621,7 +621,7 @@ class TinhTien extends Component {
               className="pi pi-exclamation-triangle p-mr-3"
               style={{ fontSize: "2rem" }}
             />
-            {this.state.product && (
+            {this.state.bill && (
               <span>
                 Bạn chắn chắn muốn xóa đã chọn ???
               </span>
