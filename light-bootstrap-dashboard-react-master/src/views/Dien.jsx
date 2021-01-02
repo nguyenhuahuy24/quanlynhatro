@@ -40,6 +40,7 @@ class Dien extends Component {
       Dien: this.emptyDien,
       //  loginuserID: localStorage.getItem("userIDlogin"),
       submitted: false,
+      deleteUtilityBillDialog: false,
       selectedShowHouse: null,
       selectedHouse: "",
       selectedRoom: "",
@@ -59,6 +60,11 @@ class Dien extends Component {
     this.onRoomChange = this.onRoomChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.openNew = this.openNew.bind(this);
+    this.hideDeleteUtilityBillDialog = this.hideDeleteUtilityBillDialog.bind(this);
+    this.deleteUtilityBill = this.deleteUtilityBill.bind(this);
+    this.confirmDeleteUtilityBill = this.confirmDeleteUtilityBill.bind(this);
+    this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
+   
 
   }
   componentDidMount() {
@@ -73,7 +79,7 @@ class Dien extends Component {
       this.utilityService
         .getAllUtilityBillByHouseId(this.state.selectedHouse)
         .then(response => {
-          this.setState({ Diens: response });
+        
           //test
           const rooms = Object.values(response)[0];
          
@@ -81,7 +87,6 @@ class Dien extends Component {
           console.log(rooms)
           rooms.forEach(room => {
             if (room.ListUtilityBill.length !== 0) {
-              console.log(room)
               data.push({
                 _id: room.ListUtilityBill[0]._id,
                 RoomNumber: room.RoomNumber,
@@ -90,8 +95,7 @@ class Dien extends Component {
               })
             }
           })
-          console.log(data)
-          this.setState({ test: { ...data } })
+          this.setState({ Diens: { ...data } })
         }).catch(err => console.log(err));
       this.phongtroService
         .getRoomByHouseId(this.state.selectedHouse)
@@ -111,7 +115,7 @@ class Dien extends Component {
  
    
     let Dien = { ...this.state.Dien };
-    console.log(Dien)
+    
     this.utilityService.createUtilityBill(Dien).then();
     // Diens[index] = Dien;
     this.toast.show({
@@ -171,11 +175,54 @@ class Dien extends Component {
       DienDialog: true
     });
   }
+  confirmDeleteUtilityBill(Dien) {
+    this.setState({
+      Dien,
+      deleteUtilityBillDialog: true
+    });
+  }
+  hideDeleteUtilityBillDialog() {
+    this.setState({ deleteUtilityBillDialog: false });
+  }
+  deleteUtilityBill(){
+    this.utilityService.deleteUtilityBill(this.state.Dien._id).then(data => {
+      if (data["deletedCount"] === 1) {
+       this.setState({ 
+        deleteUtilityBillDialog: false,
+          Dien: this.emptyDien });
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Xóa chỉ số điện nước",
+          life: 3000
+        });
+      } else {
+        this.toast.show({
+          severity: "error",
+          summary: "Fail",
+          detail: "House Deleted",
+          life: 3000
+        });
+      }
+  
+    });
+  }
   hideDialog() {
     this.setState({
       submitted: false,
       DienDialog: false
     });
+  }
+  actionBodyTemplate(rowData) {
+    return (
+      <React.Fragment>
+        <Button
+          icon="pi pi-trash"
+          className="p-button-rounded p-button-warning"
+          onClick={() => this.confirmDeleteUtilityBill(rowData)}
+        />
+      </React.Fragment>
+    );
   }
   render() {
 
@@ -231,6 +278,23 @@ class Dien extends Component {
         />
       </React.Fragment>
     );
+    const deleteUtilityBillDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          className="p-button-text"
+          onClick={this.hideDeleteUtilityBillDialog}
+        />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          className="p-button-text"
+          onClick={this.deleteUtilityBill}
+        />
+      </React.Fragment>
+    );
+
     return (
 
       <div className="datatable-crud-demo">
@@ -245,7 +309,7 @@ class Dien extends Component {
 
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.state.test ? Object.values(this.state.test) : null}
+            value={this.state.Diens ? Object.values(this.state.Diens) : null}
             dataKey="_id"
             className="p-datatable-gridlines"
             paginator
@@ -258,6 +322,8 @@ class Dien extends Component {
             <Column field="RoomNumber" header="Phòng" ></Column>
             <Column field="ElectricNumber" header="CS Điện Mới" ></Column>
             <Column field="WaterNumber" header="CS Nuoc Mới" ></Column>
+            <Column body={this.actionBodyTemplate}></Column>
+         
           </DataTable>
         </div>
         <Dialog
@@ -308,6 +374,26 @@ class Dien extends Component {
               value={this.state.Dien.WaterNumber}
               onValueChange={(e) => this.onInputNumberChange(e, "WaterNumber")}
             />
+          </div>
+        </Dialog>
+        <Dialog
+          visible={this.state.deleteUtilityBillDialog}
+          style={{ width: "450px" }}
+          header="Confirm"
+          modal
+          footer={deleteUtilityBillDialogFooter}
+          onHide={this.hideDeleteUtilityBillDialog}
+        >
+          <div className="confirmation-content">
+            <i
+              className="pi pi-exclamation-triangle p-mr-3"
+              style={{ fontSize: "2rem" }}
+            />
+            {this.state.Dien && (
+              <span>
+                Bạn chắn chắn muốn xóa đã chọn ???
+              </span>
+            )}
           </div>
         </Dialog>
       </div>
