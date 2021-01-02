@@ -68,10 +68,10 @@ class Dien extends Component {
       .then(data => this.setState({ houses: data }));
   }
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.selectedHouse !== this.state.selectedHouse) {
+    if (prevState.selectedHouse !== this.state.selectedHouse || prevState.selectedMonth !== this.state.selectedMonth) {
       const { userData, setUserData } = this.context;
       this.utilityService
-        .getAllUtilityBillByHouseId(this.state.selectedHouse)
+        .getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth)
         .then(response => {
           this.setState({ Diens: response });
           //test
@@ -80,7 +80,7 @@ class Dien extends Component {
           let data = [];
           rooms.forEach(room => {
             if (room.ListUtilityBill.length !== 0) {
-              console.log(room)
+             
               data.push({
                 Id: room.ListUtilityBill[0]._id,
                 RoomNumber: room.RoomNumber,
@@ -89,7 +89,7 @@ class Dien extends Component {
               })
             }
           })
-          console.log(data)
+        
           this.setState({ test: { ...data } })
         }).catch(err => console.log(err));
       this.phongtroService

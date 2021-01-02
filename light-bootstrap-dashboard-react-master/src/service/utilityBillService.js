@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export default class UtilityBillService {  
-    getAllUtilityBillByHouseId(houseId) {
+    getAllUtilityBillByHouseId(houseId,Month) {
         return axios
-        .get(`http://localhost:8080/utilitybills?HouseId=`+houseId,{headers:{
+        .get(`http://localhost:8080/utilitybills?HouseId=`+houseId+'&Month='+Month,{headers:{
             Authorization:'Bearer ' + localStorage.getItem("auth-token")
         }})
         .then((res) => res.data[0]);
