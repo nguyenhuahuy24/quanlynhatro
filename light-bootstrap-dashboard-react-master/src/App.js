@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import Login from "views/Login.jsx"
 import Resigter from "views/Resigter.jsx"
 
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./assets/css/animate.min.css";
 import "./assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";

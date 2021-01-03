@@ -1,7 +1,7 @@
 
 import React, { Component } from "react";
-import { NavItem, Nav, NavDropdown, MenuItem, Button } from "react-bootstrap";
-import { Link, Redirect } from "react-router-dom";
+import { NavItem, Nav, NavDropdown, MenuItem } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import UserContext from "../../context/UserContext"
 class AdminNavbarLinks extends Component {
   static contextType = UserContext

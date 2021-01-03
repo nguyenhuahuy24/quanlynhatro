@@ -497,8 +497,8 @@ class KhachThue extends Component {
               <InputMask
                 id="Phone"
                 mask="9999999999"
-                value={this.state.AddPhone}
-                onChange={(e) => this.setState({ AddPhone: e.value })}
+                value={this.state.user.Phone}
+                onChange={(e) => this.onInputNumberChange(e, "Phone")}
               ></InputMask>
             </div>
             <div className="p-field p-col">

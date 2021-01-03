@@ -1,5 +1,5 @@
-import React, { Component, useState, useContext } from "react";
-import { Link, Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import React, { Component } from "react";
+import { Link } from 'react-router-dom';
 import axios from "axios";
 import "App.scss";
 import UserContext from "../context/UserContext"

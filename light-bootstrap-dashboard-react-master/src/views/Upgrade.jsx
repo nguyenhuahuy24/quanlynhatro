@@ -1,7 +1,6 @@
 
 import React, { Component } from "react";
 import { Table, Grid, Row, Col } from "react-bootstrap";
-import axios from "axios";
 import UserService from '../service/userService';
 import Card from "components/Card/Card";
 import "App.scss";

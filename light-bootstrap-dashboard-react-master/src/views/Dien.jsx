@@ -75,30 +75,29 @@ class Dien extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.selectedHouse !== this.state.selectedHouse || prevState.selectedMonth !== this.state.selectedMonth) {
+      console.log(this.state.selectedMonth)
       const { userData, setUserData } = this.context;
       this.utilityService
-        .getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth)
-        .then(response => {
-        
-          //test
-          const rooms = Object.values(response)[0];
-         
-          let data = [];
-          console.log(rooms)
-          rooms.forEach(room => {
-            if (room.ListUtilityBill.length !== 0) {
-              data.push({
-                _id: room.ListUtilityBill[0]._id,
-                RoomNumber: room.RoomNumber,
-                WaterNumber: room.ListUtilityBill[0].WaterNumber,
-                ElectricNumber: room.ListUtilityBill[0].ElectricNumber
-              })
-            }
-          })
+      .getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth)
+      .then(response => {
+      
+        //test
+        const rooms = Object.values(response)[0];
+       
+        let data = [];
+        rooms.forEach(room => {
+          if (room.ListUtilityBill.length !== 0) {
+            data.push({
+              _id: room.ListUtilityBill[0]._id,
+              RoomNumber: room.RoomNumber,
+              WaterNumber: room.ListUtilityBill[0].WaterNumber,
+              ElectricNumber: room.ListUtilityBill[0].ElectricNumber
+            })
+          }
+        })
+        this.setState({ Diens: { ...data } })
 
-          this.setState({ Diens: { ...data } })
-
-        }).catch(err => console.log(err));
+      }).catch(err => console.log(err));
       this.phongtroService
         .getRoomByHouseId(this.state.selectedHouse)
         .then(data => this.setState({ rooms: data }));
@@ -107,17 +106,9 @@ class Dien extends Component {
     this.state.Dien.RoomId = this.state.selectedRoom;
       
   }
-  // searchTime(){
-  //   this.utilityService
-  //     .getAllUtilityBillByHouseId(this.state.selectedHouse,userData.user,this.state.emptyDien.Time)
-  //     .then(data => this.setState({ Diens: data }));
-  // }
   saveDien() {
     let state = { submitted: true };
- 
-   
     let Dien = { ...this.state.Dien };
-    
     this.utilityService.createUtilityBill(Dien).then();
     // Diens[index] = Dien;
     this.toast.show({
@@ -249,12 +240,6 @@ class Dien extends Component {
             showIcon
             yearNavigator
             yearRange="2010:2030" />
-          <Button
-            label="Xem"
-            icon="pi pi-search-plus"
-            className="p-button-success p-mr-2"
-            onClick={""}
-          />
           <Button
             label="Nhập chỉ số mới"
             icon="pi pi-search-plus"

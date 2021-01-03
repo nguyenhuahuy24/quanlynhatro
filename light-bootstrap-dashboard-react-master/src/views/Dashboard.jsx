@@ -23,13 +23,9 @@ class Dashboard extends Component {
   }
   componentDidMount(){
     const{userData,setUserData}= this.context;
-    
-      
       this.phongtroService
       .getemtyRoom()
       .then(data => this.setState({ EmptyRoom: data.AmountOfRoom }));
-    
-
     this.phongtroService
       .getNotemtyRoom()
       .then(data => this.setState({ NotemtyRoom: data.AmountOfRoom }));
