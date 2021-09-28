@@ -1,18 +1,49 @@
 import axios from 'axios';
+import Service from './Service';
+import { dataStatus, userProfile } from '../utility/config';
+class DichVuService extends Service {  
+    constructor() {
+        super();
+        this.url =`http://localhost:8080/service/`
+        this.url2=`http://localhost:8080/service/user/`
+    }
 
-export default class DichVuService {  
-    getServiceOfUser() {
-        return axios.get(`http://localhost:8080/service/user/`,{headers:{
-            Authorization:'Bearer ' + localStorage.getItem("auth-token")
-        }}).then((res) => res.data);
+    getServiceOfUser = () =>{
+        return new Promise((resolve, reject)=>{
+            this.callGetLocalAPI(this.url2).then(resp =>{   
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
     }
-    deleteDichVu(id){
-        return axios.delete(`http://localhost:8080/service/`+ id).then((res) => res.data);
+    createDichVu = (data)=>{
+        return new Promise((resolve , reject)=>{
+            this.callPostAPI(this.url,data).then(resp =>{          
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
     }
-    createDichVu(data){
-        return axios.post(`http://localhost:8080/service/`,data).then((res) => res.data);
+    editDichVu = (id, editdata)=>{
+        return new Promise((resolve , reject)=>{
+            this.callPatchAPI(id, editdata).then(resp =>{
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
     }
-    updateDichVu(id,data){
-        return axios.patch(`http://localhost:8080/service/`+id,data).then((res) => res.data);
+    deleteDichVu = (id)=>{
+        return new Promise((resolve , reject)=>{
+            this.callDeleteAPI(id).then(resp =>{
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
     }
+    
 }
+export default DichVuService;

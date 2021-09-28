@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
 import Login from "views/Login.jsx"
 import Resigter from "views/Resigter.jsx"
 
@@ -14,8 +13,10 @@ import Axios from "axios";
 import VerifyEmail from "views/VerifyEmail"
 import AdminLayout from "layouts/Admin"
 import PrivateRoute from "PrivateRoute";
+//store
+import Store from './redux/Store';
+import { Provider } from 'react-redux';
 export default function App() {
-
     const [userData, setUserData] = useState({
         token: undefined,
         user: undefined
@@ -37,28 +38,26 @@ export default function App() {
                 })
             }
         }
-
         checkLoggedIn();
     }, [])
-
     return (
         <div>
             <BrowserRouter>
                 <UserContext.Provider value={{ userData, setUserData }} >
-                    <Switch>
-
-                        <Route path="/" exact component={Login} />
-                        <Route path="/signup" exact component={Resigter} />
-                        <Route path="/verify" component={VerifyEmail} />
+                   <Provider store={Store}>
                         <Switch>
-                        <PrivateRoute path="/admin" component={AdminLayout} />
-                            
+                            <Route path="/" exact component={Login} />
+                            <Route path="/signup" exact component={Resigter} />
+                            <Route path="/verify" component={VerifyEmail} />
+                            <Switch>
+                                <PrivateRoute path="/admin" component={AdminLayout} />   
+                            </Switch>
                         </Switch>
-                    </Switch>
                     {/* <Switch>
-                            <Route path="/admin" render={props => <AdminLayout {...props} />} />
-                            <Redirect from="/" to="/admin/dashboard" />
-                        </Switch> */}
+                        <Route path="/admin" render={props => <AdminLayout {...props} />} />
+                        <Redirect from="/" to="/admin/dashboard" />
+                    </Switch> */}
+                   </Provider>
                 </UserContext.Provider>
             </BrowserRouter>
         </div>

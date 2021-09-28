@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 import "App.scss";
 import UserContext from "../context/UserContext"
-
+import { dataStatus,userProfile } from "../utility/config";
 
 class Login extends Component {
     static contextType = UserContext
@@ -28,16 +28,13 @@ class Login extends Component {
     }
 
     handleSubmit(event) {
-        const { email, password } = this.state;
         event.preventDefault();
         axios
             .post(
                 "http://localhost:8080/auth",
                 {
-
                     Email: this.state.email,
                     PassWord: this.state.password
-
                 },
                 { withCredentials: true }
             )
@@ -47,8 +44,10 @@ class Login extends Component {
                     localStorage.setItem("userIDlogin",response.data.userId)
                     this.context.setUserData({
                         token: response.data.accessToken,
-                        user: response.data.userId
+                        user: response.data.userId,
                     })
+                    userProfile.userId = response.data.userId
+                    
                     this.props.history.push("/admin/dashboard")
                 }
             })
@@ -58,7 +57,6 @@ class Login extends Component {
         
     }
     render() {
-      
         return (
            
             <div className="login-form">

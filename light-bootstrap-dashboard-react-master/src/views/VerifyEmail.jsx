@@ -5,7 +5,6 @@ class VerifyEmail extends Component {
 
     render() {
         return(
-            
         <div 
         style={{textAlign: "center", paddingTop:"4rem"}}>
             

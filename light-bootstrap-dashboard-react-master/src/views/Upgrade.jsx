@@ -4,6 +4,15 @@ import { Table, Grid, Row, Col } from "react-bootstrap";
 import UserService from '../service/userService';
 import Card from "components/Card/Card";
 import "App.scss";
+//redux
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import {changePassWord} from '../redux/action/userAction/UserAction'
+import { dataStatus } from "../utility/config";
+
+
+
+
 class Changpass extends Component {
   constructor(props) {
     super(props);
@@ -22,24 +31,25 @@ handleChange(event) {
         [event.target.name]: event.target.value
     });
 }
-
+componentDidUpdate(prevProps){
+   if (this.props.changPasswordStatus !== prevProps.changPasswordStatus) {
+        if (this.props.changPasswordStatus.status === dataStatus.SUCCESS) {
+            if(this.props.changPasswordStatus.data.err){
+                return alert(this.props.changPasswordStatus.data.err)}
+            else{
+                alert("Đổi mật khẩu thành công")
+              }
+        } 
+  }
+}
 handleSubmit(event) {
     const { Email, PassWord } = this.state;
     let data={
       currentPassWord: this.state.currentPassWord,
       newPassWord: this.state.newPassWord
     };
-  
-   this.userService.changePassWord(data)
-        .then(response => {
-          if(response.err)
-          {return alert(response.err)}
-          else{
-            alert("Đổi mật khẩu thành công")
-          }
-         
-        })
-    event.preventDefault();
+  this.props.changePassWord(data);
+  event.preventDefault();
 }
   render() {
     return (
@@ -91,5 +101,13 @@ handleSubmit(event) {
     );
   }
 }
-
-export default Changpass;
+function mapStateToProps(state) {
+  return {
+  
+    changPasswordStatus: state.UserReducer.changPasswordStatus,
+  
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { changePassWord})(Changpass),
+);

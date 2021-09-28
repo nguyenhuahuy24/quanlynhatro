@@ -2,35 +2,27 @@
 import React, { Component } from "react";
 import { Grid, Row, Col } from "react-bootstrap";
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
-import PhongTroService from '../service/phongtroService';
 import UserContext from "../context/UserContext";
-import KhachThueService from '../service/khachthueService';
+//redux
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import { getEmptyRoom ,getNotEmptyRoom} from '../redux/action/roomAction/RoomAction';
+import { getAllCustomerOfUser } from '../redux/action/customerAction/CustomerAction';
+
 class Dashboard extends Component {
 
 
   static contextType = UserContext
   constructor(props){
     super(props);
-    this.state ={
-      EmptyRoom:0,
-      NotemtyRoom: 0,
-      AmountofCustomer:0
-    }
-    this.phongtroService = new PhongTroService();
-    
-    this.userService = new KhachThueService();
-    this.userService.getAllCustomerOfUser().then(response => this.setState({AmountofCustomer : response.length}))
   }
   componentDidMount(){
-    const{userData,setUserData}= this.context;
-      this.phongtroService
-      .getemtyRoom()
-      .then(data => this.setState({ EmptyRoom: data.AmountOfRoom }));
-    this.phongtroService
-      .getNotemtyRoom()
-      .then(data => this.setState({ NotemtyRoom: data.AmountOfRoom }));
+    this.props.getEmptyRoom();
+    this.props.getNotEmptyRoom();
+    this.props.getAllCustomerOfUser();
   }
   render() {
+
     return (
       <div className="content">
         <Grid fluid>
@@ -39,14 +31,14 @@ class Dashboard extends Component {
               <StatsCard
                 bigIcon={<i className="pe-7s-server text-warning" />}
                 statsText="Đã thuê"
-                statsValue={this.state.NotemtyRoom}
+                statsValue={this.props.listNotEmptyRoom.data.AmountOfRoom}
               />
             </Col>
             <Col lg={3} sm={6}>
               <StatsCard
                 bigIcon={<i className="pe-7s-wallet text-success" />}
                 statsText="Phòng trống"
-                statsValue={this.state.EmptyRoom}
+                statsValue={this.props.listEmptyRoom.data.AmountOfRoom}
               />
             </Col>
            
@@ -54,7 +46,7 @@ class Dashboard extends Component {
               <StatsCard
                 bigIcon={<i className="fa fa-twitter text-info" />}
                 statsText="Khách Thuê"
-                statsValue={this.state.AmountofCustomer}
+                statsValue={this.props.listCustomer.data.length}
               />
             </Col>
           </Row>
@@ -65,4 +57,14 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+function mapStateToProps(state) {
+  return {
+    listEmptyRoom: state.RoomReducer.listEmptyRoom,
+    listNotEmptyRoom: state.RoomReducer.listNotEmptyRoom,
+    //customer
+    listCustomer: state.CustomerReducer.listCustomer,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { getEmptyRoom,getNotEmptyRoom,getAllCustomerOfUser})(Dashboard),
+);

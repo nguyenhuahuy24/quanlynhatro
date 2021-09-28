@@ -11,9 +11,6 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from 'primereact/calendar'
-import KhachThueService from '../service/khachthueService';
-import PhongTroService from '../service/phongtroService';
-import NhaTroService from '../service/nhatroService';
 import UserContext from "../context/UserContext";
 import classNames from 'classnames';
 import '../index.css';
@@ -22,6 +19,16 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
+//redux
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import {addPersonToRoom,removePersonToRoom} from '../redux/action/roomAction/RoomAction';
+import {getAllCustomerOfUser ,createCustomer, editCustomer, deleteCustomer} from '../redux/action/customerAction/CustomerAction'
+import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
+import {getRoomByHouseId} from '../redux/action/roomAction/RoomAction'
+
+import { dataStatus } from "../utility/config";
+
 class KhachThue extends Component {
   static contextType = UserContext
   emptyUser = {
@@ -60,9 +67,7 @@ class KhachThue extends Component {
       selectedFile: null,
       profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     };
-    this.userService = new KhachThueService();
-    this.nhatroService = new NhaTroService();
-    this.phongtroService = new PhongTroService();
+    
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.editUser = this.editUser.bind(this);
@@ -88,27 +93,89 @@ class KhachThue extends Component {
     this.state.user=this.emptyUser;
   }
   componentDidMount() {
-    const { userData, setUserData } = this.context;
-    this.nhatroService
-    .getHouseByUserId(userData.user)
-    .then(data => this.setState({ houses: data }));
-    this.userService.getAllCustomerOfUser()
-      .then(response => console.log(response));
-      
+    this.props.getHouseByUserId();
+    this.props.getAllCustomerOfUser();
   }
-  componentDidUpdate(prevProps, prevState) {
-    if( prevState.selectedHouse !==this.state.selectedHouse){
-      this.phongtroService
-      .getRoomByHouseId(this.state.selectedHouse)
-      .then(data => this.setState({ rooms: data }));
-     
+  componentDidUpdate(prevProps) {
+
+    if (this.props.listHouse !== prevProps.listHouse) {
+      if (this.props.listHouse.status === dataStatus.SUCCESS) {
+          this.props.getRoomByHouseId(this.state.selectedHouse);
+      } 
     }
-    this.userService.getAllCustomerOfUser()
-    .then(data => this.setState({ users: data }));
-    
+    if (this.props.listCustomer !== prevProps.listCustomer) {
+      if (this.props.listCustomer.status === dataStatus.SUCCESS) {
+        this.setState({ users: this.props.listCustomer.data })
+      } 
+    }
+    if (this.props.createStatus !== prevProps.createStatus) {
+      if (this.props.createStatus.status === dataStatus.SUCCESS) {
+         this.props.getAllCustomerOfUser();
+      }
+    }
+    if (this.props.editStatus !== prevProps.editStatus) {
+      if (this.props.editStatus.status === dataStatus.SUCCESS) {
+         this.props.getAllCustomerOfUser(); 
+      }
+    }
+    if (this.props.deleteStatus !== prevProps.deleteStatus) {
+      if (this.props.deleteStatus.status === dataStatus.SUCCESS) {
+        if (this.props.deleteStatus.data.deletedCount === 1) {
+                      this.setState({
+                  deleteUserDialog: false,
+                  user:this.emptyUser
+                });
+                this.toast.show({
+                  severity: "success",
+                  summary: "Successful",
+                  detail: "Xóa Bill",
+                  life: 3000
+                });
+          }else {
+                      this.toast.show({
+                severity: "error",
+                summary: "Fail",
+                detail: "Xóa Bill",
+                life: 3000
+              });
+          }
+        this.props.getAllCustomerOfUser(); 
+      }
+    }
+    if (this.props.addPersonStatus !== prevProps.addPersonStatus) {
+      if (this.props.addPersonStatus.status === dataStatus.SUCCESS) {
+            console.log(`test: `,this.props.addPersonStatus.data);
+            if(this.props.addPersonStatus.data.err)
+              {
+                this.setState({
+                AddtoRoomDialog: false
+                });
+                this.toast.show({
+                  severity: "error",
+                  summary: "Thất bại",
+                  detail: this.props.addPersonStatus.data.err,
+                  life: 6000
+                });
+            }else
+            {
+              this.setState({
+              AddtoRoomDialog: false
+              });
+              this.toast.show({
+              severity: "success",
+              summary: "Successful",
+              detail: "Thêm khách thuê",
+              life: 3000
+            });
+            }
+              
+        
+      }
+    }
   }
   onHouseChange(e) {
     this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value });
+    this.props.getRoomByHouseId(e.value._id);
   }
   onRoomChange(e) {
     this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
@@ -166,7 +233,7 @@ class KhachThue extends Component {
       fd.append("Name", this.state.user.Name);
       fd.append("Age", this.state.user.Age);
       fd.append("Email", this.state.user.Email);
-      fd.append("Phone", this.state.AddPhone);
+      fd.append("Phone", this.state.user.Phone);
       fd.append("PermanentAddress", this.state.user.PermanentAddress);
       fd.append("Cmnd", this.state.user.Cmnd);
       fd.append("DateCmnd", this.state.selectedDateCMND);
@@ -175,7 +242,8 @@ class KhachThue extends Component {
       fd.append("RoomId", this.state.selectedRoom);
       if (this.state.user._id) {
       //  this.state.user = this.userService.getCustomerById(this.state.user._id)
-        this.userService.updateCustomer(this.state.user._id, fd).then();
+        this.props.editCustomer(this.state.user._id, fd);
+        // this.userService.updateCustomer(this.state.user._id, fd).then();
         // users[index] = user;
         this.toast.show({
           severity: "success",
@@ -184,7 +252,8 @@ class KhachThue extends Component {
           life: 3000
         });
       } else {
-        this.userService.createCustomer(fd).then();
+        this.props.createCustomer(fd);
+        // this.userService.createCustomer(fd).then();
         //   users.push(user);
         this.toast.show({
           severity: "success",
@@ -193,7 +262,6 @@ class KhachThue extends Component {
           life: 3000
         });
       }
-
       state = {
         ...state,
         //  users,
@@ -220,25 +288,7 @@ class KhachThue extends Component {
     });
   }
   deleteUser() {
-
-    this.userService.deleteCustomer(this.state.user._id).then(data => {
-      if (data["deletedCount"] === 1) {
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Xóa Bill",
-          life: 3000
-        });
-      }
-      else {
-        this.toast.show({
-          severity: "success",
-          summary: "Fail",
-          detail: "Xóa Bill",
-          life: 3000
-        });
-      }
-    })
+    this.props.deleteCustomer(this.state.user._id);
   }
   findIndexById(_id) {
     let index = -1;
@@ -253,30 +303,7 @@ class KhachThue extends Component {
   }
   AddtoRoom() {
     let state = { submitted: true };
-    this.phongtroService.addPersonToRoom(this.state.selectedRoom,this.state.user._id).then(data=>{
-      if(data.err)
-      {
-        this.toast.show({
-          severity: "error",
-          summary: "Thất bại",
-          detail: data.err,
-          life: 6000
-        });
-      }else
-      this.toast.show({
-        severity: "success",
-        summary: "Successful",
-        detail: "Thêm khách thuê",
-        life: 3000
-      });
-    });
-    state = {
-        
-      ...state,
-     // rooms,
-      AddtoRoomDialog: false
-    };
-    this.setState(state);
+    this.props.addPersonToRoom(this.state.selectedRoom,this.state.user._id);
   }
   // onStatusChange(e) {
   //   let user = { ...this.state.user };
@@ -289,7 +316,6 @@ class KhachThue extends Component {
     user[`${name}`] = val;
     this.setState({ user });
   }
-
   onInputNumberChange(e, name) {
     const val = e.value || 0;
     let user = { ...this.state.user };
@@ -297,7 +323,6 @@ class KhachThue extends Component {
 
     this.setState({ user });
   }
-
   rightToolbarTemplate() {
     return (
       <React.Fragment>
@@ -341,9 +366,7 @@ class KhachThue extends Component {
       </React.Fragment>
     );
   }
-
   render() {
-  
     const { profileImg } = this.state
     const header = (
       <div className="table-header">
@@ -419,7 +442,7 @@ class KhachThue extends Component {
 
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.state.users}
+            value={this.props.listCustomer.data}
             selection={this.state.selectedUsers}
             onSelectionChange={(e) =>
               this.setState({ selectedUsers: e.value })
@@ -559,10 +582,7 @@ class KhachThue extends Component {
           onHide={this.hideDeleteUserDialog}
         >
           <div className="confirmation-content">
-            <i
-              className="pi pi-exclamation-triangle p-mr-3"
-              style={{ fontSize: "2rem" }}
-            />
+            <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: "2rem" }}/>
             {this.state.user && (
               <span>
                 Bạn chắn chắn muốn xóa đã chọn ??? <b>{this.state.user.Name}</b>
@@ -571,7 +591,6 @@ class KhachThue extends Component {
             )}
           </div>
         </Dialog>
-
         <Dialog
           visible={this.state.AddtoRoomDialog}
           style={{ width: "450px" }}
@@ -586,7 +605,7 @@ class KhachThue extends Component {
             <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowHouse}
-              options={this.state.houses}
+              options={this.props.listHouse.data}
               onChange={this.onHouseChange}
               optionLabel="Name"
               placeholder="Chọn nhà trọ"
@@ -597,7 +616,7 @@ class KhachThue extends Component {
             <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowRoom}
-              options={this.state.rooms}
+              options={this.props.listRoom.data}
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
@@ -608,5 +627,22 @@ class KhachThue extends Component {
     );
   }
 }
-
-export default KhachThue;
+function mapStateToProps(state) {
+  return {
+    //room
+    listRoom: state.RoomReducer.listRoom,
+    addPersonStatus: state.RoomReducer.addPersonStatus,
+    removePersonStatus: state.RoomReducer.removePersonStatus,
+    //customer
+    listCustomer: state.CustomerReducer.listCustomer,
+    createStatus: state.CustomerReducer.createStatus,
+    editStatus: state.CustomerReducer.editStatus,
+    deleteStatus: state.CustomerReducer.deleteStatus,
+    //house
+    listHouse: state.HouseReducer.listHouse,
+    
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, {getRoomByHouseId,getHouseByUserId, addPersonToRoom,removePersonToRoom,getAllCustomerOfUser ,createCustomer, editCustomer, deleteCustomer})(KhachThue),
+);

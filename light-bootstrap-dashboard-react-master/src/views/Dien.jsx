@@ -8,9 +8,8 @@ import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from 'primereact/inputnumber';
-import UtilityBillService from '../service/utilityBillService';
-import NhaTroService from '../service/nhatroService';
-import PhongTroService from '../service/phongtroService';
+
+
 import '../index.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -18,6 +17,14 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
 import UserContext from "../context/UserContext";
+//redux
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import {getAllUtilityBillByHouseId ,createUtilityBill, editUtilityBill, deleteUtilityBill} from '../redux/action/utilityBillAction/UtilityBillAction'
+import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
+import {getRoomByHouseId} from '../redux/action/roomAction/RoomAction'
+
+import { dataStatus } from "../utility/config";
 class Dien extends Component {
   static contextType = UserContext
   emptyDien = {
@@ -46,16 +53,12 @@ class Dien extends Component {
       selectedRoom: "",
       selectedShowRoom: null,
       selectedMonth: new Date(),
-      test: [],
     };
-
-    this.utilityService = new UtilityBillService();
-    this.nhatroService = new NhaTroService();
-    this.phongtroService = new PhongTroService();
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
     this.saveDien = this.saveDien.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
+    this.onMonthChange = this.onMonthChange.bind(this);
     this.onHouseChange = this.onHouseChange.bind(this);
     this.onRoomChange = this.onRoomChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
@@ -64,28 +67,16 @@ class Dien extends Component {
     this.deleteUtilityBill = this.deleteUtilityBill.bind(this);
     this.confirmDeleteUtilityBill = this.confirmDeleteUtilityBill.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
-   
-
   }
   componentDidMount() {
-    const { userData, setUserData } = this.context;
-    this.nhatroService
-      .getHouseByUserId(userData.user)
-      .then(data => this.setState({ houses: data }));
+    this.props.getHouseByUserId();
   }
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.selectedHouse !== this.state.selectedHouse || prevState.selectedMonth !== this.state.selectedMonth) {
-      console.log(this.state.selectedMonth)
-      const { userData, setUserData } = this.context;
-      this.utilityService
-      .getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth)
-      .then(response => {
-      
-        //test
-        const rooms = Object.values(response)[0];
-       
-        let data = [];
-        rooms.forEach(room => {
+    if (this.props.listUtilityBill !== prevProps.listUtilityBill) {
+      if (this.props.listUtilityBill.status === dataStatus.SUCCESS) {
+          const rooms = Object.values(this.props.listUtilityBill.data)[0];
+          let data = [];
+          rooms.forEach(room => {
           if (room.ListUtilityBill.length !== 0) {
             data.push({
               _id: room.ListUtilityBill[0]._id,
@@ -94,36 +85,76 @@ class Dien extends Component {
               ElectricNumber: room.ListUtilityBill[0].ElectricNumber
             })
           }
-        })
+        })  
         this.setState({ Diens: { ...data } })
-
-      }).catch(err => console.log(err));
-      this.phongtroService
-        .getRoomByHouseId(this.state.selectedHouse)
-        .then(data => this.setState({ rooms: data }));
+      } 
+    }
+    if (this.props.listHouse !== prevProps.listHouse) {
+      if (this.props.listHouse.status === dataStatus.SUCCESS) {
+          this.props.getRoomByHouseId(this.state.selectedHouse);
+      } 
+    }
+    if (this.props.createStatus !== prevProps.createStatus) {
+      if (this.props.createStatus.status === dataStatus.SUCCESS) {
+         this.props.getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth);
+      }
+    }
+    if (this.props.deleteStatus !== prevProps.deleteStatus) {
+      if (this.props.deleteStatus.status === dataStatus.SUCCESS) {      
+            if(this.props.deleteStatus.data.deletedCount === 1){
+                this.setState({ 
+                    deleteUtilityBillDialog: false,
+                    Dien: this.emptyDien });
+                this.toast.show({
+                  severity: "success",
+                  summary: "Successful",
+                  detail: "Xóa chỉ số điện nước",
+                  life: 3000
+                });
+            }else{
+              this.setState({
+              deleteUtilityBillDialog: false
+              });
+              this.toast.show({
+                  severity: "error",
+                  summary: "Fail",
+                  detail: "House Deleted",
+                  life: 3000
+                });
+            }
+            this.props.getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth);
+      }
     }
     this.state.Dien.Time = this.state.selectedMonth;
     this.state.Dien.RoomId = this.state.selectedRoom;
-      
   }
   saveDien() {
     let state = { submitted: true };
     let Dien = { ...this.state.Dien };
-    this.utilityService.createUtilityBill(Dien).then();
-    // Diens[index] = Dien;
-    this.toast.show({
-      severity: "success",
-      summary: "Thành công",
-      detail: "Nhập chỉ số điện",
-      life: 3000
-    });
+    if(this.state.Dien._id)
+    {
+       this.props.editUtilityBill(this.state.Dien._id, Dien);
+        // houses[index] = house;
+        this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Cập nhật chỉ số điện/Nước ",
+          life: 3000
+        });
+    }
+    else{
+        this.props.createUtilityBill(Dien);
+        this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Nhập chỉ số Điện/Nước",
+          life: 3000
+        });
+    }
+    
     //  }
     state = {
-      ...state,
-      selectedHouse:null,
-      test:null,
-      selectedMonth: new Date(),
-      selectedShowHouse:null,
+      ...state,  
       DienDialog: false,
       Dien: this.emptyDien
     };
@@ -136,8 +167,26 @@ class Dien extends Component {
 
     this.setState({ Dien });
   }
+  onMonthChange(e) {
+    this.setState({ selectedMonth: e.value});
+    if(this.state.selectedHouse == "")
+    {
+      this.toast.show({
+      severity: "error",
+      summary: "Lỗi",
+      detail: "Chưa chọn nhà trọ",
+      life: 2500
+      });
+    }
+    else{
+      this.props.getAllUtilityBillByHouseId(this.state.selectedHouse,e.value);
+    }
+    
+  }
   onHouseChange(e) {
     this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value, });
+    this.props.getRoomByHouseId(e.value._id);
+    this.props.getAllUtilityBillByHouseId(e.value._id,this.state.selectedMonth);
   }
   onRoomChange(e) {
     this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
@@ -168,6 +217,12 @@ class Dien extends Component {
       DienDialog: true
     });
   }
+  editDien(Dien) {
+    this.setState({
+      Dien: { ...Dien },
+      DienDialog: true
+    });
+  }
   confirmDeleteUtilityBill(Dien) {
     this.setState({
       Dien,
@@ -178,27 +233,7 @@ class Dien extends Component {
     this.setState({ deleteUtilityBillDialog: false });
   }
   deleteUtilityBill(){
-    this.utilityService.deleteUtilityBill(this.state.Dien._id).then(data => {
-      if (data["deletedCount"] === 1) {
-       this.setState({ 
-        deleteUtilityBillDialog: false,
-          Dien: this.emptyDien });
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Xóa chỉ số điện nước",
-          life: 3000
-        });
-      } else {
-        this.toast.show({
-          severity: "error",
-          summary: "Fail",
-          detail: "House Deleted",
-          life: 3000
-        });
-      }
-  
-    });
+    this.props.deleteUtilityBill(this.state.Dien._id);
   }
   hideDialog() {
     this.setState({
@@ -209,6 +244,11 @@ class Dien extends Component {
   actionBodyTemplate(rowData) {
     return (
       <React.Fragment>
+      <Button
+          icon="pi pi-pencil"
+          className="p-button-rounded p-button-success p-mr-2"
+          onClick={() => this.editDien(rowData)}
+        />
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-warning"
@@ -225,7 +265,7 @@ class Dien extends Component {
           <Dropdown
             className="p-mr-2"
             value={this.state.selectedShowHouse}
-            options={this.state.houses}
+            options={this.props.listHouse.data}
             onChange={this.onHouseChange}
             optionLabel="Name"
             placeholder="Chọn nhà trọ"
@@ -235,7 +275,7 @@ class Dien extends Component {
             id="monthpicker"
             className="p-mr-2"
             value={this.state.selectedMonth}
-            onChange={(e) => this.setState({ selectedMonth: e.value })}
+            onChange={this.onMonthChange}
             view="month" dateFormat="mm/yy"
             showIcon
             yearNavigator
@@ -340,7 +380,7 @@ class Dien extends Component {
             <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowRoom}
-              options={this.state.rooms}
+              options={this.props.listRoom.data}
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
@@ -387,5 +427,19 @@ class Dien extends Component {
     );
   }
 }
-
-export default Dien;
+function mapStateToProps(state) {
+  return {
+    //room
+    listRoom: state.RoomReducer.listRoom,
+    //utilityBill
+    listUtilityBill: state.UtilityBillReducer.listUtilityBill,
+    createStatus: state.UtilityBillReducer.createStatus,
+    editStatus: state.UtilityBillReducer.editStatus,
+    deleteStatus: state.UtilityBillReducer.deleteStatus,
+    //house
+    listHouse: state.HouseReducer.listHouse,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, {getRoomByHouseId,getHouseByUserId, getAllUtilityBillByHouseId ,createUtilityBill, editUtilityBill, deleteUtilityBill})(Dien),
+);

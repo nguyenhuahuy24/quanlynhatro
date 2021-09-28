@@ -9,9 +9,6 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from "primereact/dropdown";
-import PhongTroService from '../service/phongtroService';
-import NhaTroService from '../service/nhatroService';
-import DichVuService from '../service/dichvuService';
 import classNames from 'classnames';
 import '../index.css';
 import 'primeflex/primeflex.css';
@@ -19,9 +16,14 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
-
 import UserContext from "../context/UserContext";
+//redux
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import { getRoomByHouseId ,createRoom, editRoom, deleteRoom} from '../redux/action/roomAction/RoomAction'
+import { getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 
+import { dataStatus } from "../utility/config";
 class PhongTro extends Component {
   static contextType = UserContext
   emptyRoom = {
@@ -36,13 +38,11 @@ class PhongTro extends Component {
     ListPerson: "",
     ListService: "",
   };
-
   constructor(props) {
     super(props);
     this.state = {
       houses: null,
       rooms: null,
-      DVs: null,
       roomDialog: false,
       deleteRoomDialog: false,
       deleteRoomsDialog: false,
@@ -56,9 +56,8 @@ class PhongTro extends Component {
       selectedFile: null,
       profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     };
-    this.nhatroService = new NhaTroService();
-    this.phongtroService = new PhongTroService();
-    this.DVService = new DichVuService();
+
+  
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
@@ -80,15 +79,58 @@ class PhongTro extends Component {
     this.handleImageChange = this.handleImageChange.bind(this);
   }
   componentDidMount() {
-    const { userData, setUserData } = this.context;
-    this.nhatroService
-      .getHouseByUserId(userData.user)
-      .then(data => this.setState({ houses: data }));
+    // const { userData, setUserData } = this.context;
+    // this.nhatroService
+    //   .getHouseByUserId(userData.user)
+    //   .then(data => this.setState({ houses: data }));
+    this.props.getHouseByUserId();
   }
-  componentDidUpdate() {
-    this.phongtroService
-      .getRoomByHouseId(this.state.selectedKhuTro)
-      .then(data => this.setState({ rooms: data }));
+  componentDidUpdate(prevProps) {
+    
+    // this.phongtroService
+    //   .getRoomByHouseId(this.state.selectedKhuTro)
+    //   .then(data => this.setState({ rooms: data }));
+    // if (this.state.selectedKhuTro !== prevProps.selectedKhuTro) {
+    //   this.props.getRoomByHouseId(this.state.selectedKhuTro);
+    // }
+    if (this.props.createStatus !== prevProps.createStatus) {
+      if (this.props.createStatus.status === dataStatus.SUCCESS) {
+         this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+    }
+    if (this.props.editStatus !== prevProps.editStatus) {
+      if (this.props.editStatus.status === dataStatus.SUCCESS) {
+         this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+    }
+    if (this.props.deleteStatus !== prevProps.deleteStatus) {
+      if (this.props.deleteStatus.status === dataStatus.SUCCESS) {
+        if (this.props.deleteStatus.data.deletedCount === 1) {
+              this.setState({ 
+                  deleteRoomDialog: false,
+                  room: this.emptyRoom });
+                  this.toast.show({
+                      severity: "success",
+                      summary: "Successful",
+                      detail: "Phòng Deleted",
+                      life: 3000
+                  });
+          }else {
+                this.toast.show({
+                    severity: "success",
+                    summary: "Fail",
+                    detail: "Phòng Deleted",
+                    life: 3000
+                  });
+          }
+        this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+    }
+    if (this.props.listRoom !== prevProps.listRoom) {
+      if (this.props.listRoom.status === dataStatus.SUCCESS) {
+        this.setState({ rooms: this.props.listRoom.data })
+      } 
+    }
   }
   handleImageChange(e) {
     const reader = new FileReader();
@@ -108,8 +150,8 @@ class PhongTro extends Component {
   }
   onKhuTroChange(e) {
     this.setState({ selectedKhuTro: e.value._id,selectedShow:e.value });
+    this.props.getRoomByHouseId(e.value._id);
   }
-
   openNew() {
     this.setState({
       room: this.emptyRoom,
@@ -147,11 +189,9 @@ class PhongTro extends Component {
       fd.append("HouseId", this.state.selectedKhuTro);
     //  fd.append("Status", this.state.room.Status);
       if (this.state.room._id) {
-  
       // this.phongtroService.getRoomById(this.state.room._id).then(data => this.setState({room:data}))
-      
-      this.phongtroService.updateRoom(this.state.room._id, fd).then();
-    
+      this.props.editRoom(this.state.room._id, fd);
+      //this.phongtroService.updateRoom(this.state.room._id, fd).then();
        // rooms[index] = room;
         this.toast.show({
           severity: "success",
@@ -160,7 +200,8 @@ class PhongTro extends Component {
           life: 3000
         });
       } else {
-        this.phongtroService.createRoom(fd).then();
+        this.props.createRoom(fd);
+        //this.phongtroService.createRoom(fd).then();
        // rooms.push(room);
         this.toast.show({
           severity: "success",
@@ -195,27 +236,28 @@ class PhongTro extends Component {
     });
   }
   deleteRoom() {
-    this.phongtroService.deleteRoom(this.state.room._id).then(data => {
-      if (data["deletedCount"] === 1) {
-        this.setState({ 
-          deleteRoomDialog: false,
-           room: this.emptyRoom });
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Phòng Deleted",
-          life: 3000
-        });
-      }
-      else {
-        this.toast.show({
-          severity: "success",
-          summary: "Fail",
-          detail: "Phòng Deleted",
-          life: 3000
-        });
-      }
-    })
+    this.props.deleteRoom(this.state.room._id);
+    // this.phongtroService.deleteRoom(this.state.room._id).then(data => {
+    //   if (data["deletedCount"] === 1) {
+    //     this.setState({ 
+    //       deleteRoomDialog: false,
+    //        room: this.emptyRoom });
+    //     this.toast.show({
+    //       severity: "success",
+    //       summary: "Successful",
+    //       detail: "Phòng Deleted",
+    //       life: 3000
+    //     });
+    //   }
+    //   else {
+        // this.toast.show({
+        //   severity: "success",
+        //   summary: "Fail",
+        //   detail: "Phòng Deleted",
+        //   life: 3000
+        // });
+    //   }
+    // })
 
   }
   findIndexById(_id) {
@@ -272,7 +314,7 @@ class PhongTro extends Component {
         <Dropdown
           className="p-mr-2"
           value={this.state.selectedShow}
-          options={this.state.houses}
+          options={this.props.listHouse.data}
           onChange={this.onKhuTroChange}
           optionLabel="Name"
           placeholder="Chọn khu trọ"
@@ -373,7 +415,7 @@ class PhongTro extends Component {
           ></Toolbar>
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.state.rooms}
+            value={this.props.listRoom.data}
             dataKey="id"
             paginator
             rows={10}
@@ -441,7 +483,7 @@ class PhongTro extends Component {
           </div>
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
-              <label htmlFor="Length">Chiều dài</label>
+              <label htmlFor="Length">Chiều dài(m)</label>
               <InputText
                 id="Length"
                 value={this.state.room.Length}
@@ -450,7 +492,7 @@ class PhongTro extends Component {
               />
             </div>
             <div className="p-field p-col">
-              <label htmlFor="Width">Chiều rộng</label>
+              <label htmlFor="Width">Chiều rộng(m)</label>
               <InputText
                 id="Width"
                 value={this.state.room.Width}
@@ -506,4 +548,15 @@ class PhongTro extends Component {
   }
 }
 
-export default PhongTro;
+function mapStateToProps(state) {
+  return {
+    listHouse: state.HouseReducer.listHouse,
+    listRoom: state.RoomReducer.listRoom,
+    createStatus: state.RoomReducer.createStatus,
+    editStatus: state.RoomReducer.editStatus,
+    deleteStatus: state.RoomReducer.deleteStatus,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { getHouseByUserId,getRoomByHouseId ,createRoom, editRoom, deleteRoom})(PhongTro),
+);

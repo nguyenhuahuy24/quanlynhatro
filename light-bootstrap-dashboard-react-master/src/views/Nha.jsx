@@ -8,7 +8,6 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import NhaTroService from '../service/nhatroService';
 import classNames from 'classnames';
 import '../index.css';
 import 'primeflex/primeflex.css';
@@ -16,6 +15,13 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import UserContext from "../context/UserContext";
+
+
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import { getHouseByUserId ,createHouse, editHouse, deleteHouse} from '../redux/action/houseAction/HouseAction'
+import { dataStatus } from "../utility/config";
+
 
 class Nha extends Component {
   static contextType = UserContext
@@ -36,9 +42,9 @@ class Nha extends Component {
     //  loginuserID: localStorage.getItem("userIDlogin"),
       selectedHouses: null,
       submitted: false,
-      globalFilter: null
+      globalFilter: null,
     };
-    this.houseService = new NhaTroService();
+ 
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.openNew = this.openNew.bind(this);
@@ -58,14 +64,56 @@ class Nha extends Component {
     this.state.house=this.emptyHouse;
   }
   componentDidMount() {
-    this.houseService
-      .getHouseByUserId()
-      .then(data => this.setState({ houses: data }));
+    
+    // this.houseService
+    //   .getHouseByUserId()
+    //   .then(data =>this.setState({ houses: data }));
+    this.props.getHouseByUserId();
+    
   }
-  componentDidUpdate(){
-    this.houseService
-      .getHouseByUserId()
-      .then(data => this.setState({ houses: data }));
+  componentDidUpdate(prevProps){
+    if (this.props.createStatus !== prevProps.createStatus) {
+      if (this.props.createStatus.status === dataStatus.SUCCESS) {
+         this.props.getHouseByUserId();
+      }
+    }
+    if (this.props.editStatus !== prevProps.editStatus) {
+      if (this.props.editStatus.status === dataStatus.SUCCESS) {
+         this.props.getHouseByUserId(); 
+      }
+    }
+    if (this.props.deleteStatus !== prevProps.deleteStatus) {
+      if (this.props.deleteStatus.status === dataStatus.SUCCESS) {
+        if (this.props.deleteStatus.data.deletedCount === 1) {
+              this.setState({ 
+                deleteHouseDialog: false,
+                house: this.emptyHouse});
+              this.toast.show({
+                  severity: "success",
+                  summary: "Successful",
+                  detail: "House Deleted",
+                  life: 3000
+                });
+          }else {
+                this.toast.show({
+                  severity: "warning",
+                  summary: "Fail",
+                  detail: "House Deleted",
+                  life: 3000
+                });
+          }
+        this.props.getHouseByUserId();
+      }
+    }
+    if (this.props.listHouse !== prevProps.listHouse) {
+      if (this.props.listHouse.status === dataStatus.SUCCESS) {
+        this.setState({ houses: this.props.listHouse.data })
+      } 
+    }
+    // this.houseService
+    //   .getHouseByUserId()
+    //   .then(data => this.setState({ houses: data }));
+
   }
   openNew() {
     this.setState({
@@ -93,7 +141,8 @@ class Nha extends Component {
       let house = { ...this.state.house };
       if (this.state.house._id) {
       //  const index = this.findIndexById(this.state.house._id);
-        this.houseService.updateHouse(this.state.house._id, house).then();
+        //this.houseService.updateHouse(this.state.house._id, house).then();
+        this.props.editHouse(this.state.house._id, house);
         // houses[index] = house;
         this.toast.show({
           severity: "success",
@@ -103,7 +152,8 @@ class Nha extends Component {
         });
       }
       else {
-        this.houseService.createHouse(house).then();
+       this.props.createHouse(house);
+       //this.houseService.createHouse(house).then();
       // houses.push(house);
         this.toast.show({
           severity: "success",
@@ -134,27 +184,29 @@ class Nha extends Component {
     });
   }
   deleteHouse() {
-     this.houseService.deleteHouse(this.state.house._id).then(data => {
-      if (data["deletedCount"] === 1) {
-       this.setState({ 
-         deleteHouseDialog: false,
-          house: this.emptyHouse });
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "House Deleted",
-          life: 3000
-        });
-      } else {
-        this.toast.show({
-          severity: "success",
-          summary: "Fail",
-          detail: "House Deleted",
-          life: 3000
-        });
-      }
+    this.props.deleteHouse(this.state.house._id);
+    // this.houseService.deleteHouse(this.state.house._id).then(data => {
+    //   console.log(`data screen:`,data);
+    //   if (data["deletedCount"] === 1) {
+    //    this.setState({ 
+    //      deleteHouseDialog: false,
+    //       house: this.emptyHouse });
+    //     this.toast.show({
+    //       severity: "success",
+    //       summary: "Successful",
+    //       detail: "House Deleted",
+    //       life: 3000
+    //     });
+    //   } else {
+    //     this.toast.show({
+    //       severity: "warning",
+    //       summary: "Fail",
+    //       detail: "House Deleted",
+    //       life: 3000
+    //     });
+    //   }
   
-    });
+    // });
 
   }
   findIndexById(_id) {
@@ -276,19 +328,19 @@ class Nha extends Component {
           <DataTable
             ref={(el) => this.dt = el}
             value={this.state.houses}
-            selection={this.state.selectedHouses}
-            onSelectionChange={(e) =>
-              this.setState({ selectedHouses: e.value })
-            }
+            // selection={this.props.listHouse.data}
+            // onSelectionChange={(e) =>
+            //   this.setState({ selectedHouses: e.value })
+            // }
             dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} houses"
             globalFilter={this.state.globalFilter}
             header={header}>
-            <Column
+            {/* <Column
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
-            ></Column>
+            ></Column> */}
             <Column field="Name" header="Tên nhà trọ" ></Column>
             <Column field="Address" header="Địa chỉ" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
@@ -359,4 +411,14 @@ class Nha extends Component {
   }
 }
 
-export default Nha;
+function mapStateToProps(state) {
+  return {
+    listHouse: state.HouseReducer.listHouse,
+    createStatus: state.HouseReducer.createStatus,
+    editStatus: state.HouseReducer.editStatus,
+    deleteStatus: state.HouseReducer.deleteStatus,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { getHouseByUserId,createHouse,editHouse, deleteHouse})(Nha),
+);

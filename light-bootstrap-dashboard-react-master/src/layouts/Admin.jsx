@@ -49,7 +49,6 @@ class Admin extends Component {
     }
     return "Brand";
   };
- 
   render() {
     return (
       <div className="wrapper">

@@ -5,6 +5,10 @@ import Card from "components/Card/Card";
 import "App.scss";
 import UserService from '../service/userService';
 
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import {getUser ,changePassWord, editUser} from '../redux/action/userAction/UserAction'
+import { dataStatus } from "../utility/config";
 
 class InformationOfUser extends Component {
     constructor(props) {
@@ -15,26 +19,41 @@ class InformationOfUser extends Component {
             Image: "",
             Age: 0,
             Phone: "",
-            selectedFile: null
+            selectedFile: ""
 
         };
         this.userService = new UserService();
-        this.userService.getUser().then(data => {
-            if (data.Name) this.setState({ Name: data.Name });
-            if (data.Image) {
-                let image = `http://localhost:8080/`+data.Image
-                this.setState({ Image: image })
-            } else {
-                this.setState({ Image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' })
-            }
-            if (data.Age) this.setState({ Age: data.Age });
-            if (data.Phone) this.setState({ Phone: data.Phone });
-        })
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleImageChange = this.handleImageChange.bind(this);
     }
-
+    componentDidMount(){
+        this.props.getUser();
+    }
+    componentDidUpdate(prevProps){
+        if (this.props.user !== prevProps.user) {
+            if (this.props.user.status === dataStatus.SUCCESS) {
+                if (this.props.user.data.Name) this.setState({ Name: this.props.user.data.Name });
+                if (this.props.user.data.Image) {
+                    let image = `http://localhost:8080/`+this.props.user.data.Image
+                    this.setState({ Image: image })
+                } else {
+                    this.setState({ Image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' })
+                }
+                if (this.props.user.data.Age) this.setState({ Age: this.props.user.data.Age });
+                if (this.props.user.data.Phone) this.setState({ Phone: this.props.user.data.Phone });
+             } 
+        }
+        if (this.props.editStatus !== prevProps.editStatus) {
+            if (this.props.editStatus.status === dataStatus.SUCCESS) {
+                 this.props.getUser();
+                alert("Cập nhật thông tin thành công")
+            }
+            else{
+                alert("Cập nhật thông tin thất bại")
+            }
+        }
+    }
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value
@@ -52,23 +71,15 @@ class InformationOfUser extends Component {
     }
     handleSubmit(event) {
         const fd = new FormData()
+        if(this.state.selectedFile!="")
+        {
+            fd.append("Image", this.state.selectedFile);
+        }
         fd.append("Name", this.state.Name);
         fd.append("Image", this.state.selectedFile);
         fd.append("Age", this.state.Age);
         fd.append("Phone", this.state.Phone);
-        
-        axios.patch("http://localhost:8080/user", fd, {
-            headers: {
-                Authorization: 'Bearer ' + localStorage.getItem("auth-token")
-            }
-        })
-            .then(response => {
-                console.log(response)
-                alert("Cập nhật thông tin thành công")
-            })
-            .catch(error => {
-                alert("Cập nhật thông tin thất bại")
-            });
+        this.props.editUser(fd);
         event.preventDefault();
     }
     render() {
@@ -146,4 +157,14 @@ class InformationOfUser extends Component {
         );
     }
 
-} export default InformationOfUser;
+}
+function mapStateToProps(state) {
+  return {
+    user: state.UserReducer.user,
+    changPasswordStatus: state.UserReducer.changPasswordStatus,
+    editStatus: state.UserReducer.editStatus,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { getUser ,changePassWord, editUser})(InformationOfUser),
+);

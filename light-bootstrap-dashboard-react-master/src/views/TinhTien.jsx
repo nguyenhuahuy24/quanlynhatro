@@ -8,13 +8,8 @@ import { Calendar } from 'primereact/calendar'
 import { RadioButton } from 'primereact/radiobutton'
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from "primereact/dropdown";
-
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
-
-import BillService from '../service/billService';
-import PhongTroService from '../service/phongtroService';
-import NhaTroService from '../service/nhatroService';
 import UserContext from "../context/UserContext";
 import '../index.css';
 import 'primeflex/primeflex.css';
@@ -22,6 +17,13 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
 import '../index.css';
+//redux
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import {getBillInMonthOfUser ,createBill, editBill, deleteBill} from '../redux/action/billAction/BillAction'
+import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
+import {getRoomByHouseId} from '../redux/action/roomAction/RoomAction'
+import { dataStatus,userProfile } from "../utility/config";
 
 class TinhTien extends Component {
   static contextType = UserContext
@@ -63,11 +65,7 @@ class TinhTien extends Component {
       
     };
 
-    this.billService = new BillService();
-    this.nhatroService = new NhaTroService();
-    this.phongtroService = new PhongTroService();
     this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
-  
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
@@ -92,24 +90,13 @@ class TinhTien extends Component {
     this.hideDeleteBillsDialog = this.hideDeleteBillsDialog.bind(this);
   }
   componentDidMount() {
-    const{userData,setUserData}= this.context;
-    this.nhatroService
-      .getHouseByUserId(userData.user)
-      .then(data => this.setState({ houses: data }));
+    this.props.getHouseByUserId();
   }
   componentDidUpdate(prevProps, prevState){
-    if( prevState.selectedHouse!==this.state.selectedHouse){
-      const{userData,setUserData}= this.context;
-      this.phongtroService
-        .getRoomByHouseId(this.state.selectedHouse)
-        .then(data=> this.setState({rooms:data}));
-      this.billService
-        .getBillInMonthOfUser(this.state.selectedHouse,userData.user)
-        .then(response => {
-          console.log(response)
-          const bills = Object.values(response.Rooms);
+    if (this.props.listBill !== prevProps.listBill) {
+      if (this.props.listBill.status === dataStatus.SUCCESS) {
+          const bills = Object.values(this.props.listBill.data.Rooms);
           let data = [];
-          console.log(bills)
           bills.forEach(bill => {
             if (bill.ListBill.length !== 0) {
               data.push({
@@ -122,10 +109,51 @@ class TinhTien extends Component {
                 ElectricFee:bill.ListBill[0].ElectricFee
               })
             }
-          })  
-        
+          })
+          console.log(`data: `,data);
           this.setState({ bills: { ...data } })
-        }).catch(err => console.log(err));
+      } 
+    }
+    if (this.props.listHouse !== prevProps.listHouse) {
+      if (this.props.listHouse.status === dataStatus.SUCCESS) {
+          this.props.getRoomByHouseId(this.state.selectedHouse);
+      } 
+    }
+    if (this.props.createStatus !== prevProps.createStatus) {
+      if (this.props.createStatus.status === dataStatus.SUCCESS) {
+         this.props.getBillInMonthOfUser(this.state.selectedHouse,userProfile.userId);
+      }
+    }
+    if (this.props.editStatus !== prevProps.editStatus) {
+      if (this.props.editStatus.status === dataStatus.SUCCESS) {
+          this.props.getBillInMonthOfUser(this.state.selectedHouse,userProfile.userId);
+      } 
+    }
+    if (this.props.deleteStatus !== prevProps.deleteStatus) {
+      if (this.props.deleteStatus.status === dataStatus.SUCCESS) {      
+            if(this.props.deleteStatus.data.deletedCount === 1){
+                this.setState({ 
+                    deleteBillDialog: false,
+                    bill: this.emptyBill });
+                this.toast.show({
+                  severity: "success",
+                  summary: "Successful",
+                  detail: "Xóa Bill",
+                  life: 3000
+                });
+            }else{
+              this.setState({
+              deleteBillDialog: false
+              });
+              this.toast.show({
+          severity: "success",
+          summary: "Fail",
+          detail: "Xóa Bill",
+          life: 3000
+        });
+            }
+          this.props.getBillInMonthOfUser(this.state.selectedHouse,userProfile.userId);
+      }
     }
   }
   formatCurrency(value) {
@@ -150,7 +178,8 @@ class TinhTien extends Component {
   }
   onHousesChange(e) {
     this.setState({ selectedHouse: e.value._id,selectedShowHouse:e.value });
-    
+    this.props.getBillInMonthOfUser(e.value._id,userProfile.userId);
+    this.props.getRoomByHouseId(e.value._id);
   }
   openNew() {
     this.setState({
@@ -159,7 +188,6 @@ class TinhTien extends Component {
       billDialog: true
     });
   }
-
   hideDialog() {
     this.setState({
       submitted: false,
@@ -178,22 +206,13 @@ class TinhTien extends Component {
       ViewBillDialog: false
     });
   }
-
-
-
-
-  hideDeleteBillDialog() {
-    this.setState({ deleteBillDialog: false });
-  }
-
-  hideDeleteBillsDialog() {
-    this.setState({ deleteBillsDialog: false });
-  }
+  hideDeleteBillDialog() {this.setState({ deleteBillDialog: false });}
+  hideDeleteBillsDialog() {this.setState({ deleteBillsDialog: false });}
   ThanhToan() {
     let state = { submitted: true }; 
-   
     let a ={Status:this.state.bill.Status}
-    this.billService.updateBill(this.state.bill._id,a).then();
+    this.props.editBill(this.state.bill._id,a);
+    //this.billService.updateBill(this.state.bill._id,a).then();
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -203,8 +222,7 @@ class TinhTien extends Component {
     state = {
         ...state,
         bills:null,
-        selectedShowHouse:null,
-        selectedHouse:null,
+      
         ConfirmBillDialog: false,
         bill: this.emptyBill
       };
@@ -213,7 +231,8 @@ class TinhTien extends Component {
   TinhBill() {
     let state = { submitted: true }; 
     let a ={RoomId:this.state.selectedRoom}
-    this.billService.createBill(a).then();
+    this.props.createBill(a);
+    //this.billService.createBill(a).then();
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -223,10 +242,6 @@ class TinhTien extends Component {
     state = {
         ...state,
         bills:null,
-        selectedShowHouse:null,
-        selectedHouse:null,
-        selectedRoom:null,
-        selectedHouse: null,
         billDialog: false,
         bill: this.emptyBill
       };
@@ -254,24 +269,7 @@ class TinhTien extends Component {
     });
   }
   deleteBill() {
-    this.state.billService.deleteBill(this.state.bill._id).then(data => {
-      if (data["deletedCount" === 1]) {
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Xóa Bill",
-          life: 3000
-        });
-      }
-      else {
-        this.toast.show({
-          severity: "success",
-          summary: "Fail",
-          detail: "Xóa Bill",
-          life: 3000
-        });
-      }
-    })
+    this.props.deleteBill(this.state.bill._id);
   }
   confirmDeleteSelected() {
     this.setState({ deleteBillsDialog: true });
@@ -309,7 +307,7 @@ class TinhTien extends Component {
         <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowHouse}
-              options={this.state.houses}
+              options={this.props.listHouse.data}
               onChange={this.onHousesChange}
               optionLabel="Name"
               placeholder="Chọn nhà trọ"
@@ -493,7 +491,7 @@ class TinhTien extends Component {
             <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowHouse}
-              options={this.state.houses}
+              options={this.props.listHouse.data}
               onChange={this.onHousesChange}
               optionLabel="Name"
               placeholder="Chọn nhà trọ"
@@ -504,7 +502,7 @@ class TinhTien extends Component {
             <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowRoom}
-              options={this.state.rooms}
+              options={this.props.listRoom.data}
               onChange={this.onRoomsChange}
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
@@ -635,4 +633,19 @@ class TinhTien extends Component {
   }
 }
 
-export default TinhTien;
+function mapStateToProps(state) {
+  return {
+    //room
+    listRoom: state.RoomReducer.listRoom,
+    //Bill
+    listBill: state.BillReducer.listBill,
+    createStatus: state.BillReducer.createStatus,
+    editStatus: state.BillReducer.editStatus,
+    deleteStatus: state.BillReducer.deleteStatus,
+    //house
+    listHouse: state.HouseReducer.listHouse,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, {getRoomByHouseId,getHouseByUserId, getBillInMonthOfUser ,createBill, editBill, deleteBill})(TinhTien),
+);

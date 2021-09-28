@@ -12,11 +12,18 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
-import { Dropdown } from "primereact/dropdown";
-import DichVuService from '../service/dichvuService';
 import classNames from 'classnames';
 import { InputText } from 'primereact/inputtext';
 import UserContext from "../context/UserContext";
+
+
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
+import { getServiceOfUser ,createDichVu, editDichVu, deleteDichVu} from '../redux/action/dichVuAction/DichVuAction'
+import { dataStatus } from "../utility/config";
+
+
+
 class DichVu extends Component {
   static contextType = UserContext
   emptyDV = {
@@ -42,7 +49,7 @@ class DichVu extends Component {
       selectedCategory: null,
       
     };
-    this.DVService = new DichVuService();
+  
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
@@ -64,14 +71,54 @@ class DichVu extends Component {
     this.state.house=this.emptyDV;
   }
   componentDidMount() {
-    this.DVService
-      .getServiceOfUser()
-      .then(data => this.setState({ DVs: data }));
+    // this.DVService
+    //   .getServiceOfUser()
+    //   .then(data => this.setState({ DVs: data }));
+    this.props.getServiceOfUser();
   }
-  componentDidUpdate(){
-    this.DVService
-      .getServiceOfUser()
-      .then(data => this.setState({ DVs: data }));
+  componentDidUpdate(prevProps){
+    if (this.props.createStatus !== prevProps.createStatus) {
+      if (this.props.createStatus.status === dataStatus.SUCCESS) {
+         this.props.getServiceOfUser();
+      }
+    }
+    if (this.props.editStatus !== prevProps.editStatus) {
+      if (this.props.editStatus.status === dataStatus.SUCCESS) {
+         this.props.getServiceOfUser();
+         
+      }
+    }
+    if (this.props.deleteStatus !== prevProps.deleteStatus) {
+      if (this.props.deleteStatus.status === dataStatus.SUCCESS) {
+            if(this.props.deleteStatus.data.deletedCount === 1)
+          {
+            this.setState({
+            //  DVs,
+              deleteDVDialog: false,
+              DV: this.emptyDV
+            });
+            this.toast.show({
+              severity: "success",
+              summary: "Successful",
+              detail: "Dịch Vụ Deleted",
+              life: 3000
+            });
+          }else{
+            this.toast.show({
+              severity: "success",
+              summary: "Fail",
+              detail: "Dich Vụ Deleted",
+              life: 3000
+            });
+          }
+        this.props.getServiceOfUser();
+      }
+    }
+    if (this.props.listDichVu !== prevProps.listDichVu) {
+      if (this.props.listDichVu.status === dataStatus.SUCCESS) {
+        this.setState({ DVs: this.props.listDichVu.data })
+      } 
+    }
   }
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
@@ -108,7 +155,7 @@ class DichVu extends Component {
       let DV = { ...this.state.DV };
       if (this.state.DV._id) {
         //const index = this.findIndexById(this.state.DV._id);
-        this.DVService.updateDichVu(this.state.DV._id,DV).then();
+        this.props.editDichVu(this.state.DV._id,DV);
        // DVs[index] = DV;
         this.toast.show({
           severity: "success",
@@ -117,7 +164,7 @@ class DichVu extends Component {
           life: 3000
         });
       } else {
-        this.DVService.createDichVu(DV).then();
+        this.props.createDichVu(DV);
        // DVs.push(DV);
         this.toast.show({
           severity: "success",
@@ -148,30 +195,7 @@ class DichVu extends Component {
     });
   }
   deleteDV() {
-    let DVs =this.DVService.deleteDichVu(this.state.DV._id).then(data=>{
-      if(data["deletedCount"] === 1)
-      {
-        this.setState({
-        //  DVs,
-          deleteDVDialog: false,
-          DV: this.emptyDV
-        });
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Dịch Vụ Deleted",
-          life: 3000
-        });
-      }else{
-        this.toast.show({
-          severity: "success",
-          summary: "Fail",
-          detail: "Dich Vụ Deleted",
-          life: 3000
-        });
-      }
-    })
-    
+    this.props.deleteDichVu(this.state.DV._id);
   }
   findIndexById(_id) {
     let index = -1;
@@ -409,5 +433,14 @@ class DichVu extends Component {
     );
   }
 }
-
-export default DichVu;
+function mapStateToProps(state) {
+  return {
+    listDichVu: state.DichVuReducer.listDichVu,
+    createStatus: state.DichVuReducer.createStatus,
+    editStatus: state.DichVuReducer.editStatus,
+    deleteStatus: state.DichVuReducer.deleteStatus,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { getServiceOfUser ,createDichVu, editDichVu, deleteDichVu})(DichVu),
+);
