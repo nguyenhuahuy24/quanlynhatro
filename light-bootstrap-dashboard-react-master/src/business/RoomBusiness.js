@@ -17,6 +17,22 @@ class RoomBusiness {
             failed(error)
         }
     };
+    getPersonInRoom = async (data, success, failed) => {
+        try {
+            const roomService = new RoomService()
+            const id = data
+            console.log(`business Person: `,roomService)
+            const result = await roomService.getPersonInRoom(id);
+            if (result.status === dataStatus.SUCCESS) {
+                success(result)
+            }
+            else {
+                failed(result)
+            }
+        } catch (error) {
+            failed(error)
+        }
+    };
     createRoom = async (data, success, failed) =>{
         try {
             const room = new RoomService()

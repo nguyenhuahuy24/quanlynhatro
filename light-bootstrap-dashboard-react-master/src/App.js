@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import Login from "views/Login.jsx"
 import Resigter from "views/Resigter.jsx"
 
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./assets/css/animate.min.css";
 import "./assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
 import "./assets/css/demo.css";
 import "./assets/css/pe-icon-7-stroke.css";
+import "./App.scss"
+
 import UserContext from "./context/UserContext"
 import Axios from "axios";
 import VerifyEmail from "views/VerifyEmail"
@@ -41,10 +43,13 @@ export default function App() {
         checkLoggedIn();
     }, [])
     return (
-        <div>
-            <BrowserRouter>
+      
+          <BrowserRouter>
                 <UserContext.Provider value={{ userData, setUserData }} >
                    <Provider store={Store}>
+                        
+          
+          
                         <Switch>
                             <Route path="/" exact component={Login} />
                             <Route path="/signup" exact component={Resigter} />
@@ -57,10 +62,11 @@ export default function App() {
                         <Route path="/admin" render={props => <AdminLayout {...props} />} />
                         <Redirect from="/" to="/admin/dashboard" />
                     </Switch> */}
-                   </Provider>
+         
+           </Provider>
                 </UserContext.Provider>
             </BrowserRouter>
-        </div>
-    )
+        
+    );
 
 }

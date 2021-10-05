@@ -4,7 +4,7 @@ html {
 }
 
 body {
-    background-color: #e27c7c;
+    background-color: #ffff;
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
     font-weight: normal;
     color: #495057;
@@ -13,13 +13,15 @@ body {
     padding: .5em;
     margin-bottom: 50px;
 }
-
+a{
+    color: #595959;
+}
 h1, h2, h3, h4, h5, h6 {
     margin: 1.5rem 0 1rem 0;
     font-family: inherit;
     font-weight: 600;
     line-height: 1.2;
-    color: inherit;
+    /* color: inherit; */
 }
 
 h1 { font-size: 2.5rem; }
@@ -243,4 +245,109 @@ img.flag {
     width: 150px;
     height: 150px;
     object-fit: cover;
-  }                             
+  }   
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.mr-20 {
+  margin-right: 20px !important;
+}
+.log-out{
+    color: #333333;
+}
+
+.button-demo .p-button {
+  margin-right: 0.5rem;
+}
+.button-demo .p-buttonset .p-button {
+  margin-right: 0;
+}
+.button-demo .template .p-button i {
+  line-height: 2.25rem;
+}
+.button-demo .template .p-button.google {
+  background: linear-gradient(to left, #ff4d4d 50%, #ff1a1a 50%);
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: background-position 0.3s ease-out;
+  color: #fff;
+  border-color: #ff1a1a;
+}
+.button-demo .template .p-button.google:hover {
+  background-position: left bottom;
+}
+
+.button-demo .template .p-button.google:focus {
+  box-shadow: #ff8080;
+}
+
+.button-demo .template .p-button.facebook {
+  background: linear-gradient(to left, #0000b3 50%, #000080 50%);
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: background-position 0.3s ease-out;
+  color: #fff;
+  border-color: #000080;
+}
+.button-demo .template .p-button.facebook:hover {
+  background-position: left bottom;
+}
+
+.button-demo .template .p-button.facebook:focus {
+  box-shadow: #1a1aff;
+}
+.button-demo .template .p-button.twitter {
+  background: linear-gradient(to left, #0099ff 50%, #006bb3 50%);
+  background-size: 200%,100%;
+  background-position: right bottom;
+  transition: background-position 0.3s ease-out;
+  color: #fff;
+  border-color: #006bb3;
+}
+.button-demo .template .p-button.twitter:hover {
+  background-position: left bottom;
+}
+.button-demo .template .p-button.twitter:focus {
+  box-shadow: #66c2ff;
+}
+
+@media screen and (max-width: 950px) {
+  .button-demo .p-button {
+    margin-bottom: 1.5rem;
+  }
+  .button-demo .p-button:not(.p-button-icon-only) {
+    display: flex;
+    width: 100%;
+  }
+  .button-demo .p-buttonset .p-button {
+    margin-bottom: 0;
+  }
+}
+
+.datatable-crud-demo .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.datatable-crud-demo .product-image {
+    width: 100px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.datatable-crud-demo .p-dialog .product-image {
+    width: 150px;
+    margin: 0 auto 2rem auto;
+    display: block;
+}
+
+.datatable-crud-demo .confirmation-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+                
+                

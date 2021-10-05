@@ -7,6 +7,11 @@ const roomState = {
     message: '',
     data: [],
   },
+  listPersonInRoom: {
+    status: dataStatus.NONE,
+    message: '',
+    data: [],
+  },
   listEmptyRoom: {
     status: dataStatus.NONE,
     message: '',
@@ -60,6 +65,27 @@ const RoomReducer = (state = roomState, action) => {
       state = {
         ...state,
         listRoom: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_PERSON_TO_ROOM:
+      state = {
+        ...state,
+        listPersonInRoom: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_PERSON_TO_ROOM_FAILED:
+      state = {
+        ...state,
+        listPersonInRoom: {
           status: action.data.status,
           message: action.data.message,
           data: []

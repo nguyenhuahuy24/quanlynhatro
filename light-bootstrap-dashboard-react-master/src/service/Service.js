@@ -129,7 +129,8 @@ class Service {
         try {
              console.log(`service data url:`,url);
              console.log(`service data:`,data);
-            const response = await axios.patch(url, data).then((res) => res.data);
+            const response = await axios.patch(url,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")
+        }});
             console.log(`service edit:`,response);
             if (typeof (response) === 'object' && 'error' in response) {        
                 return {

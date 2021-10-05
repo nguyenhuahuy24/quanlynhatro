@@ -5,10 +5,12 @@ class DichVuService extends Service {
     constructor() {
         super();
         this.url =`http://localhost:8080/room/`
+        this.url_person= `http://localhost:8080/room/person/`
+        this.url_room=`http://localhost:8080/room/house/`
     }
-    callGetAPI = async (id) => {
+    callGetAPI = async (url,id) => {
         try {
-            const response = await axios.get(`http://localhost:8080/room/house/` + id,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
+            const response = await axios.get(url + id,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -58,7 +60,7 @@ class DichVuService extends Service {
     callRemovePersonRoom = async (roomId,customerId)=>
     {
         try {
-            const response = axios.patch(this.url+roomId+`/removeCustomer/`+customerId).then((res)=> res.data);
+            const response = await axios.patch(this.url+roomId+`/removeCustomer/`+customerId).then((res)=> res.data);
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -68,7 +70,7 @@ class DichVuService extends Service {
             else {
                 return {
                     status: dataStatus.SUCCESS,
-                    data: response.data
+                    data: response
                 }
             }
         } catch (error) {
@@ -130,7 +132,16 @@ class DichVuService extends Service {
     ////////////////////////////////////////////////
     getRoomByHouseId = (id) =>{
         return new Promise((resolve, reject)=>{
-            this.callGetAPI(id).then(resp =>{   
+            this.callGetAPI(this.url_room,id).then(resp =>{   
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
+    }
+    getPersonInRoom =(roomId)=>{
+        return new Promise((resolve, reject)=>{
+            this.callGetAPI(this.url_person,roomId).then(resp =>{   
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

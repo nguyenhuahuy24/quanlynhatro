@@ -1,9 +1,11 @@
 import React, { Component } from "react";
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
+import { Button } from 'primereact/button';
 import axios from "axios";
 import "App.scss";
 import UserContext from "../context/UserContext"
 import { dataStatus,userProfile } from "../utility/config";
+import "../index.css";
 
 class Login extends Component {
     static contextType = UserContext
@@ -56,50 +58,94 @@ class Login extends Component {
             });
         
     }
-    render() {
-        return (
-           
-            <div className="login-form">
-                 <form>
-                <h2 className="text-center">Sign In</h2>
+     render() {
+    return (
+        <div className="App">
+          <div className="appAside" />
+          <div className="appForm">
+              <div className="pageSwitcher"></div>
 
-                <div className="form-group">
-               
-                    <input
-                        className="form-control"
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={this.state.email}
-                        onChange={this.handleChange}
-                        required />
-                </div>
-
-                <div className="form-group">
-                  
-                    <input
-                        className="form-control"
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={this.state.password}
-                        onChange={this.handleChange}
-                        required />
-                </div>
-                <button
-                    type="submit"
-                    className="btn btn-primary btn-block"
-                    onClick={this.handleSubmit}
-                >
-                    Submit</button>
-               
-                <p className="forgot-password text-center">
-                    Đăng kí thành viên <Link to="/signup">Sign Up</Link>
-                </p>
-                </form>
+            <div className="formTitle">
+              <NavLink
+                to="/"
+                activeClassName="formTitleLink-active"
+                className="formTitleLink"
+              >
+                Đăng Nhập
+              </NavLink>{" "}
+              or{" "}
+              <NavLink
+                exact
+                to="/signup"
+                activeClassName="formTitleLink-active"
+                className="formTitleLink"
+              >
+                Đăng Ký
+              </NavLink>
             </div>
-           
-        );
-    }
+       
+      <div className="formCenter">
+        <form className="formFields" onSubmit={this.handleSubmit}>
+          <div className="formField">
+            <label className="formFieldLabel" htmlFor="email">
+              E-Mail:
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="formFieldInput"
+              placeholder="Nhập email của bạn"
+              name="email"
+              value={this.state.email}
+              onChange={this.handleChange}
+            />
+          </div>
+
+          <div className="formField">
+            <label className="formFieldLabel" htmlFor="password">
+              Mật Khẩu:
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="formFieldInput"
+              placeholder="Nhập mật khẩu của bạn"
+              name="password"
+              value={this.state.password}
+              onChange={this.handleChange}
+            />
+          </div>
+
+          <div className="formField">
+            <button className="formFieldButton">Đăng Nhập</button>{" "}
+            <Link to="/signup" className="formFieldLink">
+              Tạo tài khoản mới.
+            </Link>
+          </div> 
+        </form>
+        
+              <div className="button-demo">
+                  <div className="template">
+                       <Button className="facebook p-p-0">
+                  <i className="pi pi-facebook p-px-2"></i>
+                  <span className="p-px-3">Facebook</span>
+              </Button>
+              <Button className="twitter p-p-0">
+                  <i className="pi pi-twitter p-px-2"></i>
+                  <span className="p-px-3">Twitter</span>
+              </Button>
+              <Button className="google p-p-0">
+                  <i className="pi pi-google p-px-2"></i>
+                  <span className="p-px-3">Google</span>
+              </Button>
+                  </div>
+              </div>
+      </div>
+       
+          </div>
+        </div>
+      
+    );
+  }
 }
 export default Login;

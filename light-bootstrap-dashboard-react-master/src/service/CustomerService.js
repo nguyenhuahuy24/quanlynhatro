@@ -17,6 +17,7 @@ class CustomerService extends Service {
     }
     createCustomer = (data)=>{
         return new Promise((resolve , reject)=>{
+            console.log("Service goi api")
             this.callPostLocalAPI(this.url,data).then(resp =>{ 
                 console.log("service")         
                 resolve(resp)
