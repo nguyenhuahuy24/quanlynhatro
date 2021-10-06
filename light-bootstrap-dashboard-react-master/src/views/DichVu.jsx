@@ -229,7 +229,7 @@ class DichVu extends Component {
           className="p-button-success p-mr-2"
           onClick={this.openNew}
         />
-        <Button
+        {/* <Button
           label="Xóa"
           icon="pi pi-trash"
           className="p-button-danger"
@@ -237,7 +237,7 @@ class DichVu extends Component {
           disabled={
             !this.state.selectedDVs || !this.state.selectedDVs.length
           }
-        />
+        /> */}
       </React.Fragment>
     );
   }

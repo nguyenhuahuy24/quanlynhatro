@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import { Table, Grid, Row, Col } from "react-bootstrap";
-import axios from "axios";
 import Card from "components/Card/Card";
 import "App.scss";
-import UserService from '../service/userService';
-
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
 import {getUser ,changePassWord, editUser} from '../redux/action/userAction/UserAction'
@@ -19,10 +16,9 @@ class InformationOfUser extends Component {
             Image: "",
             Age: 0,
             Phone: "",
-            selectedFile: ""
+            selectedFile: null
 
         };
-        this.userService = new UserService();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleImageChange = this.handleImageChange.bind(this);
@@ -71,7 +67,8 @@ class InformationOfUser extends Component {
     }
     handleSubmit(event) {
         const fd = new FormData()
-        if(this.state.selectedFile!="")
+        console.log(`test selectedFile: `,this.state.selectedFile)
+        if(this.state.selectedFile !=null)
         {
             fd.append("Image", this.state.selectedFile);
         }
@@ -79,10 +76,13 @@ class InformationOfUser extends Component {
         fd.append("Image", this.state.selectedFile);
         fd.append("Age", this.state.Age);
         fd.append("Phone", this.state.Phone);
+        console.log(`test fd: `,fd)
+
         this.props.editUser(fd);
         event.preventDefault();
     }
     render() {
+        
         return (
             <div className="content">
                 <Grid fluid>

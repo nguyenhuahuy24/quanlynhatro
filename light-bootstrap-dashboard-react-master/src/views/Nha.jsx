@@ -185,29 +185,6 @@ class Nha extends Component {
   }
   deleteHouse() {
     this.props.deleteHouse(this.state.house._id);
-    // this.houseService.deleteHouse(this.state.house._id).then(data => {
-    //   console.log(`data screen:`,data);
-    //   if (data["deletedCount"] === 1) {
-    //    this.setState({ 
-    //      deleteHouseDialog: false,
-    //       house: this.emptyHouse });
-    //     this.toast.show({
-    //       severity: "success",
-    //       summary: "Successful",
-    //       detail: "House Deleted",
-    //       life: 3000
-    //     });
-    //   } else {
-    //     this.toast.show({
-    //       severity: "warning",
-    //       summary: "Fail",
-    //       detail: "House Deleted",
-    //       life: 3000
-    //     });
-    //   }
-  
-    // });
-
   }
   findIndexById(_id) {
     let index = -1;
@@ -242,7 +219,7 @@ class Nha extends Component {
           className="p-button-success p-mr-2"
           onClick={this.openNew}
         />
-        <Button
+        {/* <Button
           label="Xóa"
           icon="pi pi-trash"
           className="p-button-danger"
@@ -250,7 +227,7 @@ class Nha extends Component {
           disabled={
             !this.state.selectedHouses || !this.state.selectedHouses.length
           }
-        />
+        /> */}
       </React.Fragment>
     );
   }

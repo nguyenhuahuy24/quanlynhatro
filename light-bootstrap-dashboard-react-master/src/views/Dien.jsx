@@ -67,6 +67,7 @@ class Dien extends Component {
     this.deleteUtilityBill = this.deleteUtilityBill.bind(this);
     this.confirmDeleteUtilityBill = this.confirmDeleteUtilityBill.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
+    this.exportExcel = this.exportExcel.bind(this);
   }
   componentDidMount() {
     this.props.getHouseByUserId();
@@ -128,6 +129,24 @@ class Dien extends Component {
     this.state.Dien.Time = this.state.selectedMonth;
     this.state.Dien.RoomId = this.state.selectedRoom;
   }
+  exportExcel() {
+        import('xlsx').then(xlsx => {
+            var worksheet = xlsx.utils.json_to_sheet(this.state.Diens);
+            var workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+            var excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+            this.saveAsExcelFile(excelBuffer, 'Dien');
+        });
+    }
+  saveAsExcelFile(buffer, fileName) {
+        import('file-saver').then(FileSaver => {
+            let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+            let EXCEL_EXTENSION = '.xlsx';
+            const data = new Blob([buffer], {
+                type: EXCEL_TYPE
+            });
+            FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+        });
+    }
   saveDien() {
     let state = { submitted: true };
     let Dien = { ...this.state.Dien };
@@ -194,7 +213,39 @@ class Dien extends Component {
   leftToolbarTemplate() {
     return (
       <React.Fragment>
-        <h4 className="p-m-0">Chỉ số Điện/Nước</h4>
+         <span className="p-input-icon-right">
+          <h7  className="p-mr-2">Chọn nhà: </h7>
+          <Dropdown
+            className="p-mr-2"
+            value={this.state.selectedShowHouse}
+            options={this.props.listHouse.data}
+            onChange={this.onHouseChange}
+            optionLabel="Name"
+            placeholder="Chọn nhà trọ"
+          />
+          <h7 className="p-mr-2">Tháng/Năm </h7>
+          <Calendar
+            id="monthpicker"
+            className="p-mr-2"
+            value={this.state.selectedMonth}
+            onChange={this.onMonthChange}
+            view="month" dateFormat="mm/yy"
+            showIcon
+            yearNavigator
+            yearRange="2010:2030" />
+          <Button
+            label="Nhập chỉ số mới"
+            icon="pi pi-search-plus"
+            className="p-button-danger p-mr-2"
+            onClick={this.openNew}
+          />
+          <Button
+          label="Xuất file excel"
+          icon="pi pi-file-o"
+          className="p-button-warning p-mr-2"
+          onClick={this.exportExcel}
+        />
+        </span>
       </React.Fragment>
     );
   }
@@ -261,32 +312,8 @@ class Dien extends Component {
 
     const header = (
       <div className="table-header">
-        <span className="p-input-icon-right">
-          <Dropdown
-            className="p-mr-2"
-            value={this.state.selectedShowHouse}
-            options={this.props.listHouse.data}
-            onChange={this.onHouseChange}
-            optionLabel="Name"
-            placeholder="Chọn nhà trọ"
-          />
-          <label className="p-mr-2">Tháng/Năm </label>
-          <Calendar
-            id="monthpicker"
-            className="p-mr-2"
-            value={this.state.selectedMonth}
-            onChange={this.onMonthChange}
-            view="month" dateFormat="mm/yy"
-            showIcon
-            yearNavigator
-            yearRange="2010:2030" />
-          <Button
-            label="Nhập chỉ số mới"
-            icon="pi pi-search-plus"
-            className="p-button-danger"
-            onClick={this.openNew}
-          />
-        </span>
+       
+         <h5 className="p-m-0">Quản lý chỉ số Điện/Nước</h5>
       </div>
     );
     const DienDialogFooter = (
@@ -294,7 +321,7 @@ class Dien extends Component {
         <Button
           label="Cancel"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-text "
           onClick={this.hideDialog}
         />
         <Button
@@ -331,7 +358,7 @@ class Dien extends Component {
           <Toolbar
             className="p-mb-4"
             left={this.leftToolbarTemplate}
-            right={this.rightToolbarTemplate}
+            // right={this.rightToolbarTemplate}
           ></Toolbar>
 
           <DataTable

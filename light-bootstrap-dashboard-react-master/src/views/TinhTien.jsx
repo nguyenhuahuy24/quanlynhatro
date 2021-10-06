@@ -16,7 +16,6 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
-import '../index.css';
 //redux
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
@@ -339,7 +338,7 @@ class TinhTien extends Component {
           onClick={"this.confirmDeleteSelected"}
 
         />
-        <Button
+        {/* <Button
           label="Delete"
           icon="pi pi-trash"
           className="p-button-danger"
@@ -347,7 +346,7 @@ class TinhTien extends Component {
           disabled={
             !this.state.selectedBills || !this.state.selectedBills.length
           }
-        />
+        /> */}
       </React.Fragment>
     );
   }
@@ -379,7 +378,7 @@ class TinhTien extends Component {
   render() {
     const header = (
       <div className="table-header">
-        <h5 className="p-m-0">Tính tiền</h5>
+        <h5 className="p-m-0">Quản lý hóa đơn</h5>
       </div>
     );
     const BillDialogFooter = (
@@ -444,9 +443,9 @@ class TinhTien extends Component {
             ref={(el) => (this.dt = el)}
             value={this.state.bills ? Object.values(this.state.bills) : null}
            
-            onSelectionChange={(e) =>
-              this.setState({ selectedBills: e.value })
-            }
+            // onSelectionChange={(e) =>
+            //   this.setState({ selectedBills: e.value })
+            // }
             dataKey="id"
             paginator
             rows={10}
@@ -456,10 +455,10 @@ class TinhTien extends Component {
             globalFilter={this.state.globalFilter}
             header={header}
           >
-            <Column
+            {/* <Column
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
-            ></Column>
+            ></Column> */}
             <Column field="RoomNumber" header="Phòng" ></Column>
             <Column
               field="TotalBill"

@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { NavItem, Nav, NavDropdown, MenuItem } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import UserContext from "../../context/UserContext"
+import "index.css"
 class AdminNavbarLinks extends Component {
   static contextType = UserContext
   render() {
@@ -41,10 +42,10 @@ class AdminNavbarLinks extends Component {
         </Nav>
         <Nav pullRight>
         
-        <NavItem eventKey={3} href="#">
-            <label onClick={logout}>
-              <Link to ="/">Log out</Link>
-            </label>
+        <NavItem eventKey={3}>
+            <a  onClick={logout}>
+              <Link to ="/">Đăng Xuất</Link>
+            </a>
           </NavItem>
           
           

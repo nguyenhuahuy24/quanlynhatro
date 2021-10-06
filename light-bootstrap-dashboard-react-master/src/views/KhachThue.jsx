@@ -18,7 +18,6 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
-import '../index.css';
 //redux
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
@@ -241,10 +240,7 @@ class KhachThue extends Component {
       fd.append("Image", this.state.selectedFile);
       fd.append("RoomId", this.state.selectedRoom);
       if (this.state.user._id) {
-      //  this.state.user = this.userService.getCustomerById(this.state.user._id)
-        this.props.editCustomer(this.state.user._id, fd);
-        // this.userService.updateCustomer(this.state.user._id, fd).then();
-        // users[index] = user;
+      this.props.editCustomer(this.state.user._id, fd);
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -253,8 +249,6 @@ class KhachThue extends Component {
         });
       } else {
         this.props.createCustomer(fd);
-        // this.userService.createCustomer(fd).then();
-        //   users.push(user);
         this.toast.show({
           severity: "success",
           summary: "Successful",
@@ -276,6 +270,7 @@ class KhachThue extends Component {
     this.setState(state);
   }
   editUser(user) {
+    console.log(`test user`,user);
     this.setState({
       user: { ...user },
       userDialog: true
@@ -333,7 +328,7 @@ class KhachThue extends Component {
           className="p-button-success p-mr-2"
           onClick={this.openNew}
         />
-        <Button
+        {/* <Button
           label="Delete"
           icon="pi pi-trash"
           className="p-button-danger"
@@ -341,7 +336,7 @@ class KhachThue extends Component {
           disabled={
             !this.state.selectedUsers || !this.state.selectedUsers.length
           }
-        />
+        /> */}
       </React.Fragment>
     );
   }
@@ -384,13 +379,13 @@ class KhachThue extends Component {
     const userDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
           className="p-button-text"
           onClick={this.hideDialog}
         />
         <Button
-          label="Save"
+          label="Lưu"
           icon="pi pi-check"
           className="p-button-text"
           onClick={this.saveUser}
@@ -416,13 +411,13 @@ class KhachThue extends Component {
     const AddtoRoomDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
           className="p-button-text"
           onClick={this.hideAddtoRoomUserDialog}
         />
         <Button
-          label="Add"
+          label="Thêm"
           icon="pi pi-check"
           className="p-button-text"
           onClick={this.AddtoRoom}
@@ -443,10 +438,10 @@ class KhachThue extends Component {
           <DataTable
             ref={(el) => (this.dt = el)}
             value={this.props.listCustomer.data}
-            selection={this.state.selectedUsers}
-            onSelectionChange={(e) =>
-              this.setState({ selectedUsers: e.value })
-            }
+            // selection={this.state.selectedUsers}
+            // onSelectionChange={(e) =>
+            //   this.setState({ selectedUsers: e.value })
+            // }
             dataKey="id"
             paginator
             rows={10}
@@ -456,10 +451,10 @@ class KhachThue extends Component {
             globalFilter={this.state.globalFilter}
             header={header}
           >
-            <Column
+            {/* <Column
               selectionMode="multiple"
               headerStyle={{ width: "5rem" }}
-            ></Column>
+            ></Column> */}
             <Column field="Name" header="Tên Khách Hàng" ></Column>
             <Column field="Phone" header="Số điện thoại" ></Column>
             <Column field="Age" header="Tuổi" ></Column>
@@ -543,10 +538,40 @@ class KhachThue extends Component {
               required
             />
           </div>
+          
+
+          <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="">Nhà</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowHouse}
+              options={this.props.listHouse.data}
+              onChange={this.onHouseChange}
+              optionLabel="Name"
+              placeholder="Chọn nhà trọ"
+            />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="">Phòng</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowRoom}
+              options={this.props.listRoom.data}
+              onChange={this.onRoomChange}
+              optionLabel="RoomNumber"
+              placeholder="Chọn phòng trọ"
+            /> </div>
+          </div>
+
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
               <label htmlFor="DateCmnd">Ngày cấp</label>
               <Calendar 
+              id="navigatorstemplate"
+              monthNavigator 
+              yearNavigator 
+              yearRange="1950:2010"
               value={this.state.selectedDateCMND} 
               onChange={(e) => this.setState({ selectedDateCMND: e.value })} showIcon />
             </div>

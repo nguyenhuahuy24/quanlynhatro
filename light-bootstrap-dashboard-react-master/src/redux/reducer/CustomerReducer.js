@@ -55,7 +55,7 @@ const customerReducer = (state = customerState, action) => {
           data: action.data.data
         }
       }
-       console.log(`reducer create: `,state)
+       console.log(`reducer edit: `,state)
       break;
     case NAME_EPICS.EPIC_CUSTOMER_SCREEN.EPIC_EDIT_CUSTOMER_FAILED:
       state = {

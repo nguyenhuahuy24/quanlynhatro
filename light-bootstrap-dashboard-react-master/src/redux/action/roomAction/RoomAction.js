@@ -7,6 +7,14 @@ export function getRoomByHouseId(id){
         data: id
       };
 }
+export function getPersonInRoom(id){
+    console.log("Action get");
+    return {
+        type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
+        typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_PERSON_IN_ROOM,
+        data: id
+      };
+}
 export function editRoom(id, editdata){
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
@@ -46,7 +54,7 @@ export function addPersonToRoom(roomId,customerId) {
   };
 }
 export function removePersonToRoom(roomId,customerId) {
-  console.log("Action")
+  console.log("Action remove")
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
     typeAction: NAME_ACTIONS.ROOM_SCREEN.REMOVE_PERSON_TO_ROOM,
