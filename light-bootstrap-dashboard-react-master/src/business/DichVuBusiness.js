@@ -1,4 +1,4 @@
-import DichVuService from '../service/DichVuService';
+import DichVuService from '../service/dichvuService';
 import { dataStatus, userProfile } from '../utility/config';
 
 class DichVuBusiness {
