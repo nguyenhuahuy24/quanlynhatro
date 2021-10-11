@@ -347,10 +347,6 @@ class DichVu extends Component {
             globalFilter={this.state.globalFilter}
             header={header}
           >
-             <Column
-              selectionMode="multiple"
-              headerStyle={{ width: "5rem" }}
-            ></Column>
             <Column field="ServiceName" header="Tên Dịch Vụ" ></Column>
             <Column
               field="Price"

@@ -4,8 +4,9 @@ class BillBusiness {
     getBillInMonthOfUser = async (data, success, failed) => {
         try {
             const billService = new BillService()
-            const {houseId, userId} = data
-            const result = await billService.getBillInMonthOfUser(houseId, userId);
+            const {Month,houseId, userId} = data
+            console.log(`test data business:`,data)
+            const result = await billService.getBillInMonthOfUser(Month,houseId, userId);
             console.log("business")
             if (result.status === dataStatus.SUCCESS) {
                 success(result)

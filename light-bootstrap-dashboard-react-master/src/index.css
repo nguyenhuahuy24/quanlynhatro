@@ -236,15 +236,13 @@ img.flag {
   cursor: pointer;
 }    
 .img-holder{
-    margin: auto;
-    width: 150px;
-    height: 150px;
-    margin-top: 1rem;
+      
   }
-  .img{
+.img{
     width: 150px;
     height: 150px;
-    object-fit: cover;
+    padding: 2px;
+  box-sizing: border-box;
   }   
 
 body {

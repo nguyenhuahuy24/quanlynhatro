@@ -9,7 +9,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from "primereact/dropdown";
-
+import _ from 'lodash'
 //
 import classNames from 'classnames';
 import '../index.css';
@@ -33,7 +33,7 @@ class PhongTro extends Component {
     Width: null,
     Price: 0,
     Details: "",
-    Image: "",
+    Image: [],
     HouseId: null,
     Status: 0,
     ListPerson: "",
@@ -56,11 +56,15 @@ class PhongTro extends Component {
       selectedCustomer: null,
       //khi khi click vào room sẽ lưu tạm thời roomID
       selectedRoom:null,
+
       globalFilter: null,
       selectedKhuTro: "",
       selectedShow:"",
-      selectedFile: null,
-      profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+      ////////////
+      selectedFile: [],
+      ///test
+      imageArray:[],
+      profileImg: [],
       test:''
     };
 
@@ -92,7 +96,21 @@ class PhongTro extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.createStatus !== prevProps.createStatus) {
       if (this.props.createStatus.status === dataStatus.SUCCESS) {
+        this.toast.show({
+          severity: "success",
+          summary: "Thành Công",
+          detail: "Room Created",
+          life: 3000
+        });
          this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+      else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất Bại",
+          detail: "Room Created",
+          life: 3000
+        });
       }
     }
     if (this.props.listPerson !== prevProps.listPerson) {
@@ -103,7 +121,21 @@ class PhongTro extends Component {
    
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
+        this.toast.show({
+          severity: "success",
+          summary: "Thành Công",
+          detail: "Room Updated",
+          life: 3000
+        });
          this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+      else{
+          this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Room Updated",
+          life: 3000
+        });
       }
     }
     if (this.props.removePersonStatus !== prevProps.removePersonStatus) {
@@ -158,17 +190,64 @@ class PhongTro extends Component {
       } 
     }
   }
-  handleImageChange(e) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        this.setState({ profileImg: reader.result })  
+    buildImgTag(){
+      if(this.state.room.Image.length>0 && this.state.imageArray.length == 0){
+        return <div className="img-holder">
+      { 
+          this.state.room.Image.map(imageURI =>
+            (<img className="img" src={`http://localhost:8080/uploads/images/`+imageURI} alt="Photo uploaded"/>)
+          ) 
+        }
+        </div>
       }
+      else if(this.state.room.Image.length>0 && this.state.imageArray.length> 0){
+        return <div className="img-holder">
+          { 
+            this.state.imageArray.map(imageURI => 
+            (<img className="img" src={imageURI} alt="Photo uploaded"/>)) 
+          }
+          </div>
+      }
+      else{
+      return <div className="img-holder">
+          { 
+            this.state.imageArray.map(imageURI => 
+            (<img className="img" src={imageURI} alt="Photo uploaded"/>)) 
+          }
+          </div>
+      }
+    
+}
+    readURI(e){
+    if (e.target.files) {
+        /* Get files in array form */
+        const files = Array.from(e.target.files);
+
+        /* Map each file to a promise that resolves to an array of image URI's */ 
+        Promise.all(files.map(file => {
+            return (new Promise((resolve,reject) => {
+                const reader = new FileReader();
+                reader.addEventListener('load', (ev) => {
+                    resolve(ev.target.result);
+                });
+                reader.addEventListener('error', reject);
+                reader.readAsDataURL(file);
+            }));
+        }))
+        .then(images => {
+            this.setState({ imageArray : images })
+        }, error => {        
+            console.error(error);
+        });
     }
-    reader.readAsDataURL(e.target.files[0])
-    console.log(`test file: `,e.target.files[0])
-    this.setState({ selectedFile: e.target.files[0] })
+    
+}
+  handleImageChange(e) {
+    this.readURI(e);
+    //this.setState({selectedFile:e.target.files[0]})
+    this.setState({selectedFile:[...this.state.selectedFile,...e.target.files],Image:[]})
   }
+  //
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
       style: "currency",
@@ -189,6 +268,7 @@ class PhongTro extends Component {
   hideDialog() {
     this.setState({
       submitted: false,
+      selectedFile:[],
       roomDialog: false
     });
   }
@@ -206,7 +286,6 @@ class PhongTro extends Component {
   hideDeleteCustomerDialog() {
     this.setState({ deleteCustomerDialog: false });
   }
-
   statusBodyTemplate(rowData) {
     if (rowData.Status == "1") {
       return <span className={`product-badge status-1`}>{"Đã thuê"}</span>;
@@ -214,7 +293,6 @@ class PhongTro extends Component {
     if (rowData.Status == "0") { return <span className={`product-badge status-0`}>{"Trống"}</span>; }
   }
   saveRoom() {
-      
     let state = { submitted: true };
       const fd = new FormData();
       fd.append("RoomNumber", this.state.room.RoomNumber);
@@ -222,51 +300,32 @@ class PhongTro extends Component {
       fd.append("Width", this.state.room.Width);
       fd.append("Price", this.state.room.Price);
       fd.append("Details", this.state.room.Details);
-      fd.append("HouseId", this.state.selectedKhuTro);
-      if(this.state.selectedFile!= null)
-      {
-        console.log("selectedFile khác null")
-        fd.append("Image", this.state.selectedFile);
-      }   
+      fd.append("HouseId", this.state.selectedKhuTro);  
+      _.forEach(this.state.selectedFile, file =>{
+          fd.append('Image',file)
+        })
       if (this.state.room._id) {
-      console.log(`test selected Image edit: `,this.state.selectedFile)
-      console.log(`test Image edit: `,this.state.room.Image)
       this.props.editRoom(this.state.room._id, fd);
-
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Room Updated",
-          life: 3000
-        });
         state = {
         ...state,
        // rooms,
-        profileImg:null,
-        selectedFile:null,
+        imageArray:[],
+        selectedFile:[],
         roomDialog: false,
         room: this.emptyRoom
       };
       } else {
         this.props.createRoom(fd);
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Room Created",
-          life: 3000
-        });
+        
         state = {
         ...state,
        // rooms,
-        profileImg:null,
-        selectedFile:null,
+        imageArray:[],
+        selectedFile:[],
         roomDialog: false,
         room: this.emptyRoom
       };
       }
-      
-    
-
     this.setState(state);
   }
   PersonRoom(room) {
@@ -279,6 +338,7 @@ class PhongTro extends Component {
   }
   editRoom(room) {
     let image;
+    console.log(`get data: `,room)
     if(room.Image!="")
     {
        image = `http://localhost:8080/`+room.Image
@@ -415,7 +475,7 @@ class PhongTro extends Component {
     );
   }
   render() {
-    const { profileImg } = this.state
+    const imgTag = this.buildImgTag();
     const header = (
       <div className="table-header">
         <h5 className="p-m-0">Quản lý phòng</h5>
@@ -584,12 +644,13 @@ class PhongTro extends Component {
               id="Image"
               className="fileInput"
               type="file"
-              onChange={(e) => this.handleImageChange(e)}
+              accept="image/gif,image/jpeg,image/jpg,image/png,video/mp4,video/x-m4v"
+              title="Add photos or video"
+              //onChange={this.handleChange.bind(this)}
+              onChange={(e)=>this.handleImageChange(e)}
+              multiple
             />
-            <div className="img-holder">
-              <img src={profileImg} alt="" id="img" className="img" />
-              {/* `http://localhost:8080/`+ this.state.room.Image */}
-            </div>
+            {imgTag}
           </div>
         </Dialog>
        {/* Delete Room dialog */}

@@ -6,10 +6,10 @@ class BillsService extends Service {
         super();
         this.url =`http://localhost:8080/bill/`
     }
-    callGetAPI = async (houseId,userId) => {
+    callGetAPI = async (Month,houseId,userId) => {//&HouseId=   &UserId=
         try {
-            const response = await axios.get(`http://localhost:8080/bill?HouseId=`+houseId+`&UserId=`+userId)
-            console.log(`service`,response);
+            const response = await axios.get(`http://localhost:8080/bill?Month=`+Month+'&UserId='+userId+'&HouseId='+houseId)
+            console.log(`service get`,response);
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -33,7 +33,7 @@ class BillsService extends Service {
     callPostAPI = async (data) => {
         try {
             const response = await axios.post(this.url, data).then((res) => res.data);   
-            console.log("service utility create");  
+            console.log("service utility create",response);  
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -54,9 +54,9 @@ class BillsService extends Service {
             }
         }
     }    
-    getBillInMonthOfUser = (houseId,userId) =>{
+    getBillInMonthOfUser = (Month,houseId,userId) =>{
         return new Promise((resolve, reject)=>{
-            this.callGetAPI(houseId,userId).then(resp =>{
+            this.callGetAPI(Month,houseId,userId).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

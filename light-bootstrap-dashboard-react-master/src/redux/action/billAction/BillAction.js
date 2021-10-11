@@ -1,10 +1,11 @@
 import {NAME_ACTIONS} from './ActionName'
-export function getBillInMonthOfUser(houseId,userId){
+export function getBillInMonthOfUser(Month,houseId,userId){
      console.log("Action Bill")
     return {
         type: NAME_ACTIONS.BILL_SCREEN.BILL_SCREEN,
         typeAction: NAME_ACTIONS.BILL_SCREEN.GET_BILL,
         data: {
+            Month: Month,
             houseId:houseId,
             userId: userId
             }

@@ -37,6 +37,13 @@ class RoomBusiness {
         try {
             const room = new RoomService()
             // const {createData} = data
+    //          const room = await axios.post(
+    //             `http://localhost:8080/room/`,
+    //             data,
+    //             {headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}},
+    //             {headers: {"Content-Type": "multipart/form-data"}
+    //   },
+    //         )
             const result = await room.createRoom(data) 
             if (result.status === dataStatus.SUCCESS) {
                 success(result);

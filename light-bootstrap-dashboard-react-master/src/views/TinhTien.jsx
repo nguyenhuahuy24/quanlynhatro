@@ -56,7 +56,7 @@ class TinhTien extends Component {
       selectedBills: null,
       submitted: false,
       globalFilter: null,
-      selectedHouse: null,
+      selectedHouse: "",
       selectedShowHouse: null,
       selectedShowRoom:null,
       selectedRoom: null,
@@ -71,6 +71,7 @@ class TinhTien extends Component {
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.onStatusChange = this.onStatusChange.bind(this);
     this.openNew = this.openNew.bind(this);
+    this.onMonthChange = this.onMonthChange.bind(this);
     this.openViewBill = this.openViewBill.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
     this.hideConfirmBillDialog = this.hideConfirmBillDialog.bind(this);
@@ -120,12 +121,12 @@ class TinhTien extends Component {
     }
     if (this.props.createStatus !== prevProps.createStatus) {
       if (this.props.createStatus.status === dataStatus.SUCCESS) {
-         this.props.getBillInMonthOfUser(this.state.selectedHouse,userProfile.userId);
+         this.props.getBillInMonthOfUser(this.state.selectedMonth,this.state.selectedHouse,userProfile.userId);
       }
     }
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
-          this.props.getBillInMonthOfUser(this.state.selectedHouse,userProfile.userId);
+          this.props.getBillInMonthOfUser(this.state.selectedMonth,this.state.selectedHouse,userProfile.userId);
       } 
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
@@ -151,7 +152,7 @@ class TinhTien extends Component {
           life: 3000
         });
             }
-          this.props.getBillInMonthOfUser(this.state.selectedHouse,userProfile.userId);
+          this.props.getBillInMonthOfUser(this.state.selectedMonth,his.state.selectedHouse,userProfile.userId);
       }
     }
   }
@@ -177,7 +178,7 @@ class TinhTien extends Component {
   }
   onHousesChange(e) {
     this.setState({ selectedHouse: e.value._id,selectedShowHouse:e.value });
-    this.props.getBillInMonthOfUser(e.value._id,userProfile.userId);
+    this.props.getBillInMonthOfUser(this.state.selectedMonth,e.value._id,userProfile.userId);
     this.props.getRoomByHouseId(e.value._id);
   }
   openNew() {
@@ -289,6 +290,22 @@ class TinhTien extends Component {
 
     this.setState({ bill });
   }
+  onMonthChange(e) {
+    this.setState({ selectedMonth: e.value});
+    if(this.state.selectedHouse == "")
+    {
+      this.toast.show({
+      severity: "error",
+      summary: "Lỗi",
+      detail: "Chưa chọn nhà trọ",
+      life: 2500
+      });
+    }
+    else{
+      this.props.getBillInMonthOfUser(this.state.selectedMonth,this.state.selectedHouse,userProfile.userId);
+    }
+    
+  }
 
   leftToolbarTemplate() {
     return (
@@ -298,7 +315,7 @@ class TinhTien extends Component {
           id="monthpicker"
           className="p-mr-2"
           value={this.state.bill.DateCreate}
-          onChange={(e) => this.setState({ selectedMonth: e.value })}
+          onChange={this.onMonthChange}
           view="month" dateFormat="mm/yy"
           showIcon
           yearNavigator
