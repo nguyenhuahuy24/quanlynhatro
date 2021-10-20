@@ -11,6 +11,7 @@ class DichVuService extends Service {
     callGetAPI = async (url,id) => {
         try {
             const response = await axios.get(url + id,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
+             console.log(`service room get house:`,response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -159,7 +160,7 @@ class DichVuService extends Service {
     }
     editRoom = (id, editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchAPI(id, editdata).then(resp =>{
+            this.callPatchLocalAPI(id, editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

@@ -221,8 +221,7 @@ class TinhTien extends Component {
         });
     state = {
         ...state,
-        bills:null,
-      
+        selectedMonth:"",
         ConfirmBillDialog: false,
         bill: this.emptyBill
       };

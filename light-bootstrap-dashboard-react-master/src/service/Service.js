@@ -79,8 +79,8 @@ class Service {
     }
     callPostAPI = async (url,data) => {
         try {
-            console.log(`Service url:`,url)
-            const response = await axios.post(url, data).then((res) => res.data);     
+            const response = await axios.post(url, data).then((res) => res.data);    
+            console.log(`data after create: `,response) 
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -155,6 +155,7 @@ class Service {
     callDeleteAPI = async (id) => {
         try {
             const response = await axios.delete(this.url + id).then((res) => res.data);
+            console.log(`data after delete: `,response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

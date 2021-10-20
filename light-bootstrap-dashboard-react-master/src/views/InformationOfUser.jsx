@@ -1,11 +1,17 @@
 import React, { Component } from "react";
 import { Table, Grid, Row, Col } from "react-bootstrap";
+import { Calendar } from 'primereact/calendar'
 import Card from "components/Card/Card";
 import "App.scss";
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
 import {getUser ,changePassWord, editUser} from '../redux/action/userAction/UserAction'
 import { dataStatus } from "../utility/config";
+
+import 'primeflex/primeflex.css';
+import 'primeicons/primeicons.css';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.css';
 
 class InformationOfUser extends Component {
     constructor(props) {
@@ -16,7 +22,11 @@ class InformationOfUser extends Component {
             Image: "",
             Age: 0,
             Phone: "",
-            selectedFile: null
+            selectedFile: "",
+            PermanentAddress:"",
+            Cmnd:"",
+            DateCmnd:"",
+            PlaceCmnd:"",
 
         };
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -38,15 +48,29 @@ class InformationOfUser extends Component {
                 }
                 if (this.props.user.data.Age) this.setState({ Age: this.props.user.data.Age });
                 if (this.props.user.data.Phone) this.setState({ Phone: this.props.user.data.Phone });
+                if (this.props.user.data.PermanentAddress) this.setState({ PermanentAddress: this.props.user.data.PermanentAddress });
+                if (this.props.user.data.Cmnd) this.setState({ Cmnd: this.props.user.data.Cmnd });
+                if (this.props.user.data.DateCmnd) this.setState({ DateCmnd: this.props.user.data.DateCmnd });
+                if (this.props.user.data.PlaceCmnd) this.setState({ PlaceCmnd: this.props.user.data.PlaceCmnd });
              } 
         }
         if (this.props.editStatus !== prevProps.editStatus) {
             if (this.props.editStatus.status === dataStatus.SUCCESS) {
                  this.props.getUser();
-                alert("Cập nhật thông tin thành công")
+                 this.toast.show({
+              severity: "success",
+              summary: "Successful",
+              detail: "Cập nhật thành công",
+              life: 2500
+            });
             }
             else{
-                alert("Cập nhật thông tin thất bại")
+                this.toast.show({
+              severity: "error",
+              summary: "Fail",
+              detail: "Cập nhật thức bại",
+              life: 3000
+            });
             }
         }
     }
@@ -67,17 +91,15 @@ class InformationOfUser extends Component {
     }
     handleSubmit(event) {
         const fd = new FormData()
-        console.log(`test selectedFile: `,this.state.selectedFile)
-        if(this.state.selectedFile !=null)
-        {
-            fd.append("Image", this.state.selectedFile);
-        }
+
         fd.append("Name", this.state.Name);
         fd.append("Image", this.state.selectedFile);
         fd.append("Age", this.state.Age);
         fd.append("Phone", this.state.Phone);
-        console.log(`test fd: `,fd)
-
+        fd.append("PermanentAddress", this.state.PermanentAddress);
+        fd.append("Cmnd", this.state.Cmnd);
+        fd.append("DateCmnd", this.state.DateCmnd);
+        fd.append("PlaceCmnd", this.state.PlaceCmnd);
         this.props.editUser(fd);
         event.preventDefault();
     }
@@ -87,48 +109,100 @@ class InformationOfUser extends Component {
             <div className="content">
                 <Grid fluid>
                     <Row>
-                        <Col md={8} mdOffset={2}>
+                        <Col>
                             <Card
-                                hCenter
-                                title="Thông tin cá nhân"
                                 content={
                                     <Table>
                                         <div className="form-group">
-                                        <label >Họ và tên</label>
+                                            <div className="col-md-10">
+                                                 <label >Họ và tên</label>
                                             <input
                                                 className="form-control"
                                                 type="Name"
                                                 name="Name"
-                                                placeholder="Họ và tên"
+                                         
                                                 value={this.state.Name}
                                                 onChange={this.handleChange}
                                                 required />
-                                        </div>
-
-                                        <div className="form-group">
-                                        <label >Tuổi</label>
+                                            </div>
+                                            <div className="col-md-2">
+                                                  <label >Tuổi</label>
                                             <input
                                                 className="form-control"
                                                 type="Age"
                                                 name="Age"
-                                                placeholder="Tuổi"
+                                                
                                                 value={this.state.Age}
                                                 onChange={this.handleChange}
                                                 required />
+                                            </div>
                                         </div>
                                         <div className="form-group">
-                                        <label >Số điện thoại</label>
+                                            <div className="col-md-6">
+                                                <label >Số điện thoại</label>
                                             <input
                                                 className="form-control"
                                                 type="Phone"
                                                 name="Phone"
-                                                placeholder="Số điện thoại"
+                                                
                                                 value={this.state.Phone}
                                                 onChange={this.handleChange}
                                                 required />
+                                            </div>
+                                            <div className="col-md-6">
+                                                <label >Số CMND/CCCD</label>
+                                            <input
+                                                className="form-control"
+                                                type="Cmnd"
+                                                name="Cmnd"
+                                             
+                                                value={this.state.Cmnd}
+                                                onChange={this.handleChange}
+                                                required />
+                                            </div>
                                         </div>
-
                                         <div className="form-group">
+                                         
+                                            <div className="col-md-10">
+                                                <label >Nơi Cấp</label>
+                                            <input
+                                                className="form-control"
+                                                type="PlaceCmnd"
+                                                name="PlaceCmnd"
+                                               
+                                                value={this.state.PlaceCmnd}
+                                                onChange={this.handleChange}
+                                                required />
+                                            </div>
+                                               <div className="col-md-2">
+                                                <label >Ngày cấp</label>
+                                                <div>
+                                                <Calendar 
+                                                    id="navigatorstemplate"
+                                                    monthNavigator 
+                                                    yearNavigator 
+                                                    yearRange="1950:2010"
+                                                    value={this.state.DateCmnd} 
+                                                    onChange={(e) => this.setState({ DateCmnd: e.value })} 
+                                                    showIcon />
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-12">
+                                    
+                                                <label >Hộ Khẩu thường trú</label>
+                                            <input
+                                                className="form-control"
+                                                type="PermanentAddress"
+                                                name="PermanentAddress"
+                                             
+                                                value={this.state.PermanentAddress}
+                                                onChange={this.handleChange}
+                                                required />
+                                          
+                            
+                                        </div>
+                                        <div className="col-md-12">
                                             <label >Hình ảnh</label>
                                             <input
                                                 id="Image"
@@ -141,12 +215,15 @@ class InformationOfUser extends Component {
                                                 {/* `http://localhost:8080/`+ this.state.room.Image */}
                                             </div>
                                         </div>
-                                        <button
+                                        <div className="btn1">
+                                            <button
                                             type="submit"
-                                            className="btn btn-primary btn-block"
+                                            className="btn2"
                                             onClick={this.handleSubmit}
                                         >
                                             Cập nhập thông tin</button>
+                                        </div>
+                                        
                                     </Table>
                                 }
                             />

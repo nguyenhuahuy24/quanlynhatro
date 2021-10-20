@@ -85,12 +85,14 @@ handleSubmit(event) {
                           onChange={this.handleChange}
                           required />
                       </div>
-                      <button
+                      <div className="btn1"> 
+                        <button
                         type="submit"
-                        className="btn btn-primary btn-block"
+                        className="btn2"
                         onClick={this.handleSubmit}
                       >
-                        Submit</button>
+                        Đổi mật khẩu</button>
+                      </div>
                   </Table>
                 }
               />

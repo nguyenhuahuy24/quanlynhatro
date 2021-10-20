@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
+import { Checkbox } from 'primereact/checkbox';
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from 'primereact/inputnumber';
 
@@ -40,6 +41,7 @@ class Dien extends Component {
     super(props);
 
     this.state = {
+      checked:false,
       TimeHD: new Date(),
       rooms: null,
       houses: null,
@@ -48,11 +50,15 @@ class Dien extends Component {
       //  loginuserID: localStorage.getItem("userIDlogin"),
       submitted: false,
       deleteUtilityBillDialog: false,
+      selectDayDialog:false,
+      //
       selectedShowHouse: null,
       selectedHouse: "",
       selectedRoom: "",
       selectedShowRoom: null,
       selectedMonth: new Date(),
+      //thông báo
+      selectNotificationDate:new Date(),
     };
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
@@ -64,10 +70,15 @@ class Dien extends Component {
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDeleteUtilityBillDialog = this.hideDeleteUtilityBillDialog.bind(this);
+    this.hideSelectDayDialog = this.hideSelectDayDialog.bind(this);
+    
     this.deleteUtilityBill = this.deleteUtilityBill.bind(this);
     this.confirmDeleteUtilityBill = this.confirmDeleteUtilityBill.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.exportExcel = this.exportExcel.bind(this);
+    this.ConfirmNotification = this.ConfirmNotification.bind(this);
+    ///test
+    this.openDay = this.openDay.bind(this);
   }
   componentDidMount() {
     this.props.getHouseByUserId();
@@ -76,6 +87,7 @@ class Dien extends Component {
     if (this.props.listUtilityBill !== prevProps.listUtilityBill) {
       if (this.props.listUtilityBill.status === dataStatus.SUCCESS) {
           const rooms = Object.values(this.props.listUtilityBill.data)[0];
+          console.log(`test rooms: `,rooms)
           let data = [];
           rooms.forEach(room => {
           if (room.ListUtilityBill.length !== 0) {
@@ -240,11 +252,21 @@ class Dien extends Component {
             onClick={this.openNew}
           />
           <Button
+          label="Đặt lịch"
+          icon="pi pi-clock"
+          className="p-button-info p-mr-2"
+          tooltip="Thông báo cập nhật chỉ số điện nước hằng tháng" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+          onClick={this.openDay}
+
+        />
+          <Button
           label="Xuất file excel"
           icon="pi pi-file-o"
           className="p-button-warning p-mr-2"
           onClick={this.exportExcel}
         />
+        
         </span>
       </React.Fragment>
     );
@@ -252,6 +274,7 @@ class Dien extends Component {
   rightToolbarTemplate() {
     return (
       <React.Fragment>
+      
         <Button
           label="Xuất file excel"
           icon="pi pi-file-o"
@@ -268,11 +291,25 @@ class Dien extends Component {
       DienDialog: true
     });
   }
+  openDay() {
+    this.setState({
+     
+      submitted: false,
+      selectDayDialog: true
+    });
+  }
   editDien(Dien) {
     this.setState({
       Dien: { ...Dien },
       DienDialog: true
     });
+  }
+  ConfirmNotification(){
+    console.log("data")
+    this.setState({
+      selectDayDialog:false,
+      checked:false,
+    })
   }
   confirmDeleteUtilityBill(Dien) {
     this.setState({
@@ -282,6 +319,9 @@ class Dien extends Component {
   }
   hideDeleteUtilityBillDialog() {
     this.setState({ deleteUtilityBillDialog: false });
+  }
+  hideSelectDayDialog() {
+    this.setState({ selectDayDialog: false });
   }
   deleteUtilityBill(){
     this.props.deleteUtilityBill(this.state.Dien._id);
@@ -348,7 +388,22 @@ class Dien extends Component {
         />
       </React.Fragment>
     );
-
+         const NotificationDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          className="p-button-text"
+          onClick={this.hideSelectDayDialog}
+        />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          className="p-button-text"
+          onClick={this.ConfirmNotification}
+        />
+      </React.Fragment>
+    );
     return (
 
       <div className="datatable-crud-demo">
@@ -380,6 +435,7 @@ class Dien extends Component {
          
           </DataTable>
         </div>
+       
         <Dialog
           visible={this.state.DienDialog}
           style={{ width: "450px" }}
@@ -430,6 +486,7 @@ class Dien extends Component {
             />
           </div>
         </Dialog>
+      
         <Dialog
           visible={this.state.deleteUtilityBillDialog}
           style={{ width: "450px" }}
@@ -449,6 +506,40 @@ class Dien extends Component {
               </span>
             )}
           </div>
+        </Dialog>
+       
+        <Dialog 
+          header="Đặt lịch thông báo" 
+          visible={this.state.selectDayDialog} 
+          style={{ width: '450px' }} 
+          className="p-fluid"
+          footer={NotificationDialogFooter} 
+          onHide={this.hideSelectDayDialog}
+          >
+          <div className="p-field">
+            <label htmlFor="">Chọn ngày</label>
+            <Calendar 
+                id="navigators" 
+                value={this.state.selectNotificationDate} 
+                onChange={(e) => this.setState({ selectNotificationDate: e.value })} 
+                monthNavigator 
+                yearNavigator 
+                yearRange="2010:2030"
+                showIcon
+                 />
+
+          </div>
+             <div className="p-field-checkbox">
+             <a htmlFor="city1">Bạn muốn nhận thông báo hằng tháng: </a>
+                <Checkbox 
+                    inputId="binary"
+                    checked={this.state.checked} 
+                    onChange={e => this.setState({ checked: e.checked })}
+                     />
+                </div>
+                        
+
+         
         </Dialog>
       </div>
     );

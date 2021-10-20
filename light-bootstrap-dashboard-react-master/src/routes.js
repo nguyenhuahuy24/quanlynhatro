@@ -6,6 +6,7 @@ import KhachThue from "views/KhachThue.jsx";
 import Changpass from "views/Upgrade.jsx";
 import Dien from "views/Dien.jsx";
 import DichVu from "views/DichVu.jsx";
+import HopDong from "views/HopDong.jsx";
 import TinhTien from "views/TinhTien.jsx";
 import InformationOfUser from "views/InformationOfUser.jsx"
 
@@ -57,6 +58,13 @@ const dashboardRoutes = [
     name: "Khách Thuê",
     icon: "pe-7s-user",
     component: KhachThue,
+    layout: "/admin"
+  },
+  {
+    path: "/hopdong",
+    name: "Hợp Đồng",
+    icon: "pe-7s-user",
+    component: HopDong,
     layout: "/admin"
   },
   {

@@ -80,12 +80,39 @@ class DichVu extends Component {
     if (this.props.createStatus !== prevProps.createStatus) {
       if (this.props.createStatus.status === dataStatus.SUCCESS) {
          this.props.getServiceOfUser();
+         this.toast.show({
+          severity: "success",
+          summary: "Thành Công",
+          detail: "Dịch Vụ Created",
+          life: 2500
+        });
+      }
+      else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Dịch Vụ Created",
+          life: 2500
+        });
       }
     }
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
          this.props.getServiceOfUser();
-         
+           this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Dịch Vụ Updated",
+          life: 3000
+        });
+      }
+      else{
+          this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Dịch Vụ Updated",
+          life: 3000
+        });
       }
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
@@ -105,7 +132,7 @@ class DichVu extends Component {
             });
           }else{
             this.toast.show({
-              severity: "success",
+              severity: "error",
               summary: "Fail",
               detail: "Dich Vụ Deleted",
               life: 3000
@@ -157,21 +184,10 @@ class DichVu extends Component {
         //const index = this.findIndexById(this.state.DV._id);
         this.props.editDichVu(this.state.DV._id,DV);
        // DVs[index] = DV;
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Dịch Vụ Updated",
-          life: 3000
-        });
       } else {
         this.props.createDichVu(DV);
        // DVs.push(DV);
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Dịch Vụ Created",
-          life: 3000
-        });
+        
       }
       state = {
         ...state,

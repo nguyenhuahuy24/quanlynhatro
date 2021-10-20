@@ -332,28 +332,16 @@ class PhongTro extends Component {
     this.props.getPersonInRoom(room._id);
       this.setState({
         selectedRoom:room,
-        room: { ...room },
         listCustomerDialog: true
       });    
   }
   editRoom(room) {
-    let image;
-    console.log(`get data: `,room)
-    if(room.Image!="")
-    {
-       image = `http://localhost:8080/`+room.Image
-      this.setState({
-          room: { ...room },
-          profileImg: image,
-          roomDialog: true
-        });
-    }
-    else{
+   
       this.setState({
         room: { ...room },
         roomDialog: true
       });  
-    }
+    
         
     
   }
@@ -373,6 +361,7 @@ class PhongTro extends Component {
   }
   removePerson() {
     let customer =this.state.selectedCustomer
+    console.log(`roomid `,customer.RoomId)
     this.props.removePersonToRoom(customer.RoomId,customer._id)
     this.setState({
       deleteCustomerDialog: false,

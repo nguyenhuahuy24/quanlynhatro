@@ -140,3 +140,29 @@
 .socialMediaButtons {
   padding: 10px 100px 10px 0px;
 }
+
+.btn2 {
+  display: inline-block;
+  padding: 0.6em 1.7em;
+  border: 0.1em solid blue;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 0.35em;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  color: #000;
+  width: 50%;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.2s;
+  background-color:#33bbff;
+}
+
+.btn2:hover {
+  color: #fff;
+  background-color:#005ce6;
+}
+.btn1{
+  text-align: center;
+}

@@ -1,6 +1,6 @@
 import {NAME_ACTIONS} from './ActionName'
 export function getRoomByHouseId(id){
-  
+  console.log("Action get");
     return {
         type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
         typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_ROOM,
@@ -8,7 +8,7 @@ export function getRoomByHouseId(id){
       };
 }
 export function getPersonInRoom(id){
-    console.log("Action get");
+    
     return {
         type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
         typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_PERSON_IN_ROOM,
