@@ -6,3 +6,4 @@ Thành Viên Nhóm:
 Tiến độ làm việc:
 + 28/09/2021 xong chỉnh sửa code, bắt đầu làm chức năng mới.
 + 10/10/2021 lấy hóa đơn tính tiền theo từng tháng của nhà trọ.
++ 23/10/2021 thêm chức năng mới hộp đồng (phần của chủ trọ).
