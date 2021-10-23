@@ -50,7 +50,7 @@ class InformationOfUser extends Component {
                 if (this.props.user.data.Phone) this.setState({ Phone: this.props.user.data.Phone });
                 if (this.props.user.data.PermanentAddress) this.setState({ PermanentAddress: this.props.user.data.PermanentAddress });
                 if (this.props.user.data.Cmnd) this.setState({ Cmnd: this.props.user.data.Cmnd });
-                if (this.props.user.data.DateCmnd) this.setState({ DateCmnd: this.props.user.data.DateCmnd });
+                if (this.props.user.data.DateCmnd) this.setState({ DateCmnd: new Date(this.props.user.data.DateCmnd) });
                 if (this.props.user.data.PlaceCmnd) this.setState({ PlaceCmnd: this.props.user.data.PlaceCmnd });
              } 
         }
@@ -182,7 +182,7 @@ class InformationOfUser extends Component {
                                                     monthNavigator 
                                                     yearNavigator 
                                                     yearRange="1950:2010"
-                                                    value={this.state.DateCmnd} 
+                                                    value={this.state.DateCmnd}
                                                     onChange={(e) => this.setState({ DateCmnd: e.value })} 
                                                     showIcon />
                                                     </div>

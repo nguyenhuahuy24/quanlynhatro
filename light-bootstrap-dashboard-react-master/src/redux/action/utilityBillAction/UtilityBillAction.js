@@ -1,14 +1,11 @@
 import {NAME_ACTIONS} from './ActionName'
 
-export function getAllUtilityBillByHouseId(houseId,Month){
-     
+//test
+export function getAllUtilityBillByHouseId(data){ 
     return {
         type: NAME_ACTIONS.UTILITYBILL_SCREEN.UTILITYBILL_SCREEN,
         typeAction: NAME_ACTIONS.UTILITYBILL_SCREEN.GET_UTILITYBILL,
-        data: {
-            houseId:houseId,
-            Month: Month
-            }
+        data: data
       };
 }
 export function editUtilityBill(id, editdata){
@@ -16,13 +13,12 @@ export function editUtilityBill(id, editdata){
     type: NAME_ACTIONS.UTILITYBILL_SCREEN.UTILITYBILL_SCREEN,
     typeAction: NAME_ACTIONS.UTILITYBILL_SCREEN.EDIT_UTILITYBILL,
     data: {
-      idHouse:id,
+      idUtilityBill:id,
       editdata: editdata
     }
   }
 }
 export function createUtilityBill(createData) {
- console.log("Action Create UtilityBill")
   return {
     type: NAME_ACTIONS.UTILITYBILL_SCREEN.UTILITYBILL_SCREEN,
     typeAction: NAME_ACTIONS.UTILITYBILL_SCREEN.CREATE_UTILITYBILL,

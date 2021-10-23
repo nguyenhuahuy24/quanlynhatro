@@ -52,10 +52,10 @@ class PhongTro extends Component {
       //loginuserID: localStorage.getItem("userIDlogin"),
       room: this.emptyRoom,
       submitted: false,
-      selectedServices: null,
-      selectedCustomer: null,
+      selectedServices: "",
+      selectedCustomer: "",
       //khi khi click vào room sẽ lưu tạm thời roomID
-      selectedRoom:null,
+      selectedRoom:"",
 
       globalFilter: null,
       selectedKhuTro: "",
@@ -64,7 +64,6 @@ class PhongTro extends Component {
       selectedFile: [],
       ///test
       imageArray:[],
-      profileImg: [],
       test:''
     };
 
@@ -140,25 +139,15 @@ class PhongTro extends Component {
     }
     if (this.props.removePersonStatus !== prevProps.removePersonStatus) {
       if (this.props.removePersonStatus.status === dataStatus.SUCCESS) {
-           console.log(`test remove: `,this.props.removePersonStatus.data);
-            if(this.props.removePersonStatus.data.err)
-              {
-                this.toast.show({
-                  severity: "error",
-                  summary: "Thất bại",
-                  detail: "Xóa khách thuê",
-                  life: 6000
-                });
-            }else
-              {
                   this.toast.show({
                   severity: "success",
                   summary: "Successful",
                   detail: "Xóa khách thuê",
                   life: 3000
                 });
-                this.props.getPersonInRoom(this.state.selectedRoom._id);
-              }
+              this.props.getPersonInRoom(this.state.selectedRoom._id);
+              this.props.getRoomByHouseId(this.state.selectedKhuTro);
+              
       }
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
@@ -218,11 +207,10 @@ class PhongTro extends Component {
       }
     
 }
-    readURI(e){
+  readURI(e){
     if (e.target.files) {
         /* Get files in array form */
         const files = Array.from(e.target.files);
-
         /* Map each file to a promise that resolves to an array of image URI's */ 
         Promise.all(files.map(file => {
             return (new Promise((resolve,reject) => {
@@ -240,7 +228,6 @@ class PhongTro extends Component {
             console.error(error);
         });
     }
-    
 }
   handleImageChange(e) {
     this.readURI(e);
@@ -269,14 +256,15 @@ class PhongTro extends Component {
     this.setState({
       submitted: false,
       selectedFile:[],
-      roomDialog: false
+      roomDialog: false,
+      imageArray:[],
     });
   }
   hideCustomerDialog() {
     this.setState({
       submitted: false,
-      selectedCustomer:null,
-      selectedRoom:null,
+      selectedCustomer:"",
+      selectedRoom:"",
       listCustomerDialog: false
     });
   }
@@ -331,19 +319,15 @@ class PhongTro extends Component {
   PersonRoom(room) {
     this.props.getPersonInRoom(room._id);
       this.setState({
-        selectedRoom:room,
+        selectedRoom:room._id,
         listCustomerDialog: true
       });    
   }
   editRoom(room) {
-   
       this.setState({
         room: { ...room },
         roomDialog: true
       });  
-    
-        
-    
   }
   confirmDeleteRoom(room) {
     this.setState({
@@ -361,15 +345,15 @@ class PhongTro extends Component {
   }
   removePerson() {
     let customer =this.state.selectedCustomer
-    console.log(`roomid `,customer.RoomId)
-    this.props.removePersonToRoom(customer.RoomId,customer._id)
+   
+    this.props.removePersonToRoom(this.state.selectedRoom,customer._id)
     this.setState({
       deleteCustomerDialog: false,
-      selectedCustomer:null,
+      selectedCustomer:"",
+      selectedRoom:""
     })
     
   }
-
   onStatusChange(e) {
     let room = { ...this.state.room };
     room["Status"] = e.value;
@@ -407,15 +391,6 @@ class PhongTro extends Component {
           onClick={this.openNew}
           disabled={!this.state.selectedKhuTro}
         />
-        {/* <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={this.confirmDeleteSelected}
-          disabled={
-            !this.state.selectedRooms || !this.state.selectedRooms.length
-          }
-        /> */}
       </React.Fragment>
     );
   }
@@ -566,9 +541,8 @@ class PhongTro extends Component {
         {/* Edit Room dialog */}
         <Dialog
           visible={this.state.roomDialog}
-          style={{ width: "450px" }}
+          style={{ width: "450px",overflow: "auto" }}
           header="Thông tin phòng"
-          modal
           className="p-fluid"
           footer={roomDialogFooter}
           onHide={this.hideDialog}
@@ -658,7 +632,7 @@ class PhongTro extends Component {
             />
             {this.state.room && (
               <span>
-                Bạn chắn chắn muốn xóa đã chọn ????
+               Bạn chắn chắn muốn xóa <b>Phòng {this.state.room.RoomNumber}</b> đã chọn ???
               </span>
             )}
           </div>

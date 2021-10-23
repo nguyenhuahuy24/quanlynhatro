@@ -74,7 +74,7 @@ class BillsService extends Service {
     }
     editBill = (id, editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchAPI(id, editdata).then(resp =>{
+            this.callPatchAPI(this.url,id, editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)
@@ -83,7 +83,7 @@ class BillsService extends Service {
     }
     deleteBill = (id)=>{
         return new Promise((resolve , reject)=>{
-            this.callDeleteAPI(id).then(resp =>{
+            this.callDeleteAPI(this.url,id).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

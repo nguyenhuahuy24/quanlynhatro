@@ -101,10 +101,11 @@ class Service {
             }
         }
     }
-    callPatchAPI = async (id,data) => {
+    callPatchAPI = async (url,id,data) => {
         try {
-            const response = await axios.patch(this.url + id, data).then((res) => res.data); 
-            console.log(`data Update: `, response);
+           
+            const response = await axios.patch(url + id, data).then((res) => res.data);
+             console.log("update", response)
             if (typeof (response) === 'object' && 'error' in response) {        
                 return {
                     status: dataStatus.FAILED,
@@ -125,13 +126,10 @@ class Service {
             }
         }
     }
-    callPatchLocalAPI = async (url,data) => {
+    callPatchLocalAPI = async (url,id,data) => {
         try {
-             console.log(`service data url:`,url);
-             console.log(`service data:`,data);
-            const response = await axios.patch(url,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")
-        }});
-            console.log(`service edit:`,response);
+            const response = await axios.patch(url+id,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
+             console.log("update", response)
             if (typeof (response) === 'object' && 'error' in response) {        
                 return {
                     status: dataStatus.FAILED,
@@ -152,10 +150,11 @@ class Service {
             }
         }
     }
-    callDeleteAPI = async (id) => {
+    callDeleteAPI = async (url,id) => {
         try {
-            const response = await axios.delete(this.url + id).then((res) => res.data);
-            console.log(`data after delete: `,response)
+    
+            const response = await axios.delete(url + id).then((res) => res.data);
+            console.log("service delete", response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

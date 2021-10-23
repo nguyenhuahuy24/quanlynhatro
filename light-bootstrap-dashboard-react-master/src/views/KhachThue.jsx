@@ -13,6 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Calendar } from 'primereact/calendar'
 import UserContext from "../context/UserContext";
 import classNames from 'classnames';
+import _ from 'lodash'
 import '../index.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -34,13 +35,13 @@ class KhachThue extends Component {
     Name: "",
     Age: "",
     Email: "",
-    Phone: null,
+    Phone: "",
     PermanentAddress: "",
-    Cmnd: null,
+    Cmnd: "",
     DateCmnd: "",
     PlaceCmnd: "",
-    Image: null,
-    UserId:null,
+    Image: [],
+    UserId:"",
   };
 
   constructor(props) {
@@ -48,23 +49,22 @@ class KhachThue extends Component {
 
     this.state = {
       users: null,
-      houses: null,
-      rooms: null,
+     
       userDialog: false,
       deleteUserDialog: false,
       AddtoRoomDialog: false,
       user: this.emptyUser,
       selectedusers: null,
       submitted: false,
-      AddPhone:null,
-      selectedDateCMND:null,
+   
+      selectedDateCMND:"",
       globalFilter: null,
-      selectedHouse: null,
+      selectedHouse: "",
       selectedShowHouse:"",
-      selectedRoom: null,
+      selectedRoom: "",
       selectedShowRoom:"",
-      selectedFile: null,
-      profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+      selectedFile: [],
+      imageArray:[],
     };
     
     this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
@@ -110,30 +110,54 @@ class KhachThue extends Component {
     if (this.props.createStatus !== prevProps.createStatus) {
       if (this.props.createStatus.status === dataStatus.SUCCESS) {
          this.props.getAllCustomerOfUser();
+         this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Thêm khách thuê",
+          life: 2500
+        });
+      }
+      else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Thêm khách thuê",
+          life: 2500
+        });
       }
     }
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
-         this.props.getAllCustomerOfUser(); 
+         this.props.getAllCustomerOfUser();
+         this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Cập nhập thông tin khách khuê",
+          life: 2500
+        });
+      }
+      else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Cập nhập thông tin khách khuê",
+          life: 2500
+        });
       }
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
       if (this.props.deleteStatus.status === dataStatus.SUCCESS) {
         if (this.props.deleteStatus.data.deletedCount === 1) {
-                      this.setState({
-                  deleteUserDialog: false,
-                  user:this.emptyUser
-                });
                 this.toast.show({
                   severity: "success",
-                  summary: "Successful",
+                  summary: "Thành công",
                   detail: "Xóa Bill",
                   life: 3000
                 });
           }else {
                       this.toast.show({
                 severity: "error",
-                summary: "Fail",
+                summary: "Thất bại",
                 detail: "Xóa Bill",
                 life: 3000
               });
@@ -143,7 +167,7 @@ class KhachThue extends Component {
     }
     if (this.props.addPersonStatus !== prevProps.addPersonStatus) {
       if (this.props.addPersonStatus.status === dataStatus.SUCCESS) {
-            console.log(`test: `,this.props.addPersonStatus.data);
+          
             if(this.props.addPersonStatus.data.err)
               {
                 this.setState({
@@ -162,7 +186,7 @@ class KhachThue extends Component {
               });
               this.toast.show({
               severity: "success",
-              summary: "Successful",
+              summary: "Thành công",
               detail: "Thêm khách thuê",
               life: 3000
             });
@@ -186,15 +210,60 @@ class KhachThue extends Component {
       currency: "VND"
     });
   }
-  handleImageChange(e) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        this.setState({ profileImg: reader.result })
+    buildImgTag(){
+      if(this.state.user.Image.length>0 && this.state.imageArray.length == 0){
+        return <div className="img-holder">
+      { 
+          this.state.user.Image.map(imageURI =>
+            (<img className="img" src={`http://localhost:8080/uploads/images/`+imageURI} alt="Photo uploaded"/>)
+          ) 
+        }
+        </div>
       }
+      else if(this.state.user.Image.length>0 && this.state.imageArray.length> 0){
+        return <div className="img-holder">
+          { 
+            this.state.imageArray.map(imageURI => 
+            (<img className="img" src={imageURI} alt="Photo uploaded"/>)) 
+          }
+          </div>
+      }
+      else{
+      return <div className="img-holder">
+          { 
+            this.state.imageArray.map(imageURI => 
+            (<img className="img" src={imageURI} alt="Photo uploaded"/>)) 
+          }
+          </div>
+      }
+    
+}
+  readURI(e){
+    if (e.target.files) {
+        /* Get files in array form */
+        const files = Array.from(e.target.files);
+        /* Map each file to a promise that resolves to an array of image URI's */ 
+        Promise.all(files.map(file => {
+            return (new Promise((resolve,reject) => {
+                const reader = new FileReader();
+                reader.addEventListener('load', (ev) => {
+                    resolve(ev.target.result);
+                });
+                reader.addEventListener('error', reject);
+                reader.readAsDataURL(file);
+            }));
+        }))
+        .then(images => {
+            this.setState({ imageArray : images })
+        }, error => {        
+            console.error(error);
+        });
     }
-    reader.readAsDataURL(e.target.files[0])
-    this.setState({ selectedFile: e.target.files[0] })
+}
+  handleImageChange(e) {
+    this.readURI(e);
+    //this.setState({selectedFile:e.target.files[0]})
+    this.setState({selectedFile:[...this.state.selectedFile,...e.target.files]})
   }
   openNew() {
     this.setState({
@@ -213,7 +282,8 @@ class KhachThue extends Component {
   hideDialog() {
     this.setState({
       submitted: false,
-      userDialog: false
+      userDialog: false,
+      imageArray:[],
     });
   }
   hideDeleteUserDialog() {
@@ -227,7 +297,7 @@ class KhachThue extends Component {
     
     if (this.state.user.Name.trim()) {
       // let users = [...this.state.users];
-      let user = { ...this.state.user };
+      
       const fd = new FormData();
       fd.append("Name", this.state.user.Name);
       fd.append("Age", this.state.user.Age);
@@ -235,45 +305,46 @@ class KhachThue extends Component {
       fd.append("Phone", this.state.user.Phone);
       fd.append("PermanentAddress", this.state.user.PermanentAddress);
       fd.append("Cmnd", this.state.user.Cmnd);
-      fd.append("DateCmnd", this.state.selectedDateCMND);
+      if(this.state.selectedDateCMND!=""){
+        console.log("vo dc select")
+         fd.append("DateCmnd", this.state.selectedDateCMND);
+      }
+     
       fd.append("PlaceCmnd", this.state.user.PlaceCmnd);
-      fd.append("Image", this.state.selectedFile);
-      fd.append("RoomId", this.state.selectedRoom);
+      
+      if(this.state.selectedFile.length>0){
+        _.forEach(this.state.selectedFile, file =>{
+          fd.append('Image',file)
+        })
+      }
+      if(this.state.selectedRoom!=""){
+        fd.append("RoomId", this.state.selectedRoom);
+      }
       if (this.state.user._id) {
       this.props.editCustomer(this.state.user._id, fd);
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "User Updated",
-          life: 3000
-        });
+        
       } else {
         this.props.createCustomer(fd);
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "User Created",
-          life: 3000
-        });
       }
       state = {
         ...state,
         //  users,
-        AddPhone:null,
-        selectedDateCMND:null,
-        selectedFile:null,
+        selectedDateCMND:"",
+        selectedFile:[],
         userDialog: false,
-        user: this.emptyUser
+        user: this.emptyUser,
+        imageArray:[],
       };
     }
 
     this.setState(state);
   }
   editUser(user) {
-    console.log(`test user`,user);
+    
     this.setState({
-      user: { ...user },
-      userDialog: true
+      selectedDateCMND:new Date(user.DateCmnd),
+      userDialog: true,
+       user: { ...user },
     });
   }
   confirmDeleteUser(user) {
@@ -284,18 +355,12 @@ class KhachThue extends Component {
   }
   deleteUser() {
     this.props.deleteCustomer(this.state.user._id);
+       this.setState({
+                  deleteUserDialog: false,
+                  user:this.emptyUser
+                });
   }
-  findIndexById(_id) {
-    let index = -1;
-    for (let i = 0; i < this.state.users.length; i++) {
-      if (this.state.users[i]._id === _id) {
-        index = i;
-        break;
-      }
-    }
 
-    return index;
-  }
   AddtoRoom() {
     let state = { submitted: true };
     this.props.addPersonToRoom(this.state.selectedRoom,this.state.user._id);
@@ -362,7 +427,7 @@ class KhachThue extends Component {
     );
   }
   render() {
-    const { profileImg } = this.state
+    const imgTag = this.buildImgTag();
     const header = (
       <div className="table-header">
         <h5 className="p-m-0">Quản lý khách thuê</h5>
@@ -466,7 +531,7 @@ class KhachThue extends Component {
 
         <Dialog
           visible={this.state.userDialog}
-          style={{ width: "850px" }}
+          style={{ width: "850px",overflow: "auto" }}
           header="Thông tin khách thuê"
           modal
           className="p-fluid"
@@ -567,7 +632,8 @@ class KhachThue extends Component {
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
               <label htmlFor="DateCmnd">Ngày cấp</label>
-              <Calendar 
+              <Calendar
+              dateFormat="dd/mm/yy"
               id="navigatorstemplate"
               monthNavigator 
               yearNavigator 
@@ -590,12 +656,13 @@ class KhachThue extends Component {
               id="Image"
               className="fileInput"
               type="file"
-              onChange={(e) => this.handleImageChange(e, "Image")}
+              accept="image/gif,image/jpeg,image/jpg,image/png,video/mp4,video/x-m4v"
+              title="Add photos or video"
+              //onChange={this.handleChange.bind(this)}
+              onChange={(e)=>this.handleImageChange(e)}
+              multiple
             />
-            <div className="img-holder">
-              <img src={profileImg} alt="" id="Image" className="img" />
-              {/* `http://localhost:8080/` + this.state.user.Image */}
-            </div>
+             {imgTag}
           </div>
         </Dialog>
         <Dialog

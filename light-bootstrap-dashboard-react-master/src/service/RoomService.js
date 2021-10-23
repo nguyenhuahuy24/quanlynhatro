@@ -10,8 +10,7 @@ class DichVuService extends Service {
     }
     callGetAPI = async (url,id) => {
         try {
-            const response = await axios.get(url + id,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
-             console.log(`service room get house:`,response)
+            const response = await axios.get(url + id,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -62,6 +61,7 @@ class DichVuService extends Service {
     {
         try {
             const response = await axios.patch(this.url+roomId+`/removeCustomer/`+customerId).then((res)=> res.data);
+            console.log(`data service: `,response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -71,7 +71,7 @@ class DichVuService extends Service {
             else {
                 return {
                     status: dataStatus.SUCCESS,
-                    data: response
+                    data: response.ListPerson
                 }
             }
         } catch (error) {
@@ -160,7 +160,7 @@ class DichVuService extends Service {
     }
     editRoom = (id, editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchLocalAPI(id, editdata).then(resp =>{
+            this.callPatchLocalAPI(this.url,id, editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)
@@ -169,7 +169,7 @@ class DichVuService extends Service {
     }
     deleteRoom = (id)=>{
         return new Promise((resolve , reject)=>{
-            this.callDeleteAPI(id).then(resp =>{
+            this.callDeleteAPI(this.url,id).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

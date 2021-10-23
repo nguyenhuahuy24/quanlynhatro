@@ -4,8 +4,7 @@ class UtilityBillBusiness {
     getAllUtilityBillByHouseId = async (data, success, failed) => {
         try {
             const utilityBillService = new UtilityBillService()
-            const {houseId, Month} = data
-            const result = await utilityBillService.getAllUtilityBillByHouseId(houseId, Month);
+            const result = await utilityBillService.getAllUtilityBillByHouseId(data);
             
             if (result.status === dataStatus.SUCCESS) {
                 success(result)
@@ -38,10 +37,8 @@ class UtilityBillBusiness {
             const utilityBill = new UtilityBillService()
             console.log(`data business: `,data);
             const {idUtilityBill, editdata} = data
-            const id=[
-                idUtilityBill
-            ]
-            const result = await utilityBill.editUtilityBill(id,editdata)
+            console.log(`data id business: `,idUtilityBill);
+            const result = await utilityBill.editUtilityBill(idUtilityBill,editdata)
             console.log(`business: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);

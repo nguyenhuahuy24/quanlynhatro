@@ -19,7 +19,7 @@ class UserService extends Service {
     }
     changePassWord = (editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchLocalAPI(this.url,editdata).then(resp =>{
+            this.callPatchLocalAPI2(this.url,editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)
@@ -28,12 +28,37 @@ class UserService extends Service {
     }
     editUser = (editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchLocalAPI(this.url2,editdata).then(resp =>{
+            this.callPatchLocalAPI2(this.url2,editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)
             })
         });
-    } 
+    }
+    callPatchLocalAPI2 = async (url,data) => {
+        try {
+            const response = await axios.patch(url,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")
+        }});
+            console.log(`service edit:`,response);
+            if (typeof (response) === 'object' && 'error' in response) {        
+                return {
+                    status: dataStatus.FAILED,
+                    message: response.error.data.message
+                }
+            }
+            else {
+                return {
+                    status: dataStatus.SUCCESS,
+                    data: response.data
+                }
+            }
+        } catch (error) {
+            console.log(`Error when call API: `, error)
+            return {
+                status: dataStatus.FAILED,
+                message: 'Call API error'
+            }
+        }
+    }
 }
 export default UserService;

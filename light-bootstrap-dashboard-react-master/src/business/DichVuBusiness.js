@@ -40,7 +40,7 @@ class DichVuBusiness {
             const id = [
                 idDichVu
             ]
-            const result = await dichVuService.editDichVu(id, editdata)
+            const result = await dichVuService.editDichVu(idDichVu, editdata)
             console.log(`business: `, result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);

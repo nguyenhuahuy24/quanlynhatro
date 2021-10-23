@@ -6,10 +6,9 @@ class UtilityBillsService extends Service {
         super();
         this.url =`http://localhost:8080/utilitybills/`
     }
-    callGetAPI = async (houseId,Month) => {
+    callGetAPI = async (data) => {
         try {
-            const response = await axios.get(`http://localhost:8080/utilitybills?HouseId=`+houseId+'&Month='+Month,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})
-            
+    const response = await axios.patch(`http://localhost:8080/utilitybills/`,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -19,7 +18,7 @@ class UtilityBillsService extends Service {
             else {
                 return {
                     status: dataStatus.SUCCESS,
-                    data: response.data[0]
+                    data: response.data
                 }
             }
         } catch (error) {
@@ -31,9 +30,9 @@ class UtilityBillsService extends Service {
         }
     }
      
-    getAllUtilityBillByHouseId = (houseId,Month) =>{
+    getAllUtilityBillByHouseId = (data) =>{
         return new Promise((resolve, reject)=>{
-            this.callGetAPI(houseId,Month).then(resp =>{
+            this.callGetAPI(data).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)
@@ -51,7 +50,7 @@ class UtilityBillsService extends Service {
     }
     editUtilityBill = (id, editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchAPI(id, editdata).then(resp =>{
+            this.callPatchLocalAPI(this.url,id, editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)
@@ -60,7 +59,7 @@ class UtilityBillsService extends Service {
     }
     deleteUtilityBill = (id)=>{
         return new Promise((resolve , reject)=>{
-            this.callDeleteAPI(id).then(resp =>{
+            this.callDeleteAPI(this.url,id).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

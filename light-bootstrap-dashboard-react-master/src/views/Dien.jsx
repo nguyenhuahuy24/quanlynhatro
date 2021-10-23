@@ -16,7 +16,7 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
-import '../index.css';
+
 import UserContext from "../context/UserContext";
 //redux
 import { withGlobalContext } from '../GlobalContextProvider';
@@ -29,20 +29,16 @@ import { dataStatus } from "../utility/config";
 class Dien extends Component {
   static contextType = UserContext
   emptyDien = {
-    Time: new Date(),
+    Time: "",
     ElectricNumber: 0,
     WaterNumber: 0,
     RoomId: ""
   };
-  emtyHouse = {
-    Name: ""
-  }
   constructor(props) {
     super(props);
 
     this.state = {
       checked:false,
-      TimeHD: new Date(),
       rooms: null,
       houses: null,
       Diens: null,
@@ -86,8 +82,7 @@ class Dien extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.props.listUtilityBill !== prevProps.listUtilityBill) {
       if (this.props.listUtilityBill.status === dataStatus.SUCCESS) {
-          const rooms = Object.values(this.props.listUtilityBill.data)[0];
-          console.log(`test rooms: `,rooms)
+          const rooms = this.props.listUtilityBill.data
           let data = [];
           rooms.forEach(room => {
           if (room.ListUtilityBill.length !== 0) {
@@ -95,7 +90,16 @@ class Dien extends Component {
               _id: room.ListUtilityBill[0]._id,
               RoomNumber: room.RoomNumber,
               WaterNumber: room.ListUtilityBill[0].WaterNumber,
-              ElectricNumber: room.ListUtilityBill[0].ElectricNumber
+              ElectricNumber: room.ListUtilityBill[0].ElectricNumber,
+              RoomId:room.ListUtilityBill[0].RoomId,
+              Time: room.ListUtilityBill[0].Time
+            })
+          }else{
+            data.push({
+              RoomNumber: room.RoomNumber,
+              WaterNumber: "Chưa cập nhật",
+              ElectricNumber: "Chưa cập nhật",
+              Time: "Chưa cập nhật"
             })
           }
         })  
@@ -109,7 +113,48 @@ class Dien extends Component {
     }
     if (this.props.createStatus !== prevProps.createStatus) {
       if (this.props.createStatus.status === dataStatus.SUCCESS) {
-         this.props.getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth);
+        let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+         this.props.getAllUtilityBillByHouseId(data[0]);
+         this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Nhập chỉ số Điện/Nước",
+          life: 3000
+        });
+      }else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Nhập chỉ số Điện/Nước",
+          life: 3000
+        });
+      }
+    }
+    if (this.props.editStatus !== prevProps.editStatus) {
+      if (this.props.editStatus.status === dataStatus.SUCCESS) {
+         let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+         this.props.getAllUtilityBillByHouseId(data[0]);
+         this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Cập nhật chỉ số Điện/Nước",
+          life: 3000
+        });
+      }else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Cập nhật chỉ số Điện/Nước",
+          life: 3000
+        });
       }
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
@@ -135,11 +180,14 @@ class Dien extends Component {
                   life: 3000
                 });
             }
-            this.props.getAllUtilityBillByHouseId(this.state.selectedHouse,this.state.selectedMonth);
+            let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+         this.props.getAllUtilityBillByHouseId(data[0]);
       }
     }
-    this.state.Dien.Time = this.state.selectedMonth;
-    this.state.Dien.RoomId = this.state.selectedRoom;
   }
   exportExcel() {
         import('xlsx').then(xlsx => {
@@ -164,29 +212,18 @@ class Dien extends Component {
     let Dien = { ...this.state.Dien };
     if(this.state.Dien._id)
     {
-       this.props.editUtilityBill(this.state.Dien._id, Dien);
-        // houses[index] = house;
-        this.toast.show({
-          severity: "success",
-          summary: "Thành công",
-          detail: "Cập nhật chỉ số điện/Nước ",
-          life: 3000
-        });
+      this.props.editUtilityBill(this.state.Dien._id, Dien);
     }
     else{
-        this.props.createUtilityBill(Dien);
-        this.toast.show({
-          severity: "success",
-          summary: "Thành công",
-          detail: "Nhập chỉ số Điện/Nước",
-          life: 3000
-        });
+      Dien.RoomId= this.state.selectedRoom
+      Dien.Time= new Date(),
+       this.props.createUtilityBill(Dien);    
     }
-    
-    //  }
     state = {
       ...state,  
       DienDialog: false,
+      selectedRoom:"",
+      selectedShowRoom:"",
       Dien: this.emptyDien
     };
     this.setState(state);
@@ -210,14 +247,24 @@ class Dien extends Component {
       });
     }
     else{
-      this.props.getAllUtilityBillByHouseId(this.state.selectedHouse,e.value);
+      let data=[]
+      data.push({
+        HouseId: this.state.selectedHouse,
+        Month:e.value,
+      })
+      this.props.getAllUtilityBillByHouseId(data[0]);
     }
     
   }
   onHouseChange(e) {
     this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value, });
     this.props.getRoomByHouseId(e.value._id);
-    this.props.getAllUtilityBillByHouseId(e.value._id,this.state.selectedMonth);
+    let data=[]
+      data.push({
+        HouseId: e.value._id,
+        Month:this.state.selectedMonth,
+      })
+    this.props.getAllUtilityBillByHouseId(data[0]);
   }
   onRoomChange(e) {
     this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
@@ -300,12 +347,15 @@ class Dien extends Component {
   }
   editDien(Dien) {
     this.setState({
-      Dien: { ...Dien },
-      DienDialog: true
+     
+      DienDialog: true,
+      selectedRoom:Dien.RoomId,
+      selectedShowRoom:Dien.RoomNumber,
+       Dien: { ...Dien },
     });
+    
   }
   ConfirmNotification(){
-    console.log("data")
     this.setState({
       selectDayDialog:false,
       checked:false,
@@ -338,12 +388,19 @@ class Dien extends Component {
       <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
+          tooltip="Cập nhật chỉ số điên/nước" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.editDien(rowData)}
+          disabled={!rowData._id}
         />
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-warning"
+          tooltip="Xóa chỉ số điện/nước" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.confirmDeleteUtilityBill(rowData)}
+          disabled={!rowData._id}
+
         />
       </React.Fragment>
     );
@@ -467,6 +524,7 @@ class Dien extends Component {
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
+              disabled={this.state.Dien.RoomNumber}
             />
           </div>
           <div className="p-field">
@@ -513,6 +571,7 @@ class Dien extends Component {
           visible={this.state.selectDayDialog} 
           style={{ width: '450px' }} 
           className="p-fluid"
+          modal
           footer={NotificationDialogFooter} 
           onHide={this.hideSelectDayDialog}
           >

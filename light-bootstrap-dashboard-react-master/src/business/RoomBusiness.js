@@ -21,7 +21,6 @@ class RoomBusiness {
         try {
             const roomService = new RoomService()
             const id = data
-            console.log(`business Person: `,roomService)
             const result = await roomService.getPersonInRoom(id);
             if (result.status === dataStatus.SUCCESS) {
                 success(result)
