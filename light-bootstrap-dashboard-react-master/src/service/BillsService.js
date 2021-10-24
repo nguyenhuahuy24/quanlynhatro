@@ -6,20 +6,21 @@ class BillsService extends Service {
         super();
         this.url =`http://localhost:8080/bill/`
     }
-    callGetAPI = async (Month,houseId,userId) => {//&HouseId=   &UserId=
+    callGetAPIBill = async (data) => {
         try {
-            const response = await axios.get(`http://localhost:8080/bill?Month=`+Month+'&UserId='+userId+'&HouseId='+houseId)
+            console.log("data truoc api: ",data)
+            const response = await axios.patch(this.url,data)
             console.log(`service get`,response);
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
-                    message: response.error.data.message
+                    message: response
                 }
             }
             else {
                 return {
                     status: dataStatus.SUCCESS,
-                    data: response.data[0]
+                    data: response.data
                 }
             }
         } catch (error) {
@@ -37,7 +38,7 @@ class BillsService extends Service {
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
-                    message: response.error.data.message
+                    message: response.error
                 }
             }
             else {
@@ -54,9 +55,9 @@ class BillsService extends Service {
             }
         }
     }    
-    getBillInMonthOfUser = (Month,houseId,userId) =>{
+    getBillInMonthOfUser = (data) =>{
         return new Promise((resolve, reject)=>{
-            this.callGetAPI(Month,houseId,userId).then(resp =>{
+            this.callGetAPIBill(data).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

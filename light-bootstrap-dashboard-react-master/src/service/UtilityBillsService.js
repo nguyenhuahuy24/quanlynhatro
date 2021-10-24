@@ -8,7 +8,7 @@ class UtilityBillsService extends Service {
     }
     callGetAPI = async (data) => {
         try {
-    const response = await axios.patch(`http://localhost:8080/utilitybills/`,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
+    const response = await axios.patch(this.url,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

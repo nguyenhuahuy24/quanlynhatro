@@ -60,7 +60,7 @@ class TinhTien extends Component {
       selectedShowHouse: null,
       selectedShowRoom:null,
       selectedRoom: null,
-      selectedMonth: "",
+      selectedMonth: new Date(),
       
     };
 
@@ -78,6 +78,8 @@ class TinhTien extends Component {
     this.hideViewBillDialog = this.hideViewBillDialog.bind(this);
     this.ThanhToan = this.ThanhToan.bind(this);
     this.TinhBill = this.TinhBill.bind(this);
+    
+    this.RecalculateBill = this.RecalculateBill.bind(this);
     this.ThanhToanBill = this.ThanhToanBill.bind(this);
     this.confirmDeleteBill = this.confirmDeleteBill.bind(this);
     this.deleteBill = this.deleteBill.bind(this);
@@ -95,7 +97,7 @@ class TinhTien extends Component {
   componentDidUpdate(prevProps, prevState){
     if (this.props.listBill !== prevProps.listBill) {
       if (this.props.listBill.status === dataStatus.SUCCESS) {
-          const bills = Object.values(this.props.listBill.data.Rooms);
+          const bills = this.props.listBill.data;
           let data = [];
           bills.forEach(bill => {
             if (bill.ListBill.length !== 0) {
@@ -106,8 +108,17 @@ class TinhTien extends Component {
                 Status: bill.ListBill[0].Status,
                 OtherCosts: bill.ListBill[0].OtherCosts,
                 WaterFee: bill.ListBill[0].WaterFee,
-                ElectricFee:bill.ListBill[0].ElectricFee
+                ElectricFee:bill.ListBill[0].ElectricFee,
+                AmountOfElectric:bill.ListBill[0].AmountOfElectric,
+                AmountOfWater:bill.ListBill[0].AmountOfWater,
               })
+            }
+            else{
+               data.push({
+              RoomNumber: bill.RoomNumber,
+              TotalBill: 0,
+              Status:"Chưa tính tiền"
+            })
             }
           })
           console.log(`data: `,data);
@@ -121,12 +132,36 @@ class TinhTien extends Component {
     }
     if (this.props.createStatus !== prevProps.createStatus) {
       if (this.props.createStatus.status === dataStatus.SUCCESS) {
-         this.props.getBillInMonthOfUser(this.state.selectedMonth,this.state.selectedHouse,userProfile.userId);
+        let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+         this.props.getBillInMonthOfUser(data[0]);
+         this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Bill Created",
+          life: 2500
+        });
+      }
+      else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: this.props.createStatus.message,
+          life: 2500
+        });
       }
     }
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
-          this.props.getBillInMonthOfUser(this.state.selectedMonth,this.state.selectedHouse,userProfile.userId);
+          let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+          this.props.getBillInMonthOfUser(data[0]);
       } 
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
@@ -152,7 +187,12 @@ class TinhTien extends Component {
           life: 3000
         });
             }
-          this.props.getBillInMonthOfUser(this.state.selectedMonth,his.state.selectedHouse,userProfile.userId);
+            let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+          this.props.getBillInMonthOfUser(data[0]);
       }
     }
   }
@@ -172,13 +212,19 @@ class TinhTien extends Component {
       return <span className={`product-badge status-1`}>{"Đã thanh toán"}</span>;
     }
     if (rowData.Status == "0") { return <span className={`product-badge status-0`}>{"Chưa thanh toán"}</span>; }
+    else{ return <span className={`product-badge status`}>{rowData.Status}</span>; }
   }
   onRoomsChange(e) {
     this.setState({ selectedRoom: e.value._id,selectedShowRoom:e.value });
   }
   onHousesChange(e) {
+    let data=[]
+        data.push({
+        HouseId: e.value._id,
+        Month:this.state.selectedMonth,
+      })
     this.setState({ selectedHouse: e.value._id,selectedShowHouse:e.value });
-    this.props.getBillInMonthOfUser(this.state.selectedMonth,e.value._id,userProfile.userId);
+    this.props.getBillInMonthOfUser(data[0]);
     this.props.getRoomByHouseId(e.value._id);
   }
   openNew() {
@@ -202,7 +248,6 @@ class TinhTien extends Component {
   }
   hideViewBillDialog() {
     this.setState({
-      submitted: false,
       ViewBillDialog: false
     });
   }
@@ -221,26 +266,22 @@ class TinhTien extends Component {
         });
     state = {
         ...state,
-        selectedMonth:"",
         ConfirmBillDialog: false,
         bill: this.emptyBill
       };
     this.setState(state);
   }
   TinhBill() {
-    let state = { submitted: true }; 
-    let a ={RoomId:this.state.selectedRoom}
-    this.props.createBill(a);
-    //this.billService.createBill(a).then();
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Bill Created",
-          life: 3000
-        });
+    let state = { submitted: true };
+    let a =[]
+    a.push({
+      RoomId: this.state.selectedRoom,
+      Month: this.state.selectedMonth
+    })
+    this.props.createBill(a[0]);
+        
     state = {
         ...state,
-        bills:null,
         billDialog: false,
         bill: this.emptyBill
       };
@@ -260,7 +301,24 @@ class TinhTien extends Component {
      ViewBillDialog: true
     });
   }
-
+  RecalculateBill(){
+    let state = { submitted: true }; 
+    
+    //this.props.createBill(this.state.bill_id);
+    //this.billService.createBill(a).then();
+        this.toast.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Bill Created",
+          life: 3000
+        });
+    state = {
+        ...state,
+        ViewBillDialog: false,
+        bill: this.emptyBill
+      };
+    this.setState(state);
+  }
   confirmDeleteBill(bill) {
     this.setState({
       bill,
@@ -301,9 +359,14 @@ class TinhTien extends Component {
       });
     }
     else{
-      this.props.getBillInMonthOfUser(this.state.selectedMonth,this.state.selectedHouse,userProfile.userId);
+      console.log(this.state.selectedHouse)
+      let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:e.value,
+      })
+      this.props.getBillInMonthOfUser(data[0]);
     }
-    
   }
 
   leftToolbarTemplate() {
@@ -313,12 +376,13 @@ class TinhTien extends Component {
         <Calendar
           id="monthpicker"
           className="p-mr-2"
-          value={this.state.bill.DateCreate}
+          value={this.state.selectedMonth}
           onChange={this.onMonthChange}
           view="month" dateFormat="mm/yy"
           showIcon
           yearNavigator
-          yearRange="2010:2030" />
+          yearRange="2010:2030"
+           />
         <Dropdown
               className="p-mr-2"
               value={this.state.selectedShowHouse}
@@ -354,15 +418,6 @@ class TinhTien extends Component {
           onClick={"this.confirmDeleteSelected"}
 
         />
-        {/* <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={this.confirmDeleteSelected}
-          disabled={
-            !this.state.selectedBills || !this.state.selectedBills.length
-          }
-        /> */}
       </React.Fragment>
     );
   }
@@ -375,17 +430,26 @@ class TinhTien extends Component {
         <Button
           icon="pi pi-plus"
           className="p-button-rounded p-button-warning p-mr-2"
+          tooltip="Chi tiết hóa đơn" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={()=>this.openViewBill(rowData)}
+          disabled={!rowData._id}
         />
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
+          tooltip="Xác nhận thanh toán" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.ThanhToanBill(rowData)}
+          disabled={!rowData._id}
         />
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-warning"
+          tooltip="Xóa bill" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.confirmDeleteBill(rowData)}
+          disabled={!rowData._id}
         />
       </React.Fragment>
     );
@@ -410,6 +474,22 @@ class TinhTien extends Component {
           icon="pi pi-check"
           className="p-button-text"
           onClick={this.TinhBill}
+        />
+      </React.Fragment>
+    );
+       const RecalculateBillDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          className="p-button-text"
+          onClick={this.hideViewBillDialog}
+        />
+        <Button
+          label="Tính lại bill"
+          icon="pi pi-check"
+          className="p-button-text"
+          onClick={this.RecalculateBill}
         />
       </React.Fragment>
     );
@@ -500,7 +580,20 @@ class TinhTien extends Component {
           className="p-fluid"
           footer={BillDialogFooter}
           onHide={this.hideDialog}
-        >        
+        >   
+        <div className="p-field">
+            <label htmlFor="">Chọn tháng tính tiền:</label>
+            <Calendar
+              id="monthpicker"
+              className="p-mr-2"
+              value={this.state.selectedMonth}
+              onChange={this.onMonthChange}
+              view="month" dateFormat="mm/yy"
+              showIcon
+              yearNavigator
+              yearRange="2010:2030"
+              />
+          </div>    
           <div className="p-field">
             <label htmlFor="">Nhà</label>
             <Dropdown
@@ -564,6 +657,7 @@ class TinhTien extends Component {
           header="Chi tiết hóa đơn"
           modal
           className="p-fluid"
+          footer={RecalculateBillDialogFooter}
           onHide={this.hideViewBillDialog}
         >
            <div className="p-field">
@@ -599,13 +693,32 @@ class TinhTien extends Component {
             />
             </div>
             <div className="p-field p-col">
-              <label htmlFor="ElectricFee">Tiền Điện</label>
+              <label htmlFor="AmountOfWater">Chỉ số nước sử dụng</label>
               <InputNumber
-              id="ElectricFee"
-              value={this.state.bill.ElectricFee}
+              id="AmountOfWater"
+              value={this.state.bill.AmountOfWater}
               onValueChange={(e) => this.onInputNumberChange(e, "ElectricFee")}
+              disabled
+            /> </div>
+          </div>
+          <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="WaterFee">Tiền Điện</label>
+              <InputNumber
+              id="WaterFee"
+              value={this.state.bill.ElectricFee}
+              //onValueChange={(e) => this.onInputNumberChange(e, "WaterFee")}
               mode="currency"
               currency="Vnd"
+              disabled
+            />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="AmountOfElectric">Chỉ số Điện sử dụng</label>
+              <InputNumber
+              id="AmountOfElectric"
+              value={this.state.bill.AmountOfElectric}
+              onValueChange={(e) => this.onInputNumberChange(e, "AmountOfElectric")}
               disabled
             /> </div>
           </div>

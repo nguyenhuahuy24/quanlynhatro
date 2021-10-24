@@ -80,7 +80,6 @@ class Service {
     callPostAPI = async (url,data) => {
         try {
             const response = await axios.post(url, data).then((res) => res.data);    
-            console.log(`data after create: `,response) 
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

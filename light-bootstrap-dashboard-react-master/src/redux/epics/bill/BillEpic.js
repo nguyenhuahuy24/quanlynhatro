@@ -16,7 +16,6 @@ const resolver = (action) => {
         switch (action.typeAction) {
             case NAME_ACTIONS.BILL_SCREEN.GET_BILL:  
                 billBusiness.getBillInMonthOfUser(action.data, success => {
-                       console.log("epic get")
                     resolve({
                         actionType: NAME_ACTIONS.BILL_SCREEN.GET_BILL,
                         data: success

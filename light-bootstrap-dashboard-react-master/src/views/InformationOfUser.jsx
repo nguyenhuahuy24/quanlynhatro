@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Table, Grid, Row, Col } from "react-bootstrap";
 import { Calendar } from 'primereact/calendar'
 import Card from "components/Card/Card";
+import { Toast } from 'primereact/toast';
 import "App.scss";
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
@@ -68,7 +69,7 @@ class InformationOfUser extends Component {
                 this.toast.show({
               severity: "error",
               summary: "Fail",
-              detail: "Cập nhật thức bại",
+              detail: "Cập nhật thất bại",
               life: 3000
             });
             }
@@ -106,7 +107,9 @@ class InformationOfUser extends Component {
     render() {
         
         return (
+            
             <div className="content">
+            <Toast ref={(el) => (this.toast = el)} />
                 <Grid fluid>
                     <Row>
                         <Col>

@@ -216,7 +216,7 @@ class Dien extends Component {
     }
     else{
       Dien.RoomId= this.state.selectedRoom
-      Dien.Time= new Date(),
+      Dien.Time= this.state.selectedMonth,
        this.props.createUtilityBill(Dien);    
     }
     state = {

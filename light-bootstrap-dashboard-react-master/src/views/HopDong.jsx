@@ -48,11 +48,11 @@ class HopDong extends Component {
   constructor(props) {
     super(props);
     this.RentalPeriod = [
-            { name: '6 tháng'},
-            { name: '1 năm'},
-            { name: '2 năm'},
-            { name: '3 nam'},
-            { name: '4 năm'}
+            { name: '6 tháng',code:'6t'},
+            { name: '1 năm',code:'1n'},
+            { name: '2 năm',code:'2n'},
+            { name: '3 nam',code:'3n'},
+            { name: '4 năm',code:'4n'}
         ];
     this.state = {
       HDs: null,
@@ -67,10 +67,10 @@ class HopDong extends Component {
       selectedCustomer: "",
       selectedShowCustomer: "",
       //room
-      selectedHouse: "",
-      selectedShowHouse:"",
-      selectedRoom: "",
-      selectedShowRoom:"",
+      // selectedHouse: "",
+      // selectedShowHouse:"",
+      // selectedRoom: "",
+      // selectedShowRoom:"",
       //
       selectedArrivalDate:"",
       selectedExpirationDate:"",
@@ -95,8 +95,8 @@ class HopDong extends Component {
     this.hideDeleteHDDialog = this.hideDeleteHDDialog.bind(this);
     this.onRentalPeriodChange = this.onRentalPeriodChange.bind(this);
     //
-    this.onHouseChange = this.onHouseChange.bind(this);
-    this.onRoomChange = this.onRoomChange.bind(this);
+    // this.onHouseChange = this.onHouseChange.bind(this);
+    // this.onRoomChange = this.onRoomChange.bind(this);
     this.onCustomerChange = this.onCustomerChange.bind(this);
     //chang status
     this.OpenConfirmStatus = this.OpenConfirmStatus.bind(this);
@@ -107,11 +107,7 @@ class HopDong extends Component {
 
   }
   componentDidMount() {
-    // this.HDService
-    //   .getServiceOfUser()
-    //   .then(data => this.setState({ HDs: data }));
-    //this.props.getServiceOfUser();
-    this.props.getHouseByUserId();
+   // this.props.getHouseByUserId();
     this.props.getContractOfUser();
     this.props.getAllCustomerOfUser();
   }
@@ -194,7 +190,23 @@ class HopDong extends Component {
   }
   onRentalPeriodChange(e) {
       if(this.state.selectedArrivalDate!=""){
-        this.setState({ selectedRentalPeriod: e.value });
+        let oldDateObj = new Date(this.state.selectedArrivalDate); 
+        if(e.value.code==="6t"){
+          oldDateObj.setMonth(oldDateObj.getMonth() + 6);
+        }
+        else if(e.value.code==="1n"){
+          oldDateObj.setMonth(oldDateObj.getMonth() + 12);
+        }
+        else if(e.value.code==="2n"){
+          oldDateObj.setMonth(oldDateObj.getMonth() + 24);
+        }
+        else if(e.value.code==="3n"){   
+          oldDateObj.setMonth(oldDateObj.getMonth() + 36);
+        }
+        else if(e.value.code==="4n"){
+          oldDateObj.setMonth(oldDateObj.getMonth() + 48);
+        }
+        this.setState({ selectedRentalPeriod: e.value,selectedExpirationDate:oldDateObj });
     }else{
       this.toast.show({
       severity: "error",
@@ -204,14 +216,14 @@ class HopDong extends Component {
       });
     }
   }
-   onHouseChange(e) {
-    this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value });
-    this.props.getRoomByHouseId(e.value._id);
-  }
-  onRoomChange(e) {
-    this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
+  //  onHouseChange(e) {
+  //   this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value });
+  //   this.props.getRoomByHouseId(e.value._id);
+  // }
+  // onRoomChange(e) {
+  //   this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
     
-  }
+  // }
   onCustomerChange(e) {
     this.setState({ selectedCustomer: e.value._id, selectedShowCustomer: e.value });
 
@@ -232,6 +244,9 @@ class HopDong extends Component {
     this.setState({
       HDDialog: false,
       HD: this.emptyHD,
+      selectedRentalPeriod:"",
+      selectedArrivalDate:"",
+      selectedExpirationDate:""
     });
   }
   hideDeleteHDDialog() {
@@ -239,27 +254,31 @@ class HopDong extends Component {
   }
   saveHD() {
     let state = { submitted: true };
-    let HD = { ...this.state.HD };
-    // let data=[];
-    // data.push({
-    //   DateCreate:this.state.HD.CreateDay,
-    //   Lessor: this.state.HD.Lessor,
-    //   Renter:this.state.selectedCustomer,
-    //   House:this.state.selectedHouse,
-    //   Room:this.state.selectedRoom,
-    //   ArrivalDate:this.state.selectedArrivalDate,
-    //   ExpirationDate:this.state.selectedExpirationDate,
-    //   Deposit: this.state.HD.Deposit,
-    //   Status:3,
-    // })
-    console.log(`data test:`,this.state.selectedRentalPeriod.name)
-    //this.props.createContract(data[0]);    
+   // let HD = { ...this.state.HD };
+    let data=[];
+    data.push({
+      DateCreate:this.state.HD.CreateDay,
+      Lessor: this.state.HD.Lessor,
+      Renter:this.state.selectedCustomer,
+     // House:this.state.selectedHouse,
+     // Room:this.state.selectedRoom,
+      RentalPeriod:this.state.selectedRentalPeriod.name,
+      ArrivalDate:this.state.selectedArrivalDate,
+      ExpirationDate:this.state.selectedExpirationDate,
+      Deposit: this.state.HD.Deposit,
+      Status:3,
+    })
+
+    this.props.createContract(data[0]);    
     state = {
         ...state,
         HDDialog: false,
         HD: this.emptyHD,
         selectedCustomer:"",
-        selectedShowCustomer:""
+        selectedShowCustomer:"",
+        selectedRentalPeriod:"",
+        selectedArrivalDate:"",
+        selectedExpirationDate:""
       };
     
     this.setState(state);
@@ -329,7 +348,6 @@ class HopDong extends Component {
     this.setState({ HD });
   }
   statusBodyTemplate(rowData) {
-    console.log(`data status: `,rowData)
     if (rowData.Status == "1") {
       return <span className={`product-badge status-1`}>{"Đã đồng ý"}</span>;
     }
@@ -479,7 +497,7 @@ class HopDong extends Component {
             />
           </div>
       
-            <div className="p-formgrid p-grid">
+            {/* <div className="p-formgrid p-grid">
             <div className="p-field p-col">
               <label htmlFor="">Nhà</label>
             <Dropdown
@@ -501,7 +519,7 @@ class HopDong extends Component {
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
             /> </div>
-          </div>
+          </div> */}
           
           <div className="p-field">
             <label htmlFor="Price">Tiền đặt cọc</label>
@@ -517,7 +535,8 @@ class HopDong extends Component {
             <label htmlFor="">Hợp đồng có giá trị kể từ</label>
               <Calendar 
               id="basic"
-             // value={this.state.HD} 
+              dateFormat="dd/mm/yy"
+              value={this.state.selectedArrivalDate} 
               onChange={(e) => this.setState({ selectedArrivalDate: e.value })} 
               showIcon 
               
@@ -537,10 +556,11 @@ class HopDong extends Component {
             <label htmlFor="">Hợp đồng kết thúc:</label>
               <Calendar 
               id="navigatorstemplate"
+              dateFormat="dd/mm/yy"
               monthNavigator 
               yearNavigator 
               yearRange="2010:2030"
-              //value={this.state.selectedDateCMND} 
+              value={this.state.selectedExpirationDate} 
               onChange={(e) => this.setState({ selectedExpirationDate : e.value })} 
               showIcon 
               />
@@ -570,7 +590,7 @@ class HopDong extends Component {
         <Dialog
           visible={this.state.ConfirmHDDialog}
           style={{ width: "450px" }}
-          header="Xác định thanh toán"
+          header="Xác định hơp động"
           modal
           className="p-fluid"
          footer={ConfrimDialogFooter}
