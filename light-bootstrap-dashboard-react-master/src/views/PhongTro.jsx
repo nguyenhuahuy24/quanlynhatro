@@ -21,7 +21,7 @@ import UserContext from "../context/UserContext";
 //redux
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
-import {removePersonToRoom, getPersonInRoom,getRoomByHouseId ,createRoom, editRoom, deleteRoom} from '../redux/action/roomAction/RoomAction'
+import {removePersonToRoom,getServiceInRoom,removeServiceToRoom, getPersonInRoom,getRoomByHouseId ,createRoom, editRoom, deleteRoom} from '../redux/action/roomAction/RoomAction'
 import { getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 
 import { dataStatus } from "../utility/config";
@@ -44,11 +44,14 @@ class PhongTro extends Component {
     this.state = {
       houses: null,
       rooms: null,
-      customer:null,
+      customer:"",
+      service:"",
       listCustomerDialog:false,
+      listServiceDialog:false,
       roomDialog: false,
       deleteRoomDialog: false,
       deleteCustomerDialog: false,
+      deleteServiceDialog:false,
       //loginuserID: localStorage.getItem("userIDlogin"),
       room: this.emptyRoom,
       submitted: false,
@@ -88,6 +91,9 @@ class PhongTro extends Component {
     this.onKhuTroChange = this.onKhuTroChange.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
     this.removePerson = this.removePerson.bind(this);
+    this.removeService = this.removeService.bind(this);
+    this.onHide =this.onHide.bind(this);
+    this.confirm =this.confirm.bind(this);
   }
   componentDidMount() {
     this.props.getHouseByUserId();
@@ -114,7 +120,15 @@ class PhongTro extends Component {
     }
     if (this.props.listPerson !== prevProps.listPerson) {
       if (this.props.listPerson.status === dataStatus.SUCCESS) {
+         
           this.setState({customer:this.props.listPerson.data})
+      }
+    }
+    //
+    if (this.props.listService !== prevProps.listService) {
+      if (this.props.listService.status === dataStatus.SUCCESS) {
+         console.log("data service: ",this.props.listService.data)
+          this.setState({service:this.props.listService.data})
       }
     }
    
@@ -141,11 +155,25 @@ class PhongTro extends Component {
       if (this.props.removePersonStatus.status === dataStatus.SUCCESS) {
                   this.toast.show({
                   severity: "success",
-                  summary: "Successful",
+                  summary: "Thành công",
                   detail: "Xóa khách thuê",
                   life: 3000
                 });
-              this.props.getPersonInRoom(this.state.selectedRoom._id);
+              this.props.getPersonInRoom(this.state.selectedRoom);
+              this.props.getRoomByHouseId(this.state.selectedKhuTro);
+              
+      }
+    }
+      if (this.props.removeServiceStatus !== prevProps.removeServiceStatus) {
+        if (this.props.removeServiceStatus.status === dataStatus.SUCCESS) {
+                  this.toast.show({
+                  severity: "success",
+                  summary: "Thành công",
+                  detail: "Xóa dịch vụ 1",
+                  life: 3000
+                });
+                console.log("da vào roi")
+              this.props.getServiceInRoom(this.state.selectedRoom);
               this.props.getRoomByHouseId(this.state.selectedKhuTro);
               
       }
@@ -175,6 +203,7 @@ class PhongTro extends Component {
     }
     if (this.props.listRoom !== prevProps.listRoom) {
       if (this.props.listRoom.status === dataStatus.SUCCESS) {
+         console.log(`data room: `,this.props.listRoom.data)
         this.setState({ rooms: this.props.listRoom.data })
       } 
     }
@@ -223,7 +252,7 @@ class PhongTro extends Component {
             }));
         }))
         .then(images => {
-            this.setState({ imageArray : images })
+            this.setState({ imageArray : images })  
         }, error => {        
             console.error(error);
         });
@@ -323,6 +352,13 @@ class PhongTro extends Component {
         listCustomerDialog: true
       });    
   }
+  ServiceRoom(room) {
+    this.props.getServiceInRoom(room._id);
+      this.setState({
+        selectedRoom:room._id,
+        listServiceDialog: true
+      });    
+  }
   editRoom(room) {
       this.setState({
         room: { ...room },
@@ -340,6 +376,17 @@ class PhongTro extends Component {
       deleteCustomerDialog: true
     });
   }
+  confirm(name) {
+        this.setState({
+            [`${name}`]: true
+        });
+    }
+  onHide(name) {
+        this.setState({
+            [`${name}`]: false,
+            selectedService:"",
+        });
+    }
   deleteRoom() {
     this.props.deleteRoom(this.state.room._id);
   }
@@ -350,7 +397,15 @@ class PhongTro extends Component {
     this.setState({
       deleteCustomerDialog: false,
       selectedCustomer:"",
-      selectedRoom:""
+    })
+    
+  }
+  removeService() {
+    let service =this.state.selectedService
+    this.props.removeServiceToRoom(this.state.selectedRoom,service._id)
+    this.setState({
+      deleteServiceDialog: false,
+      selectedService:"",
     })
     
   }
@@ -382,7 +437,7 @@ class PhongTro extends Component {
           options={this.props.listHouse.data}
           onChange={this.onKhuTroChange}
           optionLabel="Name"
-          placeholder="Chọn khu trọ"
+          placeholder="Chọn nhà"
         />
         <Button
           label="Thêm phòng"
@@ -413,6 +468,13 @@ class PhongTro extends Component {
           tooltip="Thành viên trong phòng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.PersonRoom(rowData)}
+        />
+        <Button
+          icon="pe-7s-box2"
+          className="p-button-rounded p-button p-mr-2"
+          tooltip="Dịch vụ của phòng sử dụng" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+          onClick={() => this.ServiceRoom(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -501,6 +563,22 @@ class PhongTro extends Component {
         />
       </React.Fragment>
     );
+    const deleteServiceDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          className="p-button-text"
+          onClick={()=>this.onHide('deleteServiceDialog')}
+        />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          className="p-button-text"
+          onClick={this.removeService}
+        />
+      </React.Fragment>
+    );
     return (
       <div className="datatable-crud-demo">
         <Toast ref={(el) => (this.toast = el)} />
@@ -514,10 +592,10 @@ class PhongTro extends Component {
             value={this.props.listRoom.data}
             dataKey="_id"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rooms"
+            rows={5}
+            // rowsPerPageOptions={[5, 10, 25]}
+            // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            // currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rooms"
             globalFilter={this.state.globalFilter}
             header={header}
           >
@@ -653,6 +731,27 @@ class PhongTro extends Component {
             />
             {this.state.customer && (
               <span>
+                Bạn chắn chắn muốn xóa đã chọn ???? {this.state.customer.Name}
+              </span>
+            )}
+          </div>
+        </Dialog>
+        {/* delete Service */}
+        <Dialog
+          visible={this.state.deleteServiceDialog}
+          style={{ width: "450px" }}
+          header="Xóa dịch vụ khỏi phòng"
+          modal
+          footer={deleteServiceDialogFooter}
+          onHide={()=>this.onHide('deleteServiceDialog')}
+        >
+          <div className="confirmation-content">
+            <i
+              className="pi pi-exclamation-triangle p-mr-3"
+              style={{ fontSize: "2rem" }}
+            />
+            {this.state.service && (
+              <span>
                 Bạn chắn chắn muốn xóa đã chọn ????
               </span>
             )}
@@ -668,7 +767,7 @@ class PhongTro extends Component {
           onHide={this.hideCustomerDialog}
           //footer={deleteCustomerDialogFooter}
         >
-        <div className="card">
+        <div className="card1">
           <DataTable
             ref={(el) => (this.dt = el)}
             value={this.state.customer}
@@ -690,6 +789,52 @@ class PhongTro extends Component {
           onClick={this.confirmDeleteCustomer}
           disabled={!this.state.selectedCustomer}/>
         </Dialog>
+        {/* list service dialog */}
+      <Dialog
+          visible={this.state.listServiceDialog}
+          style={{ width: "500px" }}
+          header="Danh sách dịch vụ của phòng"
+          modal
+          className="p-fluid"
+          onHide={()=>this.onHide('listServiceDialog')}
+          //footer={deleteCustomerDialogFooter}
+        >
+        <div className="card1">
+          <DataTable
+            ref={(el) => (this.dt = el)}
+            value={this.state.service}
+            selectionMode="single" 
+            selection={this.state.selectedService} 
+            onSelectionChange={e => this.setState({ selectedService: e.value })}
+            dataKey="_id"
+          >
+            <Column field="ServiceName" header="Tên Dịch Vụ" ></Column>
+            <Column
+              field="Price"
+              header="Giá dịch vụ"
+              body={this.priceBodyTemplate}
+              sortable
+            ></Column>
+           
+          </DataTable>    
+        </div>
+        <Button
+          label="Delete"
+          icon="pi pi-trash"
+          className="p-button-danger"
+          onClick={() => this.confirm('deleteServiceDialog')}
+          disabled={!this.state.selectedService}/>
+        </Dialog>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       </div>
     );
   }
@@ -702,7 +847,9 @@ function mapStateToProps(state) {
     //room
     listRoom: state.RoomReducer.listRoom,
     listPerson: state.RoomReducer.listPersonInRoom,
+    listService: state.RoomReducer.listServiceInRoom,
     removePersonStatus: state.RoomReducer.removePersonStatus,
+    removeServiceStatus: state.RoomReducer.removeServiceStatus,
 
     createStatus: state.RoomReducer.createStatus,
     editStatus: state.RoomReducer.editStatus,
@@ -711,5 +858,5 @@ function mapStateToProps(state) {
   };
 }
 export default withGlobalContext(
-  connect(mapStateToProps, {removePersonToRoom,getPersonInRoom, getHouseByUserId,getRoomByHouseId ,createRoom, editRoom, deleteRoom})(PhongTro),
+  connect(mapStateToProps, {removePersonToRoom,getPersonInRoom,getServiceInRoom,removeServiceToRoom, getHouseByUserId,getRoomByHouseId ,createRoom, editRoom, deleteRoom})(PhongTro),
 );

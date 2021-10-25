@@ -6,11 +6,13 @@ class DichVuService extends Service {
         super();
         this.url =`http://localhost:8080/room/`
         this.url_person= `http://localhost:8080/room/person/`
+        this.url_service= `http://localhost:8080/room/service/`
         this.url_room=`http://localhost:8080/room/house/`
     }
     callGetAPI = async (url,id) => {
         try {
             const response = await axios.get(url + id,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})
+            
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -30,12 +32,61 @@ class DichVuService extends Service {
                 message: 'Call API error'
             }
         }
-    }  
+    }
+    callAddServiceRoom = async (roomId,serviceId)=>
+    {
+        try {
+            const response = await axios.patch(this.url+roomId+`/addService/`+serviceId).then((res)=> res.data);
+            if (typeof (response) === 'object' && 'error' in response) {
+                
+                return {
+                    status: dataStatus.FAILED,
+                    message: response.error.data.message
+                }
+            }
+            else {
+                return {
+                    status: dataStatus.SUCCESS,
+                    data: response
+                }
+            }
+        } catch (error) {
+            console.log(`Error when call API: `, error)
+            return {
+                status: dataStatus.FAILED,
+                message: 'Call API error'
+            }
+        }
+    }
+    callRemoveServiceRoom = async (roomId,serviceId)=>
+    {
+        try {
+            const response = await axios.patch(this.url+roomId+`/removeService/`+serviceId).then((res)=> res.data);
+           console.log("service: ",response)
+            if (typeof (response) === 'object' && 'error' in response) {
+                return {
+                    status: dataStatus.FAILED,
+                    message: response.error.data.message
+                }
+            }
+            else {
+                return {
+                    status: dataStatus.SUCCESS,
+                    data: response.ListService
+                }
+            }
+        } catch (error) {
+            console.log(`Error when call API: `, error)
+            return {
+                status: dataStatus.FAILED,
+                message: 'Call API error'
+            }
+        }
+    }
     callAddPersonRoom = async (roomId,customerId)=>
     {
         try {
             const response = await axios.patch(this.url+roomId+`/addCustomer/`+customerId).then((res)=> res.data);
-            console.log(`service: `,response);
             if (typeof (response) === 'object' && 'error' in response) {
                 
                 return {
@@ -60,8 +111,8 @@ class DichVuService extends Service {
     callRemovePersonRoom = async (roomId,customerId)=>
     {
         try {
+            
             const response = await axios.patch(this.url+roomId+`/removeCustomer/`+customerId).then((res)=> res.data);
-            console.log(`data service: `,response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -149,6 +200,15 @@ class DichVuService extends Service {
             })
         });
     }
+    getServiceInRoom =(roomId)=>{
+        return new Promise((resolve, reject)=>{
+            this.callGetAPI(this.url_service,roomId).then(resp =>{   
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
+    }
     createRoom = (data)=>{
         return new Promise((resolve , reject)=>{
             this.callPostLocalAPI(this.url,data).then(resp =>{          
@@ -194,10 +254,28 @@ class DichVuService extends Service {
             })
         });
     }
+    addServiceToRoom = (roomId,serviceId)=>{
+        return new Promise((resolve , reject)=>{
+            this.callAddServiceRoom(roomId,serviceId).then(resp =>{
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
+    }
+    removeServiceToRoom = (roomId,serviceId)=>{
+        return new Promise((resolve , reject)=>{
+            this.callRemoveServiceRoom(roomId,serviceId).then(resp =>{
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
+    }
     getEmptyRoom = ()=>{
         return new Promise((resolve , reject)=>{
             this.callEmptyRoom().then(resp =>{
-                  console.log(`service data: `,resp );
+              
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

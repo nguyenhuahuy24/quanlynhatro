@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+
 import axios from "axios";
 import "App.scss";
 import UserContext from "../context/UserContext"
@@ -21,8 +23,16 @@ class Login extends Component {
        
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.loginTest = this.loginTest.bind(this);
     }
-
+    loginTest(){
+      this.toast.show({
+      severity: "error",
+      summary: "Thất bại",
+      detail: "Chức năng đang cập nhật",
+      life: 3000
+      });
+    }
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value
@@ -60,7 +70,10 @@ class Login extends Component {
     }
      render() {
     return (
+      
         <div className="App">
+                <Toast ref={(el) => (this.toast = el)} />
+
           <div className="appAside" />
           <div className="appForm">
               <div className="pageSwitcher"></div>
@@ -126,15 +139,15 @@ class Login extends Component {
         
               <div className="button-demo">
                   <div className="template">
-                       <Button className="facebook p-p-0">
+                       <Button className="facebook p-p-0" onClick={this.loginTest}>
                   <i className="pi pi-facebook p-px-2"></i>
                   <span className="p-px-3">Facebook</span>
               </Button>
-              <Button className="twitter p-p-0">
+              <Button className="twitter p-p-0" onClick={this.loginTest}>
                   <i className="pi pi-twitter p-px-2"></i>
                   <span className="p-px-3">Twitter</span>
               </Button>
-              <Button className="google p-p-0">
+              <Button className="google p-p-0" onClick={this.loginTest}>
                   <i className="pi pi-google p-px-2"></i>
                   <span className="p-px-3">Google</span>
               </Button>

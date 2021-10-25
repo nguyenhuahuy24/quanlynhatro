@@ -273,7 +273,20 @@ class Dien extends Component {
     return (
       <React.Fragment>
          <span className="p-input-icon-right">
-          <h7  className="p-mr-2">Chọn nhà: </h7>
+          
+          <h7 className="p-mr-2">Tháng/Năm</h7>
+          <Calendar
+            id="monthpicker"
+            className="p-mr-2"
+            value={this.state.selectedMonth}
+            onChange={this.onMonthChange}
+            view="month"
+            dateFormat="mm/yy"
+            showIcon
+            yearNavigator
+            yearRange="2010:2030"
+             />
+
           <Dropdown
             className="p-mr-2"
             value={this.state.selectedShowHouse}
@@ -282,16 +295,6 @@ class Dien extends Component {
             optionLabel="Name"
             placeholder="Chọn nhà trọ"
           />
-          <h7 className="p-mr-2">Tháng/Năm </h7>
-          <Calendar
-            id="monthpicker"
-            className="p-mr-2"
-            value={this.state.selectedMonth}
-            onChange={this.onMonthChange}
-            view="month" dateFormat="mm/yy"
-            showIcon
-            yearNavigator
-            yearRange="2010:2030" />
           <Button
             label="Nhập chỉ số mới"
             icon="pi pi-search-plus"
@@ -305,13 +308,14 @@ class Dien extends Component {
           tooltip="Thông báo cập nhật chỉ số điện nước hằng tháng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={this.openDay}
-
+          disabled
         />
           <Button
           label="Xuất file excel"
           icon="pi pi-file-o"
           className="p-button-warning p-mr-2"
           onClick={this.exportExcel}
+          disabled
         />
         
         </span>
@@ -479,15 +483,15 @@ class Dien extends Component {
             dataKey="_id"
             className="p-datatable-gridlines"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+            rows={5}
+            // rowsPerPageOptions={[5, 10, 25]}
+            // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            // currentPageReportTemplate="Hiển thị từ {first} đến {last} của tổng {totalRecords} phòng"
             header={header}
           >
             <Column field="RoomNumber" header="Phòng" ></Column>
-            <Column field="ElectricNumber" header="CS Điện Mới" ></Column>
-            <Column field="WaterNumber" header="CS Nuoc Mới" ></Column>
+            <Column field="ElectricNumber" header="Chỉ Số Điện Mới" ></Column>
+            <Column field="WaterNumber" header="Chỉ Số Nước Mới" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
          
           </DataTable>
@@ -511,9 +515,10 @@ class Dien extends Component {
               onChange={(e) => this.setState({ selectedMonth: e.value })}
               view="month" dateFormat="mm/yy"
               showIcon
+              numberOfMonths={3}
               yearNavigator
               yearRange="2010:2030" />
-
+              
           </div>
           <div className="p-field">
             <label>Phòng</label>

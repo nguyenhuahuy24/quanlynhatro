@@ -242,8 +242,9 @@ body > .navbar-collapse{
     width: $sidebar-width;
 
     > .content{
-        padding: 30px 15px;
+        padding: 10px 15px;
         min-height: calc(100% - 123px);
+        height: 625px;
     }
 
     > .footer{

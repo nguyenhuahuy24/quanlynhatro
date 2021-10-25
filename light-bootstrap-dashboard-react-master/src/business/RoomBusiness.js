@@ -32,6 +32,21 @@ class RoomBusiness {
             failed(error)
         }
     };
+    getServiceInRoom = async (data, success, failed) => {
+        try {
+            const roomService = new RoomService()
+            const id = data
+            const result = await roomService.getServiceInRoom(id);
+            if (result.status === dataStatus.SUCCESS) {
+                success(result)
+            }
+            else {
+                failed(result)
+            }
+        } catch (error) {
+            failed(error)
+        }
+    };
     createRoom = async (data, success, failed) =>{
         try {
             const room = new RoomService()
@@ -57,13 +72,13 @@ class RoomBusiness {
     editRoom = async (data, success, failed)=>{
         try {
             const room = new RoomService()
-            console.log(`data business: `,data);
+           
             const {idRoom, editdata} = data
             const id=[
                 idRoom
             ]
             const result = await room.editRoom(id,editdata)
-            console.log(`business: `,result);
+         
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }
@@ -77,13 +92,13 @@ class RoomBusiness {
     deleteRoom = async (data, success, failed)=>{
         try {
             const room = new RoomService()
-            console.log(`data business: `,data);
+           
             const id = data
             // const id=[
             //     idHouse
             // ]
             const result = await room.deleteRoom(id)
-            console.log(`business: `,result);
+     
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }
@@ -114,10 +129,9 @@ class RoomBusiness {
     removePersonToRoom = async (data, success, failed)=>{
         try {
             const room = new RoomService()
-            console.log(`data business: `,data);
+         
             const {roomId, customerId} = data
             const result = await room.removePersonToRoom(roomId, customerId)
-            console.log(`business: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }
@@ -128,6 +142,57 @@ class RoomBusiness {
             failed(error)
         }
     }
+    addServiceToRoom = async (data, success, failed)=>{
+        try {
+            const room = new RoomService()
+          
+            const {roomId, serviceId} = data
+            const result = await room.addServiceToRoom(roomId, serviceId)
+           
+            if (result.status === dataStatus.SUCCESS) {
+                success(result);
+            }
+            else {
+                failed(result);
+            }
+        } catch (error) {
+            failed(error)
+        }
+    }
+    removeServiceToRoom = async (data, success, failed)=>{
+        try {
+            const room = new RoomService()
+            const {roomId, serviceId} = data
+            const result = await room.removeServiceToRoom(roomId, serviceId)
+           console.log("business: ",result)
+            if (result.status === dataStatus.SUCCESS) {
+                success(result);
+            }
+            else {
+                failed(result);
+            }
+        } catch (error) {
+            failed(error)
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     getEmptyRoom = async ( success, failed) => {
         try {
             const roomService = new RoomService()

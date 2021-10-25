@@ -56,14 +56,14 @@ const dashboardRoutes = [
   {
     path: "/khachthue",
     name: "Khách Thuê",
-    icon: "pe-7s-user",
+    icon: "pe-7s-users",
     component: KhachThue,
     layout: "/admin"
   },
   {
     path: "/hopdong",
     name: "Hợp Đồng",
-    icon: "pe-7s-user",
+    icon: "pi pi-book",
     component: HopDong,
     layout: "/admin"
   },
@@ -77,7 +77,7 @@ const dashboardRoutes = [
   {
     path: "/info",
     name: "Thông tin cá nhân",
-    icon: "pe-7s-users",
+    icon: "pe-7s-user",
     component: InformationOfUser,
     layout: "/admin"
   }

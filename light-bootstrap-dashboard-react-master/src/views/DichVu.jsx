@@ -11,6 +11,8 @@ import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { InputNumber } from 'primereact/inputnumber';
+import { Dropdown } from "primereact/dropdown";
+
 import { Dialog } from 'primereact/dialog';
 import classNames from 'classnames';
 import { InputText } from 'primereact/inputtext';
@@ -19,7 +21,10 @@ import UserContext from "../context/UserContext";
 
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
-import { getServiceOfUser ,createDichVu, editDichVu, deleteDichVu} from '../redux/action/dichVuAction/DichVuAction'
+import {getServiceOfUser ,createDichVu, editDichVu, deleteDichVu} from '../redux/action/dichVuAction/DichVuAction'
+import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
+import {getRoomByHouseId,addServiceToRoom} from '../redux/action/roomAction/RoomAction'
+
 import { dataStatus } from "../utility/config";
 
 
@@ -41,29 +46,38 @@ class DichVu extends Component {
       DVDialog: false,
       deleteDVDialog: false,
       deleteDVsDialog: false,
+      ServiceToRoomDialog: false,
       DV: this.emptyDV,
      // loginuserID: localStorage.getItem("userIDlogin"),
       selectedDVs: null,
       submitted: false,
       globalFilter: null,
       selectedCategory: null,
-      
+      //
+      selectedHouse: "",
+      selectedShowHouse:"",
+      selectedRoom: "",
+      selectedShowRoom:"",
     };
   
-    this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
+    this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.openNew = this.openNew.bind(this);
+    this.openServiceToRoom = this.openServiceToRoom.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
     this.saveDV = this.saveDV.bind(this);
+    this.AddtoRoom=this.AddtoRoom.bind(this);
     this.editDV = this.editDV.bind(this);
     this.confirmDeleteDV = this.confirmDeleteDV.bind(this);
     this.deleteDV = this.deleteDV.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.hideDeleteDVDialog = this.hideDeleteDVDialog.bind(this);
-    this.hideDeleteDVsDialog = this.hideDeleteDVsDialog.bind(this);
     this.onDichVuChange = this.onDichVuChange.bind(this);
+    this.onHouseChange = this.onHouseChange.bind(this);
+    this.onRoomChange = this.onRoomChange.bind(this);
+    this.hideServiceToRoomDialog = this.hideServiceToRoomDialog.bind(this);
   }
   componentWillMount(){
     const{userData,setUserData}= this.context;
@@ -75,6 +89,7 @@ class DichVu extends Component {
     //   .getServiceOfUser()
     //   .then(data => this.setState({ DVs: data }));
     this.props.getServiceOfUser();
+    this.props.getHouseByUserId();
   }
   componentDidUpdate(prevProps){
     if (this.props.createStatus !== prevProps.createStatus) {
@@ -146,6 +161,49 @@ class DichVu extends Component {
         this.setState({ DVs: this.props.listDichVu.data })
       } 
     }
+    if (this.props.listHouse !== prevProps.listHouse) {
+      if (this.props.listHouse.status === dataStatus.SUCCESS) {
+          this.props.getRoomByHouseId(this.state.selectedHouse);
+      } 
+    }
+    if (this.props.addServiceStatus !== prevProps.addServiceStatus) {
+      if (this.props.addServiceStatus.status === dataStatus.SUCCESS) {
+          
+            if(this.props.addServiceStatus.data.err)
+              {
+                this.setState({
+                ServiceToRoomDialog: false
+                });
+                this.toast.show({
+                  severity: "error",
+                  summary: "Thất bại",
+                  detail: this.props.addPersonStatus.data.err,
+                  life: 6000
+                });
+            }else
+            {
+              this.setState({
+              ServiceToRoomDialog: false
+              });
+              this.toast.show({
+              severity: "success",
+              summary: "Thành công",
+              detail: "Thêm dịch vụ",
+              life: 3000
+            });
+            }
+             this.props.getServiceOfUser();
+        
+      }
+    }
+  }
+   onHouseChange(e) {
+    this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value });
+    this.props.getRoomByHouseId(e.value._id);
+  }
+  onRoomChange(e) {
+    this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
+    
   }
   formatCurrency(value) {
     return value.toLocaleString("vnd", {
@@ -160,6 +218,13 @@ class DichVu extends Component {
       DVDialog: true
     });
   }
+  openServiceToRoom(DV) {
+    this.setState({
+      DV:{ ...DV },
+      ServiceToRoomDialog: true
+    });
+
+  }
   onDichVuChange(e) {
      this.setState({ selectedCategory: e.value });
    }
@@ -172,8 +237,11 @@ class DichVu extends Component {
   hideDeleteDVDialog() {
     this.setState({ deleteDVDialog: false });
   }
-  hideDeleteDVsDialog() {
-    this.setState({ deleteDVsDialog: false });
+  hideServiceToRoomDialog() {
+    this.setState({ ServiceToRoomDialog: false });
+  }
+  AddtoRoom() {
+    this.props.addServiceToRoom(this.state.selectedRoom,this.state.DV._id);
   }
   saveDV() {
     let state = { submitted: true };
@@ -236,7 +304,7 @@ class DichVu extends Component {
 
     this.setState({ DV });
   }
-  rightToolbarTemplate() {
+  leftToolbarTemplate() {
     return (
       <React.Fragment>
         <Button
@@ -269,10 +337,16 @@ class DichVu extends Component {
           onClick={() => this.editDV(rowData)}
         />
         <Button
+          icon="pi pi-plus"
+          className="p-button-rounded p-button-warning p-mr-2"
+          onClick={()=>this.openServiceToRoom(rowData)}
+        />
+        <Button
           icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
+          className="p-button-rounded p-button-danger"
           onClick={() => this.confirmDeleteDV(rowData)}
         />
+        
       </React.Fragment>
     );
   }
@@ -322,19 +396,19 @@ class DichVu extends Component {
         />
       </React.Fragment>
     );
-    const deleteDVsDialogFooter = (
+    const ServiceToRoomDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Hủy"
           icon="pi pi-times"
           className="p-button-text"
-          onClick={this.hideDeleteDVsDialog}
+          onClick={this.hideServiceToRoomDialog}
         />
         <Button
-          label="Yes"
+          label="Thêm"
           icon="pi pi-check"
           className="p-button-text"
-          onClick={this.deleteSelectedDVs}
+          onClick={this.AddtoRoom}
         />
       </React.Fragment>
     );
@@ -345,7 +419,7 @@ class DichVu extends Component {
         <div className="card">
           <Toolbar
             className="p-mb-4"
-            right={this.rightToolbarTemplate}
+            left={this.leftToolbarTemplate}
           ></Toolbar>
           <DataTable
             ref={(el) => (this.dt = el)}
@@ -356,10 +430,10 @@ class DichVu extends Component {
             }
             dataKey="_id"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Dịch vụ"
+            rows={5}
+            // rowsPerPageOptions={[5, 10, 25]}
+            // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            // currentPageReportTemplate="Hiển thị từ {first} đến {last} của tổng {totalRecords} Dịch vụ"
             globalFilter={this.state.globalFilter}
             header={header}
           >
@@ -441,6 +515,39 @@ class DichVu extends Component {
             )}
           </div>
         </Dialog>
+        {/* add service to room */}
+         <Dialog
+          visible={this.state.ServiceToRoomDialog}
+          style={{ width: "450px" }}
+          header="Thêm vào phòng"
+          modal
+          className="p-fluid"
+          footer={ServiceToRoomDialogFooter}
+          onHide={this.hideServiceToRoomDialog}
+        >
+          <div className="p-field">
+            <label htmlFor="">Nhà</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowHouse}
+              options={this.props.listHouse.data}
+              onChange={this.onHouseChange}
+              optionLabel="Name"
+              placeholder="Chọn nhà trọ"
+            />
+          </div>
+          <div className="p-field">
+            <label htmlFor="">Phòng</label>
+            <Dropdown
+              className="p-mr-2"
+              value={this.state.selectedShowRoom}
+              options={this.props.listRoom.data}
+              onChange={this.onRoomChange}
+              optionLabel="RoomNumber"
+              placeholder="Chọn phòng trọ"
+            />
+          </div>
+        </Dialog>
       </div>
     );
   }
@@ -451,8 +558,14 @@ function mapStateToProps(state) {
     createStatus: state.DichVuReducer.createStatus,
     editStatus: state.DichVuReducer.editStatus,
     deleteStatus: state.DichVuReducer.deleteStatus,
+    //room
+    listRoom: state.RoomReducer.listRoom,
+    addServiceStatus: state.RoomReducer.addServiceStatus,
+
+    //house
+    listHouse: state.HouseReducer.listHouse,
   };
 }
 export default withGlobalContext(
-  connect(mapStateToProps, { getServiceOfUser ,createDichVu, editDichVu, deleteDichVu})(DichVu),
+  connect(mapStateToProps, {addServiceToRoom,getHouseByUserId,getRoomByHouseId, getServiceOfUser ,createDichVu, editDichVu, deleteDichVu})(DichVu),
 );

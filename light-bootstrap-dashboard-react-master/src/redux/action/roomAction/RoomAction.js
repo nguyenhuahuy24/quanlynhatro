@@ -1,6 +1,5 @@
 import {NAME_ACTIONS} from './ActionName'
 export function getRoomByHouseId(id){
-  console.log("Action get");
     return {
         type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
         typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_ROOM,
@@ -12,6 +11,13 @@ export function getPersonInRoom(id){
     return {
         type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
         typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_PERSON_IN_ROOM,
+        data: id
+      };
+}
+export function getServiceInRoom(id){   
+    return {
+        type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
+        typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_SERVICE_IN_ROOM,
         data: id
       };
 }
@@ -34,7 +40,6 @@ export function createRoom(createData) {
   };
 }
 export function deleteRoom(id) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
     typeAction: NAME_ACTIONS.ROOM_SCREEN.DELETE_ROOM,
@@ -43,7 +48,6 @@ export function deleteRoom(id) {
 }
 //
 export function addPersonToRoom(roomId,customerId) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
     typeAction: NAME_ACTIONS.ROOM_SCREEN.ADD_PERSON_TO_ROOM,
@@ -54,7 +58,6 @@ export function addPersonToRoom(roomId,customerId) {
   };
 }
 export function removePersonToRoom(roomId,customerId) {
-  console.log("Action remove")
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
     typeAction: NAME_ACTIONS.ROOM_SCREEN.REMOVE_PERSON_TO_ROOM,
@@ -64,8 +67,27 @@ export function removePersonToRoom(roomId,customerId) {
     }
   };
 }
+export function addServiceToRoom(roomId,serviceId) {
+  return {
+    type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
+    typeAction: NAME_ACTIONS.ROOM_SCREEN.ADD_SERVICE_TO_ROOM,
+    data: {
+      roomId:roomId,
+      serviceId: serviceId
+    }
+  };
+}
+export function removeServiceToRoom(roomId,serviceId) {
+  return {
+    type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
+    typeAction: NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM,
+    data: {
+      roomId: roomId,
+      serviceId: serviceId
+    }
+  };
+}
 export function getEmptyRoom() {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
     typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_EMPTY_ROOM,
@@ -73,7 +95,6 @@ export function getEmptyRoom() {
   };
 }
 export function getNotEmptyRoom() {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
     typeAction: NAME_ACTIONS.ROOM_SCREEN.GET_NOT_EMPTY_ROOM,

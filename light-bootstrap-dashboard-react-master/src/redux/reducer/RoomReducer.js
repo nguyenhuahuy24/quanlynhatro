@@ -12,6 +12,11 @@ const roomState = {
     message: '',
     data: [],
   },
+  listServiceInRoom: {
+    status: dataStatus.NONE,
+    message: '',
+    data: [],
+  },
   listEmptyRoom: {
     status: dataStatus.NONE,
     message: '',
@@ -28,6 +33,16 @@ const roomState = {
     data: {},
   },
   removePersonStatus: {
+    status: dataStatus.NONE,
+    message: '',
+    data: {},
+  },
+  addServiceStatus: {
+    status: dataStatus.NONE,
+    message: '',
+    data: {},
+  },
+  removeServiceStatus: {
     status: dataStatus.NONE,
     message: '',
     data: {},
@@ -86,6 +101,27 @@ const RoomReducer = (state = roomState, action) => {
       state = {
         ...state,
         listPersonInRoom: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_SERVICE_TO_ROOM:
+      state = {
+        ...state,
+        listServiceInRoom: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_SERVICE_TO_ROOM_FAILED:
+      state = {
+        ...state,
+        listServiceInRoom: {
           status: action.data.status,
           message: action.data.message,
           data: []
@@ -162,12 +198,32 @@ const RoomReducer = (state = roomState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer: `,state)
+   
       break;
     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_ADD_PERSON_TO_ROOM_FAILED:
       state = {
         ...state,
         addPersonStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_ADD_SERVICE_TO_ROOM:
+      state = {
+        ...state,
+        addServiceStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_ADD_SERVICE_TO_ROOM_FAILED:
+      state = {
+        ...state,
+        addServiceStatus: {
           status: action.data.status,
           message: action.data.message,
           data: []
@@ -194,6 +250,26 @@ const RoomReducer = (state = roomState, action) => {
         }
       }
       break;
+     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM:
+      state = {
+        ...state,
+        removeServiceStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      break;
+     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM_FAILED:
+      state = {
+        ...state,
+        removeServiceStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_EMPTY_ROOM:
       state = {
         ...state,
@@ -203,7 +279,7 @@ const RoomReducer = (state = roomState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer: `,state)
+    
       break;
     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_EMPTY_ROOM_FAILED:
       state = {

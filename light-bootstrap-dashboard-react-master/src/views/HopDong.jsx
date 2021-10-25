@@ -78,7 +78,7 @@ class HopDong extends Component {
       selectedRentalPeriod:"",
     };
   
-    this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
+    this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.openNew = this.openNew.bind(this);
@@ -119,7 +119,7 @@ class HopDong extends Component {
           severity: "success",
           summary: "Thành công",
           detail: "Thêm Hợp Động",
-          life: 2500
+          life: 3000
         });
       }
       else{
@@ -127,7 +127,7 @@ class HopDong extends Component {
           severity: "error",
           summary: "Thất bại",
           detail: "Thêm Hợp Động",
-          life: 2500
+          life: 3000
         });
       }
     }
@@ -212,7 +212,7 @@ class HopDong extends Component {
       severity: "error",
       summary: "Lỗi",
       detail: "Chưa chọn ngày bắt đầu",
-      life: 2500
+      life: 3000
       });
     }
   }
@@ -330,7 +330,7 @@ class HopDong extends Component {
 
     this.setState({ HD });
   }
-  rightToolbarTemplate() {
+  leftToolbarTemplate() {
     return (
       <React.Fragment>
         <Button
@@ -447,17 +447,17 @@ class HopDong extends Component {
         <div className="card">
           <Toolbar
             className="p-mb-4"
-            right={this.rightToolbarTemplate}
+            left={this.leftToolbarTemplate}
           ></Toolbar>
           <DataTable
             ref={(el) => (this.dt = el)}
             value={this.state.HDs}
             dataKey="_id"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Hợp đồng"
+            rows={5}
+            // rowsPerPageOptions={[5, 10, 25]}
+            // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            // currentPageReportTemplate="Hiển thị từ {first} đến {last} của tổng {totalRecords} Hợp đồng"
             globalFilter={this.state.globalFilter}
             header={header}
           >

@@ -67,7 +67,7 @@ class KhachThue extends Component {
       imageArray:[],
     };
     
-    this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
+    this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.editUser = this.editUser.bind(this);
     this.openNew = this.openNew.bind(this);
@@ -383,7 +383,7 @@ class KhachThue extends Component {
 
     this.setState({ user });
   }
-  rightToolbarTemplate() {
+  leftToolbarTemplate() {
     return (
       <React.Fragment>
        
@@ -497,7 +497,7 @@ class KhachThue extends Component {
         <div className="card">
           <Toolbar
             className="p-mb-4"
-            right={this.rightToolbarTemplate}
+            left={this.leftToolbarTemplate}
           ></Toolbar>
 
           <DataTable
@@ -509,17 +509,14 @@ class KhachThue extends Component {
             // }
             dataKey="id"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+            rows={5}
+           // rowsPerPageOptions={[5, 10, 25]}
+            //paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+            //currentPageReportTemplate="Hiển thị từ {first} đến {last} của tổng {totalRecords} Khách thuê"
             globalFilter={this.state.globalFilter}
             header={header}
           >
-            {/* <Column
-              selectionMode="multiple"
-              headerStyle={{ width: "5rem" }}
-            ></Column> */}
+      
             <Column field="Name" header="Tên Khách Hàng" ></Column>
             <Column field="Phone" header="Số điện thoại" ></Column>
             <Column field="Age" header="Tuổi" ></Column>

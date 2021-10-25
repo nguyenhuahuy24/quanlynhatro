@@ -37,8 +37,11 @@ p {
 
 .card {
     margin-bottom: 2rem;
+    height: 5px;
 }
-
+.card1 {
+    margin-bottom: 2rem;
+}
 input[type="number"] {
     -moz-appearance: textfield;
 }
@@ -240,13 +243,15 @@ img.flag {
   cursor: pointer;
 }    
 .img-holder{
-      
+    text-align: center;
+    padding-bottom: 15px;
   }
 .img{
     width: 150px;
     height: 150px;
     padding: 2px;
-  box-sizing: border-box;
+    box-sizing: border-box;
+    
   }   
 
 body {
@@ -354,5 +359,6 @@ body {
 .calender-date{
     width: auto;
     position: sticky;
-}          
-                
+}
+       
+        

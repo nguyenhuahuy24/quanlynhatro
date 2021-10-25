@@ -20,7 +20,7 @@
     .navbar-nav{
          > li > a {
              padding: $navbar-padding-a;
-             margin: $navbar-margin-a;
+             //@at-root: $navbar-margin-a;
              position: relative;
          }
          > li > a.btn{

@@ -20,15 +20,15 @@ import UserContext from "../context/UserContext";
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
 import { getHouseByUserId ,createHouse, editHouse, deleteHouse} from '../redux/action/houseAction/HouseAction'
-import { dataStatus } from "../utility/config";
+import { dataStatus,userProfile } from "../utility/config";
 
 
 class Nha extends Component {
   static contextType = UserContext
   emptyHouse = {
     Name: '',
-    Address: null,
-    UserId: null
+    Address: "",
+    UserId: userProfile.userId
   };
   constructor(props) {
     super(props);
@@ -45,7 +45,7 @@ class Nha extends Component {
       globalFilter: null,
     };
  
-    this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
+    this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.openNew = this.openNew.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
@@ -58,11 +58,11 @@ class Nha extends Component {
     this.hideDeleteHouseDialog = this.hideDeleteHouseDialog.bind(this);
     this.hideDeleteHousesDialog = this.hideDeleteHousesDialog.bind(this);
   }
-  componentWillMount(){
-    const{userData,setUserData}= this.context;
-    this.emptyHouse.UserId = userData.user;
-    this.state.house=this.emptyHouse;
-  }
+  // componentWillMount(){
+  //   const{userData,setUserData}= this.context;
+  //   this.emptyHouse.UserId = userData.user;
+  //   this.state.house=this.emptyHouse;
+  // }
   componentDidMount() {
     
     // this.houseService
@@ -107,7 +107,19 @@ class Nha extends Component {
     }
     if (this.props.listHouse !== prevProps.listHouse) {
       if (this.props.listHouse.status === dataStatus.SUCCESS) {
-        this.setState({ houses: this.props.listHouse.data })
+        console.log(`house:`,this.state.house)
+        const houses = this.props.listHouse.data
+        let data =[];
+        houses.forEach(house=>{
+          data.push({
+            _id: house._id,
+            Name:house.Name,
+            Address:house.Address,
+            UserId:house.UserId,
+            Rooms:house.Rooms.length
+          })
+        })
+        this.setState({ houses: data })
       } 
     }
     // this.houseService
@@ -140,9 +152,14 @@ class Nha extends Component {
     //  let houses = [...this.state.houses];
       let house = { ...this.state.house };
       if (this.state.house._id) {
-      //  const index = this.findIndexById(this.state.house._id);
-        //this.houseService.updateHouse(this.state.house._id, house).then();
-        this.props.editHouse(this.state.house._id, house);
+       let data =[];  
+          data.push({
+            _id: house._id,
+            Name:house.Name,
+            Address:house.Address,
+            UserId:house.UserId,
+          })
+        this.props.editHouse(this.state.house._id, data[0]);
         // houses[index] = house;
         this.toast.show({
           severity: "success",
@@ -210,7 +227,7 @@ class Nha extends Component {
 
     this.setState({ house });
   }
-  rightToolbarTemplate() {
+  leftToolbarTemplate() {
     return (
       <React.Fragment>
         <Button
@@ -300,7 +317,7 @@ class Nha extends Component {
         <div className="card">
           <Toolbar
             className="p-mb-4"
-            right={this.rightToolbarTemplate}
+            left={this.leftToolbarTemplate}
           ></Toolbar>
           <DataTable
             ref={(el) => this.dt = el}
@@ -309,9 +326,11 @@ class Nha extends Component {
             // onSelectionChange={(e) =>
             //   this.setState({ selectedHouses: e.value })
             // }
-            dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} houses"
+            dataKey="id" 
+            paginator rows={5} 
+            // rowsPerPageOptions={[5, 10, 25]}
+            // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            // currentPageReportTemplate="Showing {first} to {last} of {totalRecords} houses"
             globalFilter={this.state.globalFilter}
             header={header}>
             {/* <Column
@@ -319,6 +338,7 @@ class Nha extends Component {
               headerStyle={{ width: "5rem" }}
             ></Column> */}
             <Column field="Name" header="Tên nhà trọ" ></Column>
+            <Column field="Rooms" header="Tổng phòng" ></Column>
             <Column field="Address" header="Địa chỉ" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>

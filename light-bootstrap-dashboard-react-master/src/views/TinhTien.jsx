@@ -117,7 +117,7 @@ class TinhTien extends Component {
                data.push({
               RoomNumber: bill.RoomNumber,
               TotalBill: 0,
-              Status:"Chưa tính tiền"
+              Status:"Chưa tạo hóa đơn"
             })
             }
           })
@@ -372,7 +372,7 @@ class TinhTien extends Component {
   leftToolbarTemplate() {
     return (
       <React.Fragment>
-        <label className="p-mr-2" htmlFor="datestart">Tháng/Năm </label>
+         <h7 className="p-mr-2">Tháng/Năm</h7>
         <Calendar
           id="monthpicker"
           className="p-mr-2"
@@ -402,21 +402,21 @@ class TinhTien extends Component {
           icon="pi pi-phone"
           className="p-button-info p-mr-2"
           onClick={"this.confirmDeleteSelected"}
-
+          disabled
         />
         <Button
           label="Email"
           icon="pi pi-envelope"
           className="p-button-primary p-mr-2"
           onClick={""}
-
+          disabled
         />
         <Button
           label="In danh sách"
           icon="pi pi-file-o"
           className="p-button-success p-mr-2"
           onClick={"this.confirmDeleteSelected"}
-
+          disabled
         />
       </React.Fragment>
     );
@@ -544,17 +544,14 @@ class TinhTien extends Component {
             // }
             dataKey="id"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-            globalFilter={this.state.globalFilter}
+            rows={5}
+          //  rowsPerPageOptions={[5, 10, 25]}
+          //   paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          //  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+           globalFilter={this.state.globalFilter}
             header={header}
           >
-            {/* <Column
-              selectionMode="multiple"
-              headerStyle={{ width: "5rem" }}
-            ></Column> */}
+       
             <Column field="RoomNumber" header="Phòng" ></Column>
             <Column
               field="TotalBill"

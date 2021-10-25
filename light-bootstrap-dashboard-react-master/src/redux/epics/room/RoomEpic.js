@@ -27,7 +27,7 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.ROOM_SCREEN.GET_PERSON_IN_ROOM:  
                 roomBusiness.getPersonInRoom(action.data, success => {
-                    console.log("Epic Person");
+                   
                     resolve({
                         actionType: NAME_ACTIONS.ROOM_SCREEN.GET_PERSON_IN_ROOM,
                         data: success
@@ -35,6 +35,18 @@ const resolver = (action) => {
                 }, failed => {
                     messageError = failed;
                     reject(new Error(NAME_ACTIONS.ROOM_SCREEN.GET_PERSON_IN_ROOM_FAILED));
+                })
+                break;
+            case NAME_ACTIONS.ROOM_SCREEN.GET_SERVICE_IN_ROOM:  
+                roomBusiness.getServiceInRoom(action.data, success => {
+               
+                    resolve({
+                        actionType: NAME_ACTIONS.ROOM_SCREEN.GET_SERVICE_IN_ROOM,
+                        data: success
+                    });
+                }, failed => {
+                    messageError = failed;
+                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.GET_SERVICE_IN_ROOM_FAILED));
                 })
                 break;
             case NAME_ACTIONS.ROOM_SCREEN.CREATE_ROOM:
@@ -82,6 +94,18 @@ const resolver = (action) => {
                     reject(new Error(NAME_ACTIONS.ROOM_SCREEN.ADD_PERSON_TO_ROOM_FAILED));
                 })
                 break;
+            case NAME_ACTIONS.ROOM_SCREEN.ADD_SERVICE_TO_ROOM:
+                roomBusiness.addServiceToRoom(action.data, success => {
+                    
+                    resolve({
+                        actionType: NAME_ACTIONS.ROOM_SCREEN.ADD_SERVICE_TO_ROOM,
+                        data: success
+                    });
+                }, failed => {
+                    messageError = failed;
+                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.ADD_SERVICE_TO_ROOM_FAILED));
+                })
+                break;
             case NAME_ACTIONS.ROOM_SCREEN.REMOVE_PERSON_TO_ROOM:
                 roomBusiness.removePersonToRoom(action.data, success => {
                     resolve({
@@ -90,12 +114,22 @@ const resolver = (action) => {
                     });
                 }, failed => {
                     messageError = failed;
-                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.REMOVE_PERSON_TO_ROOM_FAILED));
+                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM_FAILED));
+                })
+                break;
+            case NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM:
+                roomBusiness.removeServiceToRoom(action.data, success => {
+                    resolve({
+                        actionType: NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM,
+                        data: success
+                    });
+                }, failed => {
+                    messageError = failed;
+                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM_FAILED));
                 })
                 break;
             case NAME_ACTIONS.ROOM_SCREEN.GET_EMPTY_ROOM:
                 roomBusiness.getEmptyRoom( success => {
-                    console.log(`epic`)
                     resolve({
                         actionType: NAME_ACTIONS.ROOM_SCREEN.GET_EMPTY_ROOM,
                         data: success
@@ -134,6 +168,11 @@ const dispatch = (data) => {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_PERSON_TO_ROOM,
                 data: data.data
             };
+        case NAME_ACTIONS.ROOM_SCREEN.GET_SERVICE_IN_ROOM:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_SERVICE_TO_ROOM,
+                data: data.data
+            };
         case NAME_ACTIONS.ROOM_SCREEN.EDIT_ROOM:
             return {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_EDIT_ROOM,
@@ -157,6 +196,16 @@ const dispatch = (data) => {
         case NAME_ACTIONS.ROOM_SCREEN.REMOVE_PERSON_TO_ROOM:
             return {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_PERSON_TO_ROOM,
+                data: data.data
+            };
+        case NAME_ACTIONS.ROOM_SCREEN.ADD_SERVICE_TO_ROOM:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_ADD_SERVICE_TO_ROOM,
+                data: data.data
+            };
+        case NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM,
                 data: data.data
             };
         case NAME_ACTIONS.ROOM_SCREEN.GET_EMPTY_ROOM:
@@ -187,6 +236,11 @@ const dispatchError = (error, action) => {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_PERSON_TO_ROOM_FAILED,
                 data: messageError
             }
+        case NAME_ACTIONS.ROOM_SCREEN.GET_SERVICE_IN_ROOM_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_SERVICE_TO_ROOM_FAILED,
+                data: messageError
+            }
         case NAME_ACTIONS.ROOM_SCREEN.CREATE_ROOM_FAILED:
             return {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_CREATE_ROOM_FAILED,
@@ -210,6 +264,16 @@ const dispatchError = (error, action) => {
         case NAME_ACTIONS.ROOM_SCREEN.REMOVE_PERSON_TO_ROOM_FAILED:
             return {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_PERSON_TO_ROOM_FAILED,
+                data: messageError
+            }
+        case NAME_ACTIONS.ROOM_SCREEN.ADD_SERVICE_TO_ROOM_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_ADD_SERVICE_TO_ROOM_FAILED,
+                data: messageError
+            }
+        case NAME_ACTIONS.ROOM_SCREEN.REMOVE_SERVICE_TO_ROOM_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM_FAILED,
                 data: messageError
             }
         case NAME_ACTIONS.ROOM_SCREEN.GET_EMPTY_ROOM_FAILED:
