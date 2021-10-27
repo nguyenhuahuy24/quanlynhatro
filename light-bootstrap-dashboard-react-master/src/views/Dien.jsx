@@ -57,7 +57,6 @@ class Dien extends Component {
       selectNotificationDate:new Date(),
     };
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
-    this.rightToolbarTemplate = this.rightToolbarTemplate.bind(this);
     this.saveDien = this.saveDien.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
     this.onMonthChange = this.onMonthChange.bind(this);
@@ -190,22 +189,7 @@ class Dien extends Component {
     }
   }
   exportExcel() {
-        import('xlsx').then(xlsx => {
-            var worksheet = xlsx.utils.json_to_sheet(this.state.Diens);
-            var workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-            var excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-            this.saveAsExcelFile(excelBuffer, 'Dien');
-        });
-    }
-  saveAsExcelFile(buffer, fileName) {
-        import('file-saver').then(FileSaver => {
-            let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-            let EXCEL_EXTENSION = '.xlsx';
-            const data = new Blob([buffer], {
-                type: EXCEL_TYPE
-            });
-            FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-        });
+       this.dt.exportCSV();
     }
   saveDien() {
     let state = { submitted: true };
@@ -315,23 +299,10 @@ class Dien extends Component {
           icon="pi pi-file-o"
           className="p-button-warning p-mr-2"
           onClick={this.exportExcel}
-          disabled
+          
         />
         
         </span>
-      </React.Fragment>
-    );
-  }
-  rightToolbarTemplate() {
-    return (
-      <React.Fragment>
-      
-        <Button
-          label="Xuất file excel"
-          icon="pi pi-file-o"
-          className="p-button-warning p-mr-2"
-          onClick={""}
-        />
       </React.Fragment>
     );
   }
@@ -474,7 +445,6 @@ class Dien extends Component {
           <Toolbar
             className="p-mb-4"
             left={this.leftToolbarTemplate}
-            // right={this.rightToolbarTemplate}
           ></Toolbar>
 
           <DataTable

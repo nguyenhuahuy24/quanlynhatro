@@ -55,7 +55,6 @@ class CustomerBusiness {
     deleteCustomer = async (data, success, failed)=>{
         try {
             const customer = new CustomerService()
-            console.log(`data business: `,data);
             const id = data
             // const id=[
             //     idHouse

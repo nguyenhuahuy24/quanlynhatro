@@ -104,6 +104,7 @@ class TinhTien extends Component {
               data.push({
                _id: bill.ListBill[0]._id,
                 RoomNumber: bill.RoomNumber,
+                RoomId: bill.ListBill[0].RoomId,
                 TotalBill: bill.ListBill[0].TotalBill,
                 Status: bill.ListBill[0].Status,
                 OtherCosts: bill.ListBill[0].OtherCosts,
@@ -121,7 +122,6 @@ class TinhTien extends Component {
             })
             }
           })
-          console.log(`data: `,data);
           this.setState({ bills: { ...data } })
       } 
     }
@@ -303,13 +303,18 @@ class TinhTien extends Component {
   }
   RecalculateBill(){
     let state = { submitted: true }; 
-    
+    let a =[]
+    a.push({
+      RoomId: this.state.bill.RoomId,
+      Month: this.state.selectedMonth
+    })
+    console.log("data tính lại bill: ",a)
     //this.props.createBill(this.state.bill_id);
     //this.billService.createBill(a).then();
         this.toast.show({
           severity: "success",
-          summary: "Successful",
-          detail: "Bill Created",
+          summary: "Thành công",
+          detail: "Tính lại Bill",
           life: 3000
         });
     state = {
@@ -445,7 +450,7 @@ class TinhTien extends Component {
         />
         <Button
           icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
+          className="p-button-rounded p-button-danger"
           tooltip="Xóa bill" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.confirmDeleteBill(rowData)}

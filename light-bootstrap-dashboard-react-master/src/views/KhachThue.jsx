@@ -49,7 +49,7 @@ class KhachThue extends Component {
 
     this.state = {
       users: null,
-     
+      edit:false,
       userDialog: false,
       deleteUserDialog: false,
       AddtoRoomDialog: false,
@@ -104,6 +104,7 @@ class KhachThue extends Component {
     }
     if (this.props.listCustomer !== prevProps.listCustomer) {
       if (this.props.listCustomer.status === dataStatus.SUCCESS) {
+        console.log("data user:",this.props.listCustomer.data)
         this.setState({ users: this.props.listCustomer.data })
       } 
     }
@@ -269,7 +270,8 @@ class KhachThue extends Component {
     this.setState({
       user: this.emptyUser,
       submitted: false,
-      userDialog: true
+      userDialog: true,
+      edit:true
     });
   }
   openAddtoRoom(user) {
@@ -340,11 +342,10 @@ class KhachThue extends Component {
     this.setState(state);
   }
   editUser(user) {
-    
     this.setState({
-      selectedDateCMND:new Date(user.DateCmnd),
       userDialog: true,
        user: { ...user },
+       edit:false
     });
   }
   confirmDeleteUser(user) {
@@ -446,14 +447,22 @@ class KhachThue extends Component {
         <Button
           label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
           label="Lưu"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.saveUser}
+          disabled ={this.state.edit !=true}  
+        />
+        <Button
+          label="Chỉnh sửa"
+          icon="pi pi-check"
+          className="p-button-warning"
+          disabled ={this.state.edit !=false}
+          onClick={()=>this.setState({edit:true})}
         />
       </React.Fragment>
     );
@@ -547,6 +556,7 @@ class KhachThue extends Component {
                 className={classNames({
                   "p-invalid": this.state.submitted && !this.state.user.Name
                 })}
+                 disabled ={this.state.edit !=true}  
               />
               {this.state.submitted && !this.state.user.Name && (
                 <small className="p-invalid">Tên không được để trống.</small>
@@ -559,6 +569,7 @@ class KhachThue extends Component {
                 value={this.state.user.Age}
                 onChange={(e) => this.onInputNumberChange(e, "Age")}
                 required
+                 disabled ={this.state.edit !=true}  
               /> </div>
           </div>
           <div className="p-formgrid p-grid">
@@ -568,6 +579,7 @@ class KhachThue extends Component {
                 id="Email"
                 value={this.state.user.Email}
                 onChange={(e) => this.onInputChange(e, "Email")}
+                 disabled ={this.state.edit !=true}  
               />
             </div>
           </div>
@@ -579,6 +591,7 @@ class KhachThue extends Component {
                 mask="9999999999"
                 value={this.state.user.Phone}
                 onChange={(e) => this.onInputNumberChange(e, "Phone")}
+                 disabled ={this.state.edit !=true}  
               ></InputMask>
             </div>
             <div className="p-field p-col">
@@ -588,7 +601,7 @@ class KhachThue extends Component {
                 value={this.state.user.Cmnd}
                 onChange={(e) => this.onInputChange(e, "Cmnd")}
                 required
-
+                 disabled ={this.state.edit !=true}  
               /> </div>
           </div>
           <div className="p-field">
@@ -598,6 +611,7 @@ class KhachThue extends Component {
               value={this.state.user.PermanentAddress}
               onChange={(e) => this.onInputChange(e, "PermanentAddress")}
               required
+               disabled ={this.state.edit !=true}  
             />
           </div>
           
@@ -612,6 +626,7 @@ class KhachThue extends Component {
               onChange={this.onHouseChange}
               optionLabel="Name"
               placeholder="Chọn nhà trọ"
+               disabled ={this.state.edit !=true}  
             />
             </div>
             <div className="p-field p-col">
@@ -623,6 +638,7 @@ class KhachThue extends Component {
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
+               disabled ={this.state.edit !=true}  
             /> </div>
           </div>
 
@@ -635,16 +651,20 @@ class KhachThue extends Component {
               monthNavigator 
               yearNavigator 
               yearRange="1950:2010"
-              value={this.state.selectedDateCMND} 
-              onChange={(e) => this.setState({ selectedDateCMND: e.value })} showIcon />
+              value={new Date(this.state.user.DateCmnd)} 
+              onChange={(e) => this.setState({ selectedDateCMND: e.value })}
+               showIcon
+                disabled ={this.state.edit !=true}  
+                 />
             </div>
             <div className="p-field p-col">
               <label htmlFor="PlaceCmnd">Nơi cấp</label>
               <InputText
                 id="PlaceCmnd"
-                value={this.state.user.noicapCMND}
+                value={this.state.user.PlaceCmnd}
                 onChange={(e) => this.onInputChange(e, "PlaceCmnd")}
                 required
+                 disabled ={this.state.edit !=true}  
               /> </div>
           </div>
           <div className="p-field">
@@ -658,6 +678,7 @@ class KhachThue extends Component {
               //onChange={this.handleChange.bind(this)}
               onChange={(e)=>this.handleImageChange(e)}
               multiple
+               disabled ={this.state.edit !=true}  
             />
              {imgTag}
           </div>

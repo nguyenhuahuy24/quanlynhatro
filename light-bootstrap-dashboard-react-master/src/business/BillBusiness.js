@@ -21,7 +21,8 @@ class BillBusiness {
             const bill = new BillService()
             // const {createData} = data
             console.log("business")
-            const result = await bill.createBill(data) 
+            const result = await bill.createBill(data)
+            
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

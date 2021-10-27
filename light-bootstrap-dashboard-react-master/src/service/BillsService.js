@@ -33,8 +33,9 @@ class BillsService extends Service {
     }
     callPostAPI = async (data) => {
         try {
+            console.log("service",data); 
             const response = await axios.post(this.url, data).then((res) => res.data);   
-            console.log("service utility create",response);  
+            console.log("service bill create",response);  
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

@@ -151,7 +151,8 @@ class Service {
     }
     callDeleteAPI = async (url,id) => {
         try {
-    
+            console.log("service url",url)
+            console.log("service",id)
             const response = await axios.delete(url + id).then((res) => res.data);
             console.log("service delete", response)
             if (typeof (response) === 'object' && 'error' in response) {
