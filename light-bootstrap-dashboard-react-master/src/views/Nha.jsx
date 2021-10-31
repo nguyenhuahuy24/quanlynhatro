@@ -35,6 +35,7 @@ class Nha extends Component {
    
     this.state = {
       houses: null,
+      edit: false,
       houseDialog: false,
       deleteHouseDialog: false,
       deleteHousesDialog: false,
@@ -107,7 +108,6 @@ class Nha extends Component {
     }
     if (this.props.listHouse !== prevProps.listHouse) {
       if (this.props.listHouse.status === dataStatus.SUCCESS) {
-        console.log(`house:`,this.state.house)
         const houses = this.props.listHouse.data
         let data =[];
         houses.forEach(house=>{
@@ -131,7 +131,8 @@ class Nha extends Component {
     this.setState({
       house: this.emptyHouse,
       submitted: false,
-      houseDialog: true
+      houseDialog: true,
+      edit:true
     });
   }
   hideDialog() {
@@ -191,7 +192,8 @@ class Nha extends Component {
   editHouse(house) {
     this.setState({
       house: { ...house },
-      houseDialog: true
+      houseDialog: true,
+      edit:false
     });
   }
   confirmDeleteHouse(house) {
@@ -258,7 +260,7 @@ class Nha extends Component {
         />
         <Button
           icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
+          className="p-button-rounded p-button-danger"
           onClick={() => this.confirmDeleteHouse(rowData)}
         />
       </React.Fragment>
@@ -282,31 +284,39 @@ class Nha extends Component {
     const houseDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
-          label="Save"
+          label="Lưu"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.saveHouse}
+          disabled ={this.state.edit !=true}  
+        />
+         <Button
+          label="Chỉnh sửa"
+          icon="pi pi-pencil"
+          className="p-button-warning"
+          disabled ={this.state.edit !=false}
+          onClick={()=>this.setState({edit:true})}
         />
       </React.Fragment>
     );
     const deleteHouseDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDeleteHouseDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.deleteHouse}
         />
       </React.Fragment>
@@ -361,9 +371,11 @@ class Nha extends Component {
               onChange={(e) => this.onInputChange(e, "Name")}
               required
               autoFocus
+
               className={classNames({
                 "p-invalid": this.state.submitted && !this.state.house.Name
               })}
+              disabled ={this.state.edit !=true}
             />
             {this.state.submitted && !this.state.house.Name && (
               <small className="p-invalid">Tên không được trống.</small>
@@ -376,6 +388,7 @@ class Nha extends Component {
               value={this.state.house.Address}
               onChange={(e) => this.onInputChange(e, "Address")}
               required
+              disabled ={this.state.edit !=true}
               rows={3}
               cols={10}
             />

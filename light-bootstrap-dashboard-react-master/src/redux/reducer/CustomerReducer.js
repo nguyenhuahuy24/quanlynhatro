@@ -34,7 +34,6 @@ const customerReducer = (state = customerState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer: `,state)
       break;
     case NAME_EPICS.EPIC_CUSTOMER_SCREEN.EPIC_GET_CUSTOMER_FAILED:
       state = {
@@ -55,7 +54,6 @@ const customerReducer = (state = customerState, action) => {
           data: action.data.data
         }
       }
-       console.log(`reducer edit: `,state)
       break;
     case NAME_EPICS.EPIC_CUSTOMER_SCREEN.EPIC_EDIT_CUSTOMER_FAILED:
       state = {
@@ -76,7 +74,6 @@ const customerReducer = (state = customerState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer create: `,state)
       break;
     case NAME_EPICS.EPIC_CUSTOMER_SCREEN.EPIC_CREATE_CUSTOMER_FAILED:
       state = {

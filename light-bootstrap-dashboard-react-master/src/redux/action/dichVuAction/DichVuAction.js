@@ -1,6 +1,5 @@
 import {NAME_ACTIONS} from './ActionName'
 export function getServiceOfUser(){
-  console.log("Action dich vu:")
     return {
         type: NAME_ACTIONS.DICHVU_SCREEN.DICHVU_SCREEN,
         typeAction: NAME_ACTIONS.DICHVU_SCREEN.GET_DICHVU,
@@ -8,7 +7,6 @@ export function getServiceOfUser(){
       };
 }
 export function editDichVu(id, editdata){
-  console.log("Action")
   return {
     type: NAME_ACTIONS.DICHVU_SCREEN.DICHVU_SCREEN,
     typeAction: NAME_ACTIONS.DICHVU_SCREEN.EDIT_DICHVU,
@@ -27,7 +25,6 @@ export function createDichVu(createData) {
   };
 }
 export function deleteDichVu(id) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.DICHVU_SCREEN.DICHVU_SCREEN,
     typeAction: NAME_ACTIONS.DICHVU_SCREEN.DELETE_DICHVU,

@@ -5,7 +5,6 @@ class CustomerBusiness {
         try {
             const customerService = new CustomerService()
             const result = await customerService.getAllCustomerOfUser();
-            console.log("business")
             if (result.status === dataStatus.SUCCESS) {
                 success(result)
             }
@@ -21,7 +20,6 @@ class CustomerBusiness {
             const customer = new CustomerService()
             // const {createData} = data
             const result = await customer.createCustomer(data)
-            console.log("business create");
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }
@@ -35,7 +33,6 @@ class CustomerBusiness {
     editCustomer = async (data, success, failed)=>{
         try {
             const customer = new CustomerService()
-            console.log(`data business: `,data);
             const {idCustomer, editdata} = data
             const id=[
                 idCustomer
@@ -60,7 +57,6 @@ class CustomerBusiness {
             //     idHouse
             // ]
             const result = await customer.deleteCustomer(id)
-            console.log(`business: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

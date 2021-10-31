@@ -1,6 +1,5 @@
 import {NAME_ACTIONS} from './ActionName'
 export function getBillInMonthOfUser(data){
-     console.log("Action Bill")
     return {
         type: NAME_ACTIONS.BILL_SCREEN.BILL_SCREEN,
         typeAction: NAME_ACTIONS.BILL_SCREEN.GET_BILL,
@@ -27,10 +26,17 @@ export function createBill(createData) {
   };
 }
 export function deleteBill(id) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.BILL_SCREEN.BILL_SCREEN,
     typeAction: NAME_ACTIONS.BILL_SCREEN.DELETE_BILL,
+    data: id
+  };
+}
+export function recalculateBill(id) {
+  console.log("action")
+  return {
+    type: NAME_ACTIONS.BILL_SCREEN.BILL_SCREEN,
+    typeAction: NAME_ACTIONS.BILL_SCREEN.RECALCULATE_BILL,
     data: id
   };
 }

@@ -27,7 +27,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.BILL_SCREEN.CREATE_BILL:
                 billBusiness.createBill(action.data, success => {
-                    console.log("`epic bill create`");
                     resolve({
                         actionType: NAME_ACTIONS.BILL_SCREEN.CREATE_BILL,
                         data: success
@@ -46,6 +45,18 @@ const resolver = (action) => {
                 }, failed => {
                     messageError = failed;
                     reject(new Error(NAME_ACTIONS.BILL_SCREEN.EDIT_BILL_FAILED));
+                })
+                break;
+            case NAME_ACTIONS.BILL_SCREEN.RECALCULATE_BILL:
+                billBusiness.recalculateBill(action.data, success => {
+                    console.log("epic")
+                    resolve({
+                        actionType: NAME_ACTIONS.BILL_SCREEN.RECALCULATE_BILL,
+                        data: success
+                    });
+                }, failed => {
+                    messageError = failed;
+                    reject(new Error(NAME_ACTIONS.BILL_SCREEN.RECALCULATE_BILL_FAILED));
                 })
                 break;
             case NAME_ACTIONS.BILL_SCREEN.DELETE_BILL:
@@ -88,6 +99,11 @@ const dispatch = (data) => {
                 type: NAME_EPICS.EPIC_BILL_SCREEN.EPIC_DELETE_BILL,
                 data: data.data
             };
+        case NAME_ACTIONS.BILL_SCREEN.RECALCULATE_BILL:
+            return {
+                type: NAME_EPICS.EPIC_BILL_SCREEN.EPIC_RECALCULATE_BILL,
+                data: data.data
+            };
         default:
             console.error('Error when dispatch Bill Epic.');
             return new Error('Error when dispatch Bill Epic.');
@@ -109,6 +125,16 @@ const dispatchError = (error, action) => {
         case NAME_ACTIONS.BILL_SCREEN.EDIT_BILL_FAILED:
             return {
                 type: NAME_EPICS.EPIC_BILL_SCREEN.EPIC_EDIT_BILL_FAILED,
+                data: messageError
+            }
+        case NAME_ACTIONS.BILL_SCREEN.DELETE_BILL_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_BILL_SCREEN.EPIC_DELETE_BILL_FAILED,
+                data: messageError
+            }
+        case NAME_ACTIONS.BILL_SCREEN.RECALCULATE_BILL_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_BILL_SCREEN.EPIC_RECALCULATE_BILL_FAILED,
                 data: messageError
             }
         default:

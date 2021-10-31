@@ -25,7 +25,7 @@ import {getServiceOfUser ,createDichVu, editDichVu, deleteDichVu} from '../redux
 import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 import {getRoomByHouseId,addServiceToRoom} from '../redux/action/roomAction/RoomAction'
 
-import { dataStatus } from "../utility/config";
+import { dataStatus,userProfile } from "../utility/config";
 
 
 
@@ -35,7 +35,7 @@ class DichVu extends Component {
     ServiceName: "",
     Description: "",
     Price: 0,
-    UserId:null
+    UserId:""
   };
 
   constructor(props) {
@@ -43,6 +43,7 @@ class DichVu extends Component {
 
     this.state = {
       DVs: null,
+      edit:false,
       DVDialog: false,
       deleteDVDialog: false,
       deleteDVsDialog: false,
@@ -215,7 +216,8 @@ class DichVu extends Component {
     this.setState({
       DV: this.emptyDV,
       submitted: false,
-      DVDialog: true
+      DVDialog: true,
+      edit:true
     });
   }
   openServiceToRoom(DV) {
@@ -269,7 +271,8 @@ class DichVu extends Component {
   editDV(DV) {
     this.setState({
       DV: { ...DV },
-      DVDialog: true
+      DVDialog: true,
+      edit:false
     });
   }
   confirmDeleteDV(DV) {
@@ -313,15 +316,6 @@ class DichVu extends Component {
           className="p-button-success p-mr-2"
           onClick={this.openNew}
         />
-        {/* <Button
-          label="Xóa"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={this.confirmDeleteSelected}
-          disabled={
-            !this.state.selectedDVs || !this.state.selectedDVs.length
-          }
-        /> */}
       </React.Fragment>
     );
   }
@@ -367,31 +361,39 @@ class DichVu extends Component {
     const DVDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
-          label="Save"
+          label="Lưu"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.saveDV}
+          disabled ={this.state.edit !=true}  
+        />
+        <Button
+          label="Chỉnh sửa"
+          icon="pi pi-pencil"
+          className="p-button-warning"
+          disabled ={this.state.edit !=false}
+          onClick={()=>this.setState({edit:true})}
         />
       </React.Fragment>
     );
     const deleteDVDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideDeleteDVDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+           className="p-button-success"
           onClick={this.deleteDV}
         />
       </React.Fragment>
@@ -401,13 +403,13 @@ class DichVu extends Component {
         <Button
           label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideServiceToRoomDialog}
         />
         <Button
           label="Thêm"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.AddtoRoom}
         />
       </React.Fragment>
@@ -466,6 +468,7 @@ class DichVu extends Component {
               onChange={(e) => this.onInputChange(e, "ServiceName")}
               required
               autoFocus
+               disabled ={this.state.edit !=true}  
               className={classNames({
                 "p-invalid": this.state.submitted && !this.state.DV.ServiceName
               })}
@@ -482,6 +485,7 @@ class DichVu extends Component {
               onValueChange={(e) => this.onInputNumberChange(e, "Price")}
               mode="currency"
               currency="Vnd"
+              disabled ={this.state.edit !=true}  
             />
           </div>
           <div className="p-field">
@@ -491,6 +495,7 @@ class DichVu extends Component {
               value={this.state.DV.Description}
               onChange={(e) => this.onInputChange(e, "Description")}
               required
+               disabled ={this.state.edit !=true}  
             />
           </div>
         </Dialog>

@@ -94,7 +94,9 @@ class InformationOfUser extends Component {
         const fd = new FormData()
 
         fd.append("Name", this.state.Name);
-        fd.append("Image", this.state.selectedFile);
+        if(this.state.selectedFile!=""){
+            fd.append("Image", this.state.selectedFile);
+        }
         fd.append("Age", this.state.Age);
         fd.append("Phone", this.state.Phone);
         fd.append("PermanentAddress", this.state.PermanentAddress);

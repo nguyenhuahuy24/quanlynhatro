@@ -7,6 +7,8 @@ import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { Dropdown } from "primereact/dropdown";
 import { RadioButton } from 'primereact/radiobutton'
+import { InputTextarea } from 'primereact/inputtextarea';
+
 import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from "primereact/dialog";
 import { Calendar } from 'primereact/calendar'
@@ -52,6 +54,7 @@ class HopDong extends Component {
         ];
     this.state = {
       HDs: null,
+      edit:false,
       HDDialog: false,
       deleteHDDialog: false,
       deleteHDsDialog: false,
@@ -173,11 +176,13 @@ class HopDong extends Component {
               ExpirationDate:rent.ExpirationDate,
               Renter: rent.Renter.Name,
               Rent: rent.Rent,
+              AddressHouse:rent.AddressHouse,
               Deposit:rent.Deposit,
               RentalPeriod: rent.RentalPeriod,
               House: rent.House.Name,
               Room: rent.Room.RoomNumber,
               Status:rent.Status
+              
             })
         }) 
         this.setState({ HDs: data })
@@ -234,7 +239,7 @@ class HopDong extends Component {
     this.setState({
       HD: this.emptyHD,
       HDDialog: true,
-      
+      edit:true
     });
   }
   hideConfirmHDDialog() {
@@ -309,8 +314,12 @@ class HopDong extends Component {
   }
   editHD(HD) {
     this.setState({
+      selectedArrivalDate:new Date(HD.ArrivalDate),
+      selectedExpirationDate:new Date(HD.ExpirationDate),
+      selectedRentalPeriod: HD.RentalPeriod,
       HD: { ...HD },
-      HDDialog: true
+      HDDialog: true,
+      edit: false
     });
   }
   confirmDeleteHD(HD) {
@@ -385,6 +394,7 @@ class HopDong extends Component {
            tooltip="Chỉnh sửa hợp đồng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.editHD(rowData)}
+          disabled={rowData.Status !=3}
         />
         <Button
           icon="pi pi-plus"
@@ -420,31 +430,39 @@ class HopDong extends Component {
     const HDDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
-          label="Save"
+          label="Lưu"
           icon="pi pi-check"
-          className="p-button-text"
+           className="p-button-success"
           onClick={this.saveHD}
+          disabled ={this.state.edit !=true}
+        />
+        <Button
+          label="Chỉnh sửa"
+          icon="pi pi-pencil"
+          className="p-button-warning"
+          disabled ={this.state.edit !=false}
+          onClick={()=>this.setState({edit:true})}
         />
       </React.Fragment>
     );
     const deleteHDDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideDeleteHDDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+           className="p-button-success"
           onClick={this.deleteHD}
         />
       </React.Fragment>
@@ -452,15 +470,15 @@ class HopDong extends Component {
      const ConfrimDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideConfirmHDDialog}
         />
         <Button
           label="Xác nhận"
           icon="pi pi-check"
-          className="p-button-text"
+           className="p-button-success"
           onClick={this.ConfirmStatus}
         />
       </React.Fragment>
@@ -504,12 +522,12 @@ class HopDong extends Component {
           style={{ width: "450px" }}
           header="Thông tin hợp đồng"
           modal
-          blockScroll
           className="p-fluid"
           footer={HDDialogFooter}
           onHide={this.hideDialog}
         >
-            <div className="p-field">
+           {this.state.HD.Renter =="" &&
+            <div className="p-field" >
             <label htmlFor="ServiceName">Tên khách thuê</label>
             <Dropdown
               className="p-mr-2"
@@ -520,9 +538,17 @@ class HopDong extends Component {
               placeholder="Chọn khách thuê"
             />
           </div>
-      
-         
-          
+           }
+           {this.state.HD.Renter !="" &&
+            <div className="p-field" >
+            <label htmlFor="">Tên khách thuê</label>
+             <InputText
+              id="Renter"
+              value={this.state.HD.Renter}
+              disabled
+            />
+          </div>
+           }
           <div className="p-field">
             <label htmlFor="Price">Tiền đặt cọc</label>
             <InputNumber
@@ -531,6 +557,7 @@ class HopDong extends Component {
               onValueChange={(e) => this.onInputNumberChange(e, "Deposit")}
               mode="currency"
               currency="Vnd"
+              disabled ={this.state.edit !=true}  
             />
           </div>
           <div className="p-field">
@@ -541,19 +568,33 @@ class HopDong extends Component {
               value={this.state.selectedArrivalDate} 
               onChange={(e) => this.setState({ selectedArrivalDate: e.value })} 
               showIcon 
-              
+              disabled ={this.state.edit !=true}  
               />
           </div>
+          {this.state.edit==false &&
+          <div className="p-field">
+            <label htmlFor="RentalPeriod">Thời gian thuê</label>
+              <InputText
+              id="RentalPeriod"
+              value={this.state.HD.RentalPeriod}
+              disabled
+            />
+            
+          </div>}
+          {this.state.edit ==true &&
           <div className="p-field">
             <label htmlFor="">Thời gian thuê</label>
              <Dropdown 
              value={this.state.selectedRentalPeriod} 
              options={this.RentalPeriod} 
              onChange={this.onRentalPeriodChange} 
-             optionLabel="name" 
+             optionLabel="name"
+             disabled ={this.state.edit !=true}  
              />
             
           </div>
+
+          }
           <div className="p-field">
             <label htmlFor="">Hợp đồng kết thúc:</label>
               <Calendar 
@@ -564,7 +605,8 @@ class HopDong extends Component {
               yearRange="2010:2030"
               value={this.state.selectedExpirationDate} 
               onChange={(e) => this.setState({ selectedExpirationDate : e.value })} 
-              showIcon 
+              showIcon
+              disabled ={this.state.edit !=true}  
               />
           </div>
         </Dialog>
@@ -626,7 +668,7 @@ class HopDong extends Component {
             {/* view Hop dong dialog */}
         <Dialog
           visible={this.state.ViewHDDialog}
-          style={{ width: "450px" }}
+          style={{ width: "450px",overflow: "auto" }}
           header="Chi tiết hợp đồng"
           modal
           className="p-fluid" 
@@ -638,7 +680,7 @@ class HopDong extends Component {
               id="basic"
               dateFormat="dd/mm/yy"
               value={new Date(this.state.HD.DateCreate)} 
-              showIcon 
+               
               disabled
               />
           </div>
@@ -667,6 +709,14 @@ class HopDong extends Component {
               disabled
             /> </div>
           </div>
+           <div className="p-field">
+            <label htmlFor="AddressHouse">Địa chỉ nhà trọ</label>
+            <InputTextarea
+              id="AddressHouse"
+              value={this.state.HD.AddressHouse}
+              disabled
+            />
+          </div>
           <div className="p-field">
             <label htmlFor="Rent">Tiền thuê phòng</label>
             <InputNumber
@@ -681,9 +731,11 @@ class HopDong extends Component {
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
               <label htmlFor="Deposit">Tiền cọc</label>
-              <InputText
+              <InputNumber
               id="Deposit"
               value={this.state.HD.Deposit}
+              mode="currency"
+              currency="Vnd"
               disabled
             />
             </div>
@@ -702,7 +754,7 @@ class HopDong extends Component {
               id="basic"
               dateFormat="dd/mm/yy"
               value={new Date(this.state.HD.ArrivalDate)} 
-              showIcon 
+               
               disabled
               />
             </div>
@@ -712,7 +764,7 @@ class HopDong extends Component {
               id="basic"
               dateFormat="dd/mm/yy"
               value={new Date(this.state.HD.ExpirationDate)} 
-              showIcon 
+               
               disabled
               /> 
             </div>
@@ -724,6 +776,7 @@ class HopDong extends Component {
     );
   }
 }
+
 function mapStateToProps(state) {
   return {
     //room

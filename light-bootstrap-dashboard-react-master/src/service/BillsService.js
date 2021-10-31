@@ -5,12 +5,11 @@ class BillsService extends Service {
     constructor() {
         super();
         this.url =`http://localhost:8080/bill/`
+        this.url_recalculateBill=`http://localhost:8080/bill/recalculate/`
     }
     callGetAPIBill = async (data) => {
         try {
-            console.log("data truoc api: ",data)
             const response = await axios.patch(this.url,data)
-            console.log(`service get`,response);
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -31,11 +30,33 @@ class BillsService extends Service {
             }
         }
     }
+    callPatchBillAPI = async (url,id) => {
+        try {
+            const response = await axios.patch(url + id).then((res) => res.data);
+            console.log("service: ",response)
+            if (typeof (response) === 'object' && 'error' in response) {        
+                return {
+                    status: dataStatus.FAILED,
+                    message: response.error.data.message
+                }
+            }
+            else {
+                return {
+                    status: dataStatus.SUCCESS,
+                    data: response.data
+                }
+            }
+        } catch (error) {
+            console.log(`Error when call API: `, error)
+            return {
+                status: dataStatus.FAILED,
+                message: 'Call API error'
+            }
+        }
+    }
     callPostAPI = async (data) => {
         try {
-            console.log("service",data); 
             const response = await axios.post(this.url, data).then((res) => res.data);   
-            console.log("service bill create",response);  
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -68,6 +89,15 @@ class BillsService extends Service {
     createBill = (data)=>{
         return new Promise((resolve , reject)=>{
             this.callPostAPI(data).then(resp =>{          
+                resolve(resp)
+            }).catch(error =>{
+                reject(error)
+            })
+        });
+    }
+    recalculateBill = (id)=>{
+        return new Promise((resolve , reject)=>{
+            this.callPatchBillAPI(this.url_recalculateBill,id).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

@@ -112,8 +112,8 @@ input[type="number"]::-webkit-inner-spin-button {
     letter-spacing: .3px;
 }
 .product-badge.status {
-    background: #C8E6C9;
-    color: #604125;
+    background-color: #B3E5FC;
+    color: #23547B;
 }
 .product-badge.status-1 {
     background: #C8E6C9;

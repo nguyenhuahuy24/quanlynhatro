@@ -2,6 +2,7 @@ export const userProfile = {
     userId:"",
     Email: "",
     accessToken:"",
+    userName:""
 }
 
 export const dataStatus = {

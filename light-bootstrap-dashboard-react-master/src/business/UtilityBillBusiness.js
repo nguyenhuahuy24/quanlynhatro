@@ -20,7 +20,6 @@ class UtilityBillBusiness {
         try {
             const utilityBill = new UtilityBillService()
             // const {createData} = data
-            console.log("business")
             const result = await utilityBill.createUtilityBill(data) 
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
@@ -35,11 +34,8 @@ class UtilityBillBusiness {
     editUtilityBill = async (data, success, failed)=>{
         try {
             const utilityBill = new UtilityBillService()
-            console.log(`data business: `,data);
             const {idUtilityBill, editdata} = data
-            console.log(`data id business: `,idUtilityBill);
             const result = await utilityBill.editUtilityBill(idUtilityBill,editdata)
-            console.log(`business: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }
@@ -53,13 +49,11 @@ class UtilityBillBusiness {
     deleteUtilityBill = async (data, success, failed)=>{
         try {
             const utilityBill = new UtilityBillService()
-            console.log(`data business: `,data);
             const id = data
             // const id=[
             //     idHouse
             // ]
             const result = await utilityBill.deleteUtilityBill(id)
-            console.log(`business: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

@@ -5,7 +5,6 @@ class UserBusiness {
         try {
             const userService = new UserService()
             const result = await userService.getUser();
-            //console.log("business")
             if (result.status === dataStatus.SUCCESS) {
                 success(result)
             }
@@ -21,7 +20,6 @@ class UserBusiness {
             const user = new UserService()
             // const {createData} = data
             const result = await user.changePassWord(data) 
-             console.log(`business password edit: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }
@@ -36,7 +34,6 @@ class UserBusiness {
         try {
             const user = new UserService()
             const result = await user.editUser(data)
-            console.log(`business edit: `,result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

@@ -34,7 +34,6 @@ const dichVuReducer = (state = dichVuState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer: `,state)
       break;
     case NAME_EPICS.EPIC_DICHVU_SCREEN.EPIC_GET_DICHVU_FAILED:
       state = {

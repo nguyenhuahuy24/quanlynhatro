@@ -4,19 +4,17 @@ import { NavItem, Nav, NavDropdown, MenuItem } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Button } from 'primereact/button';
 import UserContext from "../../context/UserContext"
+import {userProfile} from "../../utility/config"
 import "../../index.css"
+
+import { withGlobalContext } from '../../GlobalContextProvider';
+import { connect } from 'react-redux';
+
 class AdminNavbarLinks extends Component {
   static contextType = UserContext
   render() {
     
-    const notification = (
-      <div>
-        <i className="fa fa-globe" />
-        <b className="caret" />
-        <span className="notification">5</span>
-        <p className="hidden-lg hidden-md">Notification</p>
-      </div>
-    );
+   
     const logout=()=>{
       const{userData,setUserData}= this.context;
       setUserData({
@@ -29,7 +27,9 @@ class AdminNavbarLinks extends Component {
     return (
       <div>
         <Nav pullRight>
-        
+        <Nav style={{paddingTop:"15px"}}>
+          <label style={{fontWeight:"400"}}>Xin Chào! {this.props.user.data.Name && <label style={{fontWeight:"400"}}>{this.props.user.data.Name}</label>}</label>
+        </Nav>
         <NavItem eventKey={3}>
             <Button
               label="Đăng xuất"
@@ -39,6 +39,7 @@ class AdminNavbarLinks extends Component {
               onClick={logout}
             />
           </NavItem>
+
         </Nav>
       
       </div>
@@ -47,4 +48,11 @@ class AdminNavbarLinks extends Component {
   }
 }
 
-export default AdminNavbarLinks;
+function mapStateToProps(state) {
+  return {
+    user: state.UserReducer.user,
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, {})(AdminNavbarLinks),
+);

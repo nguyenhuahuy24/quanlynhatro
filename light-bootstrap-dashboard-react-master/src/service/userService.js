@@ -39,7 +39,6 @@ class UserService extends Service {
         try {
             const response = await axios.patch(url,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")
         }});
-            console.log(`service edit:`,response);
             if (typeof (response) === 'object' && 'error' in response) {        
                 return {
                     status: dataStatus.FAILED,

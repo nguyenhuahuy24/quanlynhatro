@@ -6,6 +6,8 @@ import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { Calendar } from 'primereact/calendar'
 import { RadioButton } from 'primereact/radiobutton'
+import { InputTextarea } from 'primereact/inputtextarea';
+
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
@@ -19,7 +21,7 @@ import 'primereact/resources/primereact.css';
 //redux
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
-import {getBillInMonthOfUser ,createBill, editBill, deleteBill} from '../redux/action/billAction/BillAction'
+import {getBillInMonthOfUser ,createBill, editBill, deleteBill,recalculateBill} from '../redux/action/billAction/BillAction'
 import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 import {getRoomByHouseId} from '../redux/action/roomAction/RoomAction'
 import { dataStatus,userProfile } from "../utility/config";
@@ -27,8 +29,8 @@ import { dataStatus,userProfile } from "../utility/config";
 class TinhTien extends Component {
   static contextType = UserContext
   emptyBill = {
-    RoomId: null,
-    RoomNumber: null,
+    RoomId: "",
+    RoomNumber: "",
     ElectricFee: 0,
     WaterFree: 0,
     RoomPrice: 0,
@@ -37,29 +39,29 @@ class TinhTien extends Component {
     OtherCrosts: "",
     StartDate: "",
     EndDate: "",
-    Status: null
+    Status: ""
   };
   constructor(props) {
     super(props);
 
     this.state = {
      // loginuserID: localStorage.getItem("userIDlogin"),
-      houses:null,
-      room:null,
-      bills: null,
+      houses:"",
+      room:"",
+      bills: "",
       billDialog: false,
       ConfirmBillDialog:false,
       ViewBillDialog:false,
       deleteBillDialog: false,
       deleteBillsDialog: false,
       bill: this.emptyBill,
-      selectedBills: null,
+      selectedBills: "",
       submitted: false,
       globalFilter: null,
       selectedHouse: "",
-      selectedShowHouse: null,
-      selectedShowRoom:null,
-      selectedRoom: null,
+      selectedShowHouse: "",
+      selectedShowRoom:"",
+      selectedRoom: "",
       selectedMonth: new Date(),
       
     };
@@ -164,6 +166,29 @@ class TinhTien extends Component {
           this.props.getBillInMonthOfUser(data[0]);
       } 
     }
+    if (this.props.recalculateBillStatus !== prevProps.recalculateBillStatus) {
+      if (this.props.recalculateBillStatus.status === dataStatus.SUCCESS) {
+          let data=[]
+        data.push({
+        HouseId: this.state.selectedHouse,
+        Month:this.state.selectedMonth,
+      })
+      this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Tính lại Bill",
+          life: 3000
+        });
+          this.props.getBillInMonthOfUser(data[0]);
+      }else{
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Tính lại Bill",
+          life: 3000
+        });
+      }
+    }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
       if (this.props.deleteStatus.status === dataStatus.SUCCESS) {      
             if(this.props.deleteStatus.data.deletedCount === 1){
@@ -231,7 +256,7 @@ class TinhTien extends Component {
     this.setState({
       bill: this.emptyBill,
       submitted: false,
-      billDialog: true
+      billDialog: true,
     });
   }
   hideDialog() {
@@ -303,20 +328,8 @@ class TinhTien extends Component {
   }
   RecalculateBill(){
     let state = { submitted: true }; 
-    let a =[]
-    a.push({
-      RoomId: this.state.bill.RoomId,
-      Month: this.state.selectedMonth
-    })
-    console.log("data tính lại bill: ",a)
-    //this.props.createBill(this.state.bill_id);
-    //this.billService.createBill(a).then();
-        this.toast.show({
-          severity: "success",
-          summary: "Thành công",
-          detail: "Tính lại Bill",
-          life: 3000
-        });
+    this.props.recalculateBill(this.state.bill._id);
+        
     state = {
         ...state,
         ViewBillDialog: false,
@@ -364,7 +377,6 @@ class TinhTien extends Component {
       });
     }
     else{
-      console.log(this.state.selectedHouse)
       let data=[]
         data.push({
         HouseId: this.state.selectedHouse,
@@ -406,21 +418,18 @@ class TinhTien extends Component {
           label="SMS"
           icon="pi pi-phone"
           className="p-button-info p-mr-2"
-          onClick={"this.confirmDeleteSelected"}
           disabled
         />
         <Button
           label="Email"
           icon="pi pi-envelope"
           className="p-button-primary p-mr-2"
-          onClick={""}
           disabled
         />
         <Button
           label="In danh sách"
           icon="pi pi-file-o"
           className="p-button-success p-mr-2"
-          onClick={"this.confirmDeleteSelected"}
           disabled
         />
       </React.Fragment>
@@ -469,15 +478,15 @@ class TinhTien extends Component {
     const BillDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
           label="Tính"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.TinhBill}
         />
       </React.Fragment>
@@ -485,15 +494,15 @@ class TinhTien extends Component {
        const RecalculateBillDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideViewBillDialog}
         />
         <Button
           label="Tính lại bill"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.RecalculateBill}
         />
       </React.Fragment>
@@ -501,15 +510,15 @@ class TinhTien extends Component {
     const ConfrimDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideConfirmBillDialog}
         />
         <Button
           label="Xác nhận"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.ThanhToan}
         />
       </React.Fragment>
@@ -517,15 +526,15 @@ class TinhTien extends Component {
     const deleteBillDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDeleteBillDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.deleteBill}
         />
       </React.Fragment>
@@ -726,11 +735,13 @@ class TinhTien extends Component {
           </div>
           <div className="p-field">
             <label htmlFor="OtherCosts">Ghi chú</label>
-            <InputText
+            <InputTextarea
               id="OtherCosts"
               value={this.state.bill.OtherCosts}
               onChange={(e) => this.onInputChange(e, "OtherCosts")}
               required
+              rows={3}
+              cols={10}
               disabled
             />
           </div>
@@ -772,10 +783,11 @@ function mapStateToProps(state) {
     createStatus: state.BillReducer.createStatus,
     editStatus: state.BillReducer.editStatus,
     deleteStatus: state.BillReducer.deleteStatus,
+    recalculateBillStatus:state.BillReducer.recalculateBillStatus,
     //house
     listHouse: state.HouseReducer.listHouse,
   };
 }
 export default withGlobalContext(
-  connect(mapStateToProps, {getRoomByHouseId,getHouseByUserId, getBillInMonthOfUser ,createBill, editBill, deleteBill})(TinhTien),
+  connect(mapStateToProps, {recalculateBill,getRoomByHouseId,getHouseByUserId, getBillInMonthOfUser ,createBill, editBill, deleteBill})(TinhTien),
 );

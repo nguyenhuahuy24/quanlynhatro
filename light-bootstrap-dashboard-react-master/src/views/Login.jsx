@@ -2,10 +2,13 @@ import React, { Component } from "react";
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import {getUser } from '../redux/action/userAction/UserAction'
 
 import axios from "axios";
 import "App.scss";
 import UserContext from "../context/UserContext"
+import { withGlobalContext } from '../GlobalContextProvider';
+import { connect } from 'react-redux';
 import { dataStatus,userProfile } from "../utility/config";
 import "../index.css";
 
@@ -59,7 +62,7 @@ class Login extends Component {
                         user: response.data.userId,
                     })
                     userProfile.userId = response.data.userId
-                    
+                    this.props.getUser();
                     this.props.history.push("/admin/dashboard")
                 }
             })
@@ -161,4 +164,11 @@ class Login extends Component {
     );
   }
 }
-export default Login;
+function mapStateToProps(state) {
+  return {
+
+  };
+}
+export default withGlobalContext(
+  connect(mapStateToProps, { getUser})(Login),
+);

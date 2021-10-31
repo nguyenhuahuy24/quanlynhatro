@@ -44,6 +44,7 @@ class PhongTro extends Component {
     this.state = {
       houses: null,
       rooms: null,
+      edit:"",
       customer:"",
       service:"",
       listCustomerDialog:false,
@@ -127,7 +128,6 @@ class PhongTro extends Component {
     //
     if (this.props.listService !== prevProps.listService) {
       if (this.props.listService.status === dataStatus.SUCCESS) {
-         console.log("data service: ",this.props.listService.data)
           this.setState({service:this.props.listService.data})
       }
     }
@@ -169,10 +169,9 @@ class PhongTro extends Component {
                   this.toast.show({
                   severity: "success",
                   summary: "Thành công",
-                  detail: "Xóa dịch vụ 1",
+                  detail: "Xóa dịch vụ",
                   life: 3000
                 });
-                console.log("da vào roi")
               this.props.getServiceInRoom(this.state.selectedRoom);
               this.props.getRoomByHouseId(this.state.selectedKhuTro);
               
@@ -203,7 +202,6 @@ class PhongTro extends Component {
     }
     if (this.props.listRoom !== prevProps.listRoom) {
       if (this.props.listRoom.status === dataStatus.SUCCESS) {
-         console.log(`data room: `,this.props.listRoom.data)
         this.setState({ rooms: this.props.listRoom.data })
       } 
     }
@@ -278,7 +276,8 @@ class PhongTro extends Component {
     this.setState({
       room: this.emptyRoom,
       submitted: false,
-      roomDialog: true
+      roomDialog: true,
+       edit:true
     });
   }
   hideDialog() {
@@ -362,7 +361,8 @@ class PhongTro extends Component {
   editRoom(room) {
       this.setState({
         room: { ...room },
-        roomDialog: true
+        roomDialog: true,
+        edit:false
       });  
   }
   confirmDeleteRoom(room) {
@@ -487,19 +487,6 @@ class PhongTro extends Component {
     );
   }
   
-  actionBodyTemplatePerson(rowData) {
-    return (
-      <React.Fragment>
-           <Button
-          icon="pi pi-trash"
-          className="p-button-rounded p-button-danger"
-           //onClick={()=>this.props.removePersonToRoom(rowData.RoomId,rowData._id)}
-          onClick={() => this.confirmDeleteCustomer(rowData)}
-        />
-      </React.Fragment>
- 
-    );
-  }
   render() {
     const imgTag = this.buildImgTag();
     const header = (
@@ -520,29 +507,37 @@ class PhongTro extends Component {
         <Button
           label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
           label="Lưu"
           icon="pi pi-check"
-          className="p-button-text"
+         className="p-button-success"
           onClick={this.saveRoom}
+          disabled ={this.state.edit !=true} 
+        />
+        <Button
+          label="Chỉnh sửa"
+          icon="pi pi-pencil"
+          className="p-button-warning"
+          disabled ={this.state.edit !=false}
+          onClick={()=>this.setState({edit:true})}
         />
       </React.Fragment>
     );
     const deleteRoomDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDeleteRoomDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.deleteRoom}
         />
       </React.Fragment>
@@ -550,15 +545,15 @@ class PhongTro extends Component {
     const deleteCustomerDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDeleteCustomerDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.removePerson}
         />
       </React.Fragment>
@@ -566,15 +561,15 @@ class PhongTro extends Component {
     const deleteServiceDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={()=>this.onHide('deleteServiceDialog')}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.removeService}
         />
       </React.Fragment>
@@ -636,6 +631,7 @@ class PhongTro extends Component {
               className={classNames({
                 "p-invalid": this.state.submitted && !this.state.room.RoomNumber
               })}
+              disabled ={this.state.edit !=true}
             />
             {this.state.submitted && !this.state.room.RoomNumber && (
               <small className="p-invalid">Không bỏ trống.</small>
@@ -649,6 +645,7 @@ class PhongTro extends Component {
               onValueChange={(e) => this.onInputNumberChange(e, "Price")}
               mode="currency"
               currency="Vnd"
+              disabled ={this.state.edit !=true}
             />
           </div>
           <div className="p-formgrid p-grid">
@@ -659,6 +656,7 @@ class PhongTro extends Component {
                 value={this.state.room.Length}
                 onChange={(e) => this.onInputChange(e, "Length")}
                 required
+                disabled ={this.state.edit !=true}
               />
             </div>
             <div className="p-field p-col">
@@ -668,6 +666,7 @@ class PhongTro extends Component {
                 value={this.state.room.Width}
                 onChange={(e) => this.onInputChange(e, "Width")}
                 required
+                disabled ={this.state.edit !=true}
               /> </div>
           </div>
           <div className="p-field">
@@ -677,6 +676,7 @@ class PhongTro extends Component {
               value={this.state.room.Details}
               onChange={(e) => this.onInputChange(e, "Details")}
               required
+              disabled ={this.state.edit !=true}
             />
           </div>
           <div className="p-field">
@@ -690,6 +690,7 @@ class PhongTro extends Component {
               //onChange={this.handleChange.bind(this)}
               onChange={(e)=>this.handleImageChange(e)}
               multiple
+              disabled ={this.state.edit !=true}
             />
             {imgTag}
           </div>
@@ -760,7 +761,7 @@ class PhongTro extends Component {
         {/* list Person dialog */}
         <Dialog
           visible={this.state.listCustomerDialog}
-          style={{ width: "500px" }}
+          style={{ width: "500px",overflow: "auto" }}
           header="Danh sách thuê trọ"
           modal
           className="p-fluid"
@@ -779,7 +780,6 @@ class PhongTro extends Component {
             <Column field="Name" header="Tên" ></Column>
             <Column field="Age" header="Tuổi" ></Column>
             <Column field="Phone" header="Số điện thoại" ></Column>
-            {/* <Column body={this.actionBodyTemplatePerson}></Column> */}
           </DataTable>    
         </div>
         <Button
@@ -792,7 +792,7 @@ class PhongTro extends Component {
         {/* list service dialog */}
       <Dialog
           visible={this.state.listServiceDialog}
-          style={{ width: "500px" }}
+          style={{ width: "500px",overflow: "auto" }}
           header="Danh sách dịch vụ của phòng"
           modal
           className="p-fluid"

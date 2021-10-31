@@ -27,7 +27,6 @@ export function createCustomer(createData) {
   };
 }
 export function deleteCustomer(id) {
-   console.log("Action delete")
   return {
     type: NAME_ACTIONS.CUSTOMER_SCREEN.CUSTOMER_SCREEN,
     typeAction: NAME_ACTIONS.CUSTOMER_SCREEN.DELETE_CUSTOMER,

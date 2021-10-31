@@ -62,7 +62,6 @@ class DichVuService extends Service {
     {
         try {
             const response = await axios.patch(this.url+roomId+`/removeService/`+serviceId).then((res)=> res.data);
-           console.log("service: ",response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

@@ -21,6 +21,11 @@ const billState = {
     status: dataStatus.NONE,
     message: '',
     data: {},
+  },
+  recalculateBillStatus:{
+    status: dataStatus.NONE,
+    message: '',
+    data: {},
   }
 };
 const billReducer = (state = billState, action) => {
@@ -34,12 +39,32 @@ const billReducer = (state = billState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer`,state)
       break;
     case NAME_EPICS.EPIC_BILL_SCREEN.EPIC_GET_BILL_FAILED:
       state = {
         ...state,
         listBill: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_BILL_SCREEN.EPIC_RECALCULATE_BILL:
+      state = {
+        ...state,
+        recalculateBillStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      console.log("reducer: ",state)
+      break;
+    case NAME_EPICS.EPIC_BILL_SCREEN.EPIC_RECALCULATE_BILL_FAILED:
+      state = {
+        ...state,
+        recalculateBillStatus: {
           status: action.data.status,
           message: action.data.message,
           data: []
@@ -76,7 +101,6 @@ const billReducer = (state = billState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer bill create`,state);
       break;
     case NAME_EPICS.EPIC_BILL_SCREEN.EPIC_CREATE_BILL_FAILED:
       state = {

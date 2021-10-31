@@ -1,6 +1,5 @@
 import {NAME_ACTIONS} from './ActionName'
 export function getHouseByUserId(){
-     console.log("Action House")
     return {
         type: NAME_ACTIONS.HOUSE_SCREEN.HOUSE_SCREEN,
         typeAction: NAME_ACTIONS.HOUSE_SCREEN.GET_HOUSE,
@@ -26,7 +25,6 @@ export function createHouse(createData) {
   };
 }
 export function deleteHouse(id) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.HOUSE_SCREEN.HOUSE_SCREEN,
     typeAction: NAME_ACTIONS.HOUSE_SCREEN.DELETE_HOUSE,

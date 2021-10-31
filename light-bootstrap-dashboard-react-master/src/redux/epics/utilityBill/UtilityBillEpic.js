@@ -27,7 +27,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.UTILITYBILL_SCREEN.CREATE_UTILITYBILL:
                 utilityBillBusiness.createUtilityBill(action.data, success => {
-                    console.log("epic house create");
                     resolve({
                         actionType: NAME_ACTIONS.UTILITYBILL_SCREEN.CREATE_UTILITYBILL,
                         data: success

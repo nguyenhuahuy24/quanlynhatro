@@ -6,7 +6,6 @@ class ContractBusiness {
         try {
             const contractService = new ContractService()
             const result = await contractService.getContractOfUser();
-            console.log("business")
             if (result.status === dataStatus.SUCCESS) {
                 success(result)
             }
@@ -35,13 +34,11 @@ class ContractBusiness {
     editContract = async (data, success, failed) => {
         try {
             const contractService = new ContractService()
-            console.log(`data business: `, data);
             const { idContract, editdata } = data
             const id = [
                 idContract
             ]
             const result = await contractService.editContract(id, editdata)
-            console.log(`business: `, result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

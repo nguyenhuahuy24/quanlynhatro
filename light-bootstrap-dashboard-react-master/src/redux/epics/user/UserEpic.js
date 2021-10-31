@@ -23,7 +23,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.USER_SCREEN.CHANGE_PASSWORD:
                 userBusiness.changePassWord(action.data, success => {
-                    console.log("epic user change");
                     resolve({
                         actionType: NAME_ACTIONS.USER_SCREEN.CHANGE_PASSWORD,
                         data: success
@@ -35,7 +34,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.USER_SCREEN.EDIT_USER:
                 userBusiness.editUser(action.data, success => {
-                     console.log("epic user edit");
                     resolve({
                         actionType: NAME_ACTIONS.USER_SCREEN.EDIT_USER,
                         data: success

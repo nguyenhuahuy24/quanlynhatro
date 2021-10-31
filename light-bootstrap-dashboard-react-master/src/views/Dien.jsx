@@ -32,7 +32,8 @@ class Dien extends Component {
     Time: "",
     ElectricNumber: 0,
     WaterNumber: 0,
-    RoomId: ""
+    RoomId: "",
+    RoomNumber:""
   };
   constructor(props) {
     super(props);
@@ -41,6 +42,7 @@ class Dien extends Component {
       checked:false,
       rooms: null,
       houses: null,
+      edit:false,
       Diens: null,
       Dien: this.emptyDien,
       //  loginuserID: localStorage.getItem("userIDlogin"),
@@ -292,7 +294,7 @@ class Dien extends Component {
           tooltip="Thông báo cập nhật chỉ số điện nước hằng tháng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={this.openDay}
-          disabled
+          
         />
           <Button
           label="Xuất file excel"
@@ -310,7 +312,8 @@ class Dien extends Component {
     this.setState({
       Dien: this.emptyDien,
       submitted: false,
-      DienDialog: true
+      DienDialog: true,
+      edit:true,
     });
   }
   openDay() {
@@ -322,7 +325,7 @@ class Dien extends Component {
   }
   editDien(Dien) {
     this.setState({
-     
+      edit:false,
       DienDialog: true,
       selectedRoom:Dien.RoomId,
       selectedShowRoom:Dien.RoomNumber,
@@ -370,7 +373,7 @@ class Dien extends Component {
         />
         <Button
           icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
+          className="p-button-rounded p-button-danger"
           tooltip="Xóa chỉ số điện/nước" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.confirmDeleteUtilityBill(rowData)}
@@ -391,31 +394,39 @@ class Dien extends Component {
     const DienDialogFooter = (
       <React.Fragment>
         <Button
-          label="Cancel"
+          label="Hủy"
           icon="pi pi-times"
-          className="p-button-text "
+          className="p-button-danger"
           onClick={this.hideDialog}
         />
         <Button
-          label="Save"
+          label="Lưu"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.saveDien}
+          disabled ={this.state.edit !=true} 
+        />
+        <Button
+          label="Chỉnh sửa"
+          icon="pi pi-pencil"
+          className="p-button-warning"
+          disabled ={this.state.edit !=false}
+          onClick={()=>this.setState({edit:true})}
         />
       </React.Fragment>
     );
     const deleteUtilityBillDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideDeleteUtilityBillDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.deleteUtilityBill}
         />
       </React.Fragment>
@@ -423,15 +434,15 @@ class Dien extends Component {
          const NotificationDialogFooter = (
       <React.Fragment>
         <Button
-          label="No"
+          label="Không"
           icon="pi pi-times"
-          className="p-button-text"
+          className="p-button-danger"
           onClick={this.hideSelectDayDialog}
         />
         <Button
-          label="Yes"
+          label="Có"
           icon="pi pi-check"
-          className="p-button-text"
+          className="p-button-success"
           onClick={this.ConfirmNotification}
         />
       </React.Fragment>
@@ -487,10 +498,12 @@ class Dien extends Component {
               showIcon
               numberOfMonths={3}
               yearNavigator
-              yearRange="2010:2030" />
+              yearRange="2010:2030"
+                disabled />
               
           </div>
-          <div className="p-field">
+          {this.state.Dien.RoomNumber =="" &&
+            <div className="p-field">
             <label>Phòng</label>
             <Dropdown
               className="p-mr-2"
@@ -499,15 +512,27 @@ class Dien extends Component {
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
               placeholder="Chọn phòng trọ"
-              disabled={this.state.Dien.RoomNumber}
             />
           </div>
+          }
+           {this.state.Dien.RoomNumber  !="" &&
+            <div className="p-field">
+            <label>Phòng</label>
+            <InputNumber
+              id="RoomNumber"
+              value={this.state.Dien.RoomNumber}
+              disabled
+            />
+          </div>
+          }
           <div className="p-field">
             <label>Chỉ số điện mới</label>
             <InputNumber
               id="ElectricNumber"
               value={this.state.Dien.ElectricNumber}
               onValueChange={(e) => this.onInputNumberChange(e, "ElectricNumber")}
+                disabled ={this.state.edit !=true}
+
             />
           </div>
           <div className="p-field">
@@ -516,6 +541,8 @@ class Dien extends Component {
               id="WaterNumber"
               value={this.state.Dien.WaterNumber}
               onValueChange={(e) => this.onInputNumberChange(e, "WaterNumber")}
+              disabled ={this.state.edit !=true}
+
             />
           </div>
         </Dialog>

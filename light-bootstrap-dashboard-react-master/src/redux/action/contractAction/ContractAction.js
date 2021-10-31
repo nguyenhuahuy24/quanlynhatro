@@ -1,6 +1,5 @@
 import {NAME_ACTIONS} from './ActionName'
 export function getContractOfUser(){
-  console.log("Action hop dong:")
     return {
         type: NAME_ACTIONS.CONTRACT_SCREEN.CONTRACT_SCREEN,
         typeAction: NAME_ACTIONS.CONTRACT_SCREEN.GET_CONTRACT,
@@ -8,7 +7,6 @@ export function getContractOfUser(){
       };
 }
 export function editContract(id, editdata){
-  console.log("Action")
   return {
     type: NAME_ACTIONS.CONTRACT_SCREEN.CONTRACT_SCREEN,
     typeAction: NAME_ACTIONS.CONTRACT_SCREEN.EDIT_CONTRACT,
@@ -27,7 +25,6 @@ export function createContract(createData) {
   };
 }
 export function deleteContract(id) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.CONTRACT_SCREEN.CONTRACT_SCREEN,
     typeAction: NAME_ACTIONS.CONTRACT_SCREEN.DELETE_CONTRACT,

@@ -23,7 +23,6 @@ class Resigter extends Component {
 
     handleSubmit(event) {
         let state = { submitted: true };
-        console.log("a")
         const { email, password, password_confirmation } = this.state;
         if(password === password_confirmation)
         {
@@ -134,7 +133,7 @@ class Resigter extends Component {
           <div className="formField">
             <button className="formFieldButton">Đăng Ký</button>{" "}
             <Link to="/" className="formFieldLink">
-              Bạn chưa là thành viên ?
+              Bạn đã là thành viên ?
             </Link>
           </div>
         </form>

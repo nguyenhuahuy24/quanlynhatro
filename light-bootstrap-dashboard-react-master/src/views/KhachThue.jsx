@@ -41,6 +41,8 @@ class KhachThue extends Component {
     DateCmnd: "",
     PlaceCmnd: "",
     Image: [],
+    Room:"",
+    House:"",
     UserId:"",
   };
 
@@ -57,7 +59,7 @@ class KhachThue extends Component {
       selectedusers: null,
       submitted: false,
    
-      selectedDateCMND:"",
+      selectedDateCMND:new Date(),
       globalFilter: null,
       selectedHouse: "",
       selectedShowHouse:"",
@@ -104,8 +106,25 @@ class KhachThue extends Component {
     }
     if (this.props.listCustomer !== prevProps.listCustomer) {
       if (this.props.listCustomer.status === dataStatus.SUCCESS) {
-        console.log("data user:",this.props.listCustomer.data)
-        this.setState({ users: this.props.listCustomer.data })
+        const customers = Object.values(this.props.listCustomer.data)
+        let data=[];
+        customers.forEach(customer=>{
+          data.push({
+            _id: customer._id,
+            Age: customer.Age,
+            Cmnd: customer.Cmnd,
+            DateCmnd: customer.DateCmnd,
+            Email: customer.Email,
+            Image: customer.Image,
+            Name: customer.Name,
+            PermanentAddress: customer.PermanentAddress,
+            Phone: customer.Phone,
+            PlaceCmnd: customer.PlaceCmnd,
+            Room: customer.RoomId.RoomNumber,
+            House: customer.RoomId.HouseId.Name,
+          })
+        })
+        this.setState({ users: data })
       } 
     }
     if (this.props.createStatus !== prevProps.createStatus) {
@@ -178,7 +197,7 @@ class KhachThue extends Component {
                   severity: "error",
                   summary: "Thất bại",
                   detail: this.props.addPersonStatus.data.err,
-                  life: 6000
+                  life: 3500
                 });
             }else
             {
@@ -188,7 +207,7 @@ class KhachThue extends Component {
               this.toast.show({
               severity: "success",
               summary: "Thành công",
-              detail: "Thêm khách thuê",
+              detail: "Chuyền phòng cho khách thuê",
               life: 3000
             });
             }
@@ -308,7 +327,6 @@ class KhachThue extends Component {
       fd.append("PermanentAddress", this.state.user.PermanentAddress);
       fd.append("Cmnd", this.state.user.Cmnd);
       if(this.state.selectedDateCMND!=""){
-        console.log("vo dc select")
          fd.append("DateCmnd", this.state.selectedDateCMND);
       }
      
@@ -320,6 +338,7 @@ class KhachThue extends Component {
         })
       }
       if(this.state.selectedRoom!=""){
+
         fd.append("RoomId", this.state.selectedRoom);
       }
       if (this.state.user._id) {
@@ -344,6 +363,7 @@ class KhachThue extends Component {
   editUser(user) {
     this.setState({
       userDialog: true,
+        selectedDateCMND:new Date(user.DateCmnd),
        user: { ...user },
        edit:false
     });
@@ -389,20 +409,11 @@ class KhachThue extends Component {
       <React.Fragment>
        
         <Button
-          label="New"
+          label="Thêm khách thuê"
           icon="pi pi-plus"
           className="p-button-success p-mr-2"
           onClick={this.openNew}
         />
-        {/* <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={this.confirmDeleteSelected}
-          disabled={
-            !this.state.selectedUsers || !this.state.selectedUsers.length
-          }
-        /> */}
       </React.Fragment>
     );
   }
@@ -459,7 +470,7 @@ class KhachThue extends Component {
         />
         <Button
           label="Chỉnh sửa"
-          icon="pi pi-check"
+          icon="pi pi-pencil"
           className="p-button-warning"
           disabled ={this.state.edit !=false}
           onClick={()=>this.setState({edit:true})}
@@ -471,13 +482,13 @@ class KhachThue extends Component {
         <Button
           label="No"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideDeleteUserDialog}
         />
         <Button
           label="Yes"
           icon="pi pi-check"
-          className="p-button-text"
+           className="p-button-success"
           onClick={this.deleteUser}
         />
       </React.Fragment>
@@ -487,13 +498,13 @@ class KhachThue extends Component {
         <Button
           label="Hủy"
           icon="pi pi-times"
-          className="p-button-text"
+           className="p-button-danger"
           onClick={this.hideAddtoRoomUserDialog}
         />
         <Button
           label="Thêm"
           icon="pi pi-check"
-          className="p-button-text"
+           className="p-button-success"
           onClick={this.AddtoRoom}
         />
       </React.Fragment>
@@ -511,7 +522,7 @@ class KhachThue extends Component {
 
           <DataTable
             ref={(el) => (this.dt = el)}
-            value={this.props.listCustomer.data}
+            value={this.state.users}
             // selection={this.state.selectedUsers}
             // onSelectionChange={(e) =>
             //   this.setState({ selectedUsers: e.value })
@@ -617,6 +628,7 @@ class KhachThue extends Component {
           
 
           <div className="p-formgrid p-grid">
+            {this.state.user.House == "" && 
             <div className="p-field p-col">
               <label htmlFor="">Nhà</label>
             <Dropdown
@@ -626,9 +638,27 @@ class KhachThue extends Component {
               onChange={this.onHouseChange}
               optionLabel="Name"
               placeholder="Chọn nhà trọ"
-               disabled ={this.state.edit !=true}  
             />
-            </div>
+            </div>}
+            {this.state.user.House != "" && 
+            <div className="p-field p-col">
+              <label htmlFor="">Nhà</label>
+            <InputText
+                id="Name"
+                value={this.state.user.House}
+                disabled 
+              />
+            </div>}
+            {this.state.user.Room !="" && 
+            <div className="p-field p-col">
+              <label htmlFor="">Phòng</label>
+            <InputText
+                id="RoomNumber"
+                value={this.state.user.Room}
+                disabled 
+              />
+            </div>}
+            {this.state.user.Room =="" && 
             <div className="p-field p-col">
               <label htmlFor="">Phòng</label>
             <Dropdown
@@ -637,11 +667,11 @@ class KhachThue extends Component {
               options={this.props.listRoom.data}
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
-              placeholder="Chọn phòng trọ"
-               disabled ={this.state.edit !=true}  
-            /> </div>
+              placeholder="Chọn phòng trọ" 
+            /> </div>}
           </div>
-
+          {this.state.user.Room !=""&& <label style={{paddingBottom:"10px"}}>Bạn muốn chỉnh sửa Phòng của Khách Thuê có thể dùng chức năng Chuyển Phòng !</label>
+}
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
               <label htmlFor="DateCmnd">Ngày cấp</label>
@@ -651,7 +681,7 @@ class KhachThue extends Component {
               monthNavigator 
               yearNavigator 
               yearRange="1950:2010"
-              value={new Date(this.state.user.DateCmnd)} 
+              value={this.state.selectedDateCMND} 
               onChange={(e) => this.setState({ selectedDateCMND: e.value })}
                showIcon
                 disabled ={this.state.edit !=true}  
@@ -704,7 +734,7 @@ class KhachThue extends Component {
         <Dialog
           visible={this.state.AddtoRoomDialog}
           style={{ width: "450px" }}
-          header="Thêm vào phòng"
+          header="Chuyển phòng cho khách thuê"
           modal
           className="p-fluid"
           footer={AddtoRoomDialogFooter}

@@ -76,7 +76,6 @@ const utilityReducer = (state = utilityBillState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer UtilityBill create`,state);
       break;
     case NAME_EPICS.EPIC_UTILITYBILL_SCREEN.EPIC_CREATE_UTILITYBILL_FAILED:
       state = {

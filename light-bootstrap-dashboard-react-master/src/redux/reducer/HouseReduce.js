@@ -34,7 +34,6 @@ const houseReducer = (state = houseState, action) => {
           data: action.data.data
         }
       }
-     console.log("reducer house");
       break;
     case NAME_EPICS.EPIC_HOUSE_SCREEN.EPIC_GET_HOUSE_FAILED:
       state = {

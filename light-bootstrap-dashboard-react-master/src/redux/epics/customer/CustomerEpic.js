@@ -52,7 +52,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.CUSTOMER_SCREEN.DELETE_CUSTOMER:
                 customerBusiness.deleteCustomer(action.data, success => {
-                    console.log("epic create");
                     resolve({
                         actionType: NAME_ACTIONS.CUSTOMER_SCREEN.DELETE_CUSTOMER,
                         data: success

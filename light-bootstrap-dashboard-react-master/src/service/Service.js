@@ -5,8 +5,6 @@ class Service {
     callGetAPI = async (url) => {
         try {
             const response = await axios.get(url,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
-             console.log(`service`)
-
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -56,7 +54,6 @@ class Service {
             const response = await axios.post(url,data,{headers:{
             Authorization:'Bearer ' + localStorage.getItem("auth-token")
         }}).then((res) => res.data);
-            console.log(`service create:`,response) 
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -104,7 +101,6 @@ class Service {
         try {
            
             const response = await axios.patch(url + id, data).then((res) => res.data);
-             console.log("update", response)
             if (typeof (response) === 'object' && 'error' in response) {        
                 return {
                     status: dataStatus.FAILED,
@@ -128,7 +124,6 @@ class Service {
     callPatchLocalAPI = async (url,id,data) => {
         try {
             const response = await axios.patch(url+id,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
-             console.log("update", response)
             if (typeof (response) === 'object' && 'error' in response) {        
                 return {
                     status: dataStatus.FAILED,
@@ -151,10 +146,7 @@ class Service {
     }
     callDeleteAPI = async (url,id) => {
         try {
-            console.log("service url",url)
-            console.log("service",id)
             const response = await axios.delete(url + id).then((res) => res.data);
-            console.log("service delete", response)
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,

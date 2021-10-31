@@ -164,7 +164,6 @@ class RoomBusiness {
             const room = new RoomService()
             const {roomId, serviceId} = data
             const result = await room.removeServiceToRoom(roomId, serviceId)
-           console.log("business: ",result)
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

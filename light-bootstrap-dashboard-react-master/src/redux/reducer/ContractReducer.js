@@ -34,7 +34,6 @@ const contractReducer = (state = contractState, action) => {
           data: action.data.data
         }
       }
-      console.log(`reducer: `,state)
       break;
     case NAME_EPICS.EPIC_CONTRACT_SCREEN.EPIC_GET_CONTRACT_FAILED:
       state = {

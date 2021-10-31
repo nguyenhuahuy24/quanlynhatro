@@ -28,7 +28,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.HOUSE_SCREEN.CREATE_HOUSE:
                 houseBusiness.createHouse(action.data, success => {
-                    console.log("`epic house create`");
                     resolve({
                         actionType: NAME_ACTIONS.HOUSE_SCREEN.CREATE_HOUSE,
                         data: success

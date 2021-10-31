@@ -16,7 +16,6 @@ const resolver = (action) => {
         switch (action.typeAction) {
             case NAME_ACTIONS.DICHVU_SCREEN.GET_DICHVU:  
                 dichVuBusiness.getServiceOfUser( success => {
-                    console.log(`epic dich vu: `,success);
                     resolve({
                         actionType: NAME_ACTIONS.DICHVU_SCREEN.GET_DICHVU,
                         data: success
@@ -28,7 +27,6 @@ const resolver = (action) => {
                 break;
             case NAME_ACTIONS.DICHVU_SCREEN.CREATE_DICHVU:
                 dichVuBusiness.createDichVu(action.data, success => {
-                    console.log(`epic: `,success);
                     resolve({
                         actionType: NAME_ACTIONS.DICHVU_SCREEN.CREATE_DICHVU,
                         data: success

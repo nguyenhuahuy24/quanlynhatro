@@ -6,7 +6,6 @@ class DichVuBusiness {
         try {
             const dichVuService = new DichVuService()
             const result = await dichVuService.getServiceOfUser();
-            console.log("business")
             if (result.status === dataStatus.SUCCESS) {
                 success(result)
             }
@@ -35,13 +34,11 @@ class DichVuBusiness {
     editDichVu = async (data, success, failed) => {
         try {
             const dichVuService = new DichVuService()
-            console.log(`data business: `, data);
             const { idDichVu, editdata } = data
             const id = [
                 idDichVu
             ]
             const result = await dichVuService.editDichVu(idDichVu, editdata)
-            console.log(`business: `, result);
             if (result.status === dataStatus.SUCCESS) {
                 success(result);
             }

@@ -29,7 +29,6 @@ const UserReducer = (state = userState, action) => {
           data: action.data.data
         }
       }
-      
       break;
     case NAME_EPICS.EPIC_USER_SCREEN.EPIC_GET_USER_FAILED:
       state = {
@@ -50,7 +49,6 @@ const UserReducer = (state = userState, action) => {
           data: action.data.data
         }
       }
-      console.log(`Reducer user: `,state);
       break;
     case NAME_EPICS.EPIC_USER_SCREEN.EPIC_EDIT_USER_FAILED:
       state = {
@@ -71,7 +69,6 @@ const UserReducer = (state = userState, action) => {
           data: action.data.data
         }
       }
-      console.log(`Reducer user: `,state);
       break;
     case NAME_EPICS.EPIC_USER_SCREEN.EPIC_CHANGE_PASSWORD_FAILED:
       state = {

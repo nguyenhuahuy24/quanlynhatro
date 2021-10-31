@@ -26,7 +26,6 @@ export function createUtilityBill(createData) {
   };
 }
 export function deleteUtilityBill(id) {
-  console.log("Action")
   return {
     type: NAME_ACTIONS.UTILITYBILL_SCREEN.UTILITYBILL_SCREEN,
     typeAction: NAME_ACTIONS.UTILITYBILL_SCREEN.DELETE_UTILITYBILL,
