@@ -3,9 +3,14 @@ import { Link, NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import {getUser } from '../redux/action/userAction/UserAction'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../assets/css/animate.min.css";
 
+import "../assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
+import "../assets/css/demo.css";
+import "../assets/css/pe-icon-7-stroke.css";
+import "../App.scss"
 import axios from "axios";
-import "App.scss";
 import UserContext from "../context/UserContext"
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
@@ -77,13 +82,25 @@ class Login extends Component {
         <div className="App">
                 <Toast ref={(el) => (this.toast = el)} />
 
-          <div className="appAside" />
-          <div className="appForm">
-              <div className="pageSwitcher"></div>
+          <div className="appAside">
+            <div className="appForm">
+              
 
+            <div className="formTitle-home">
+              
+            
+              <NavLink
+                exact
+                to="/"
+                activeClassName="formTitleLink-active"
+                className="formTitleLink"
+              >
+                Trang Chủ
+              </NavLink>
+            </div>
             <div className="formTitle">
               <NavLink
-                to="/"
+                to="/signin"
                 activeClassName="formTitleLink-active"
                 className="formTitleLink"
               >
@@ -93,7 +110,7 @@ class Login extends Component {
               <NavLink
                 exact
                 to="/signup"
-                activeClassName="formTitleLink-active"
+                activeClassName="formTitleLink"
                 className="formTitleLink"
               >
                 Đăng Ký
@@ -159,6 +176,8 @@ class Login extends Component {
       </div>
        
           </div>
+          </div>
+          
         </div>
       
     );

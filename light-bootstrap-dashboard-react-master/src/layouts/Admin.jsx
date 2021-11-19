@@ -5,7 +5,13 @@ import AdminNavbar from "components/Navbars/AdminNavbar";
 import Sidebar from "components/Sidebar/Sidebar";
 import routes from "routes.js";
 import image from "assets/img/sidebar-3.jpg";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../assets/css/animate.min.css";
 
+import "../assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
+import "../assets/css/demo.css";
+import "../assets/css/pe-icon-7-stroke.css";
+import "../App.scss"
 class Admin extends Component {
   constructor(props) {
     super(props);

@@ -423,18 +423,28 @@ class KhachThue extends Component {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-success p-mr-2"
+          tooltip="Chỉnh sửa thông tin khác thuê" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+         
           onClick={() => this.editUser(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          className="p-button-rounded p-button-danger p-mr-2"
-          onClick={() => this.confirmDeleteUser(rowData)}
         />
         <Button
           icon="pi pi-plus"
           className="p-button-rounded p-button-warning p-mr-2"
+           tooltip="Chuyển phòng trò cho khách thuê" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+         
           onClick={()=>this.openAddtoRoom(rowData)}
         />
+        <Button
+          icon="pi pi-trash"
+           tooltip="Xóa thông tin khách thuê" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+         
+          className="p-button-rounded p-button-danger p-mr-2"
+          onClick={() => this.confirmDeleteUser(rowData)}
+        />
+        
       </React.Fragment>
     );
   }

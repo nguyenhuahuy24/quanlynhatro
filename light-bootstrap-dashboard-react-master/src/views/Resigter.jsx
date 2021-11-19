@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import { Link ,NavLink} from 'react-router-dom';
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../assets/css/animate.min.css";
+
+import "../assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
+import "../assets/css/demo.css";
+import "../assets/css/pe-icon-7-stroke.css";
+import "../App.scss"
 class Resigter extends Component {
     constructor(props) {
         super(props);
@@ -63,14 +70,25 @@ class Resigter extends Component {
    render() {
     return (
       <div className="App">
-          <div className="appAside" />
-          <div className="appForm">
+          <div className="appAside">
+            <div className="appForm">
                
-            <div className="pageSwitcher"></div>
-
+          
+            <div className="formTitle-home">
+              
+            
+              <NavLink
+                exact
+                to="/"
+                activeClassName="formTitleLink-active"
+                className="formTitleLink"
+              >
+                Trang Chủ
+              </NavLink>
+            </div>
             <div className="formTitle">
               <NavLink
-                to="/"
+                to="/signin"
                 activeClassName="formTitleLink"
                 className="formTitleLink"
               >
@@ -86,7 +104,8 @@ class Resigter extends Component {
                 Đăng Ký
               </NavLink>
             </div>
-        <form onSubmit={this.handleSubmit} className="formFields">
+        <div className="formCenter">
+            <form onSubmit={this.handleSubmit} className="formFields">
           <div className="formField">
             <label className="formFieldLabel" htmlFor="email">
               E-Mail:
@@ -132,12 +151,16 @@ class Resigter extends Component {
 
           <div className="formField">
             <button className="formFieldButton">Đăng Ký</button>{" "}
-            <Link to="/" className="formFieldLink">
+            <Link to="/signin" className="formFieldLink">
               Bạn đã là thành viên ?
             </Link>
           </div>
         </form>
+        </div>
+        
           </div>
+          </div>
+          
         </div>
       
     )}

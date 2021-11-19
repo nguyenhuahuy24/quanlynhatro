@@ -8,13 +8,22 @@ import Dien from "views/Dien.jsx";
 import DichVu from "views/DichVu.jsx";
 import HopDong from "views/HopDong.jsx";
 import TinhTien from "views/TinhTien.jsx";
+import Support from "views/Support.jsx";
+
 import InformationOfUser from "views/InformationOfUser.jsx"
 
 const dashboardRoutes = [
+   {
+    path: "/support",
+    name: "Bảng Quản Trị",
+    icon: "pe-7s-bookmarks",
+    component: Support,
+    layout: "/admin"
+  },
   {
     path: "/dashboard",
     name: "Thống kê",
-    icon: "pe-7s-graph",
+    icon: "pe-7s-graph3",
     component: Dashboard,
     layout: "/admin"
   },

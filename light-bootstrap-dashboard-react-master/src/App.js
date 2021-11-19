@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Login from "views/Login.jsx"
+import Home from "views/Home.jsx"
 import Resigter from "views/Resigter.jsx"
 
 import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./assets/css/animate.min.css";
-import "./assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
-import "./assets/css/demo.css";
-import "./assets/css/pe-icon-7-stroke.css";
-import "./App.scss"
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import "./assets/css/animate.min.css";
+
+// import "./assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
+// import "./assets/css/demo.css";
+// import "./assets/css/pe-icon-7-stroke.css";
+// import "./App.scss"
 
 import UserContext from "./context/UserContext"
 import Axios from "axios";
@@ -51,7 +53,8 @@ export default function App() {
           
           
                         <Switch>
-                            <Route path="/" exact component={Login} />
+                            <Route path="/" exact component={Home} />
+                            <Route path="/signin" exact component={Login} />
                             <Route path="/signup" exact component={Resigter} />
                             <Route path="/verify" component={VerifyEmail} />
                             <Switch>

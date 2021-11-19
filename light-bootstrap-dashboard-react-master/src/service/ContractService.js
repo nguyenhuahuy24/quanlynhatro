@@ -5,6 +5,7 @@ class ContractService extends Service {
     constructor() {
         super();
         this.url =`http://localhost:8080/contract/`
+        this.url_update =`http://localhost:8080/contract/update/`
     }
 
     getContractOfUser = () =>{
@@ -27,7 +28,7 @@ class ContractService extends Service {
     }
     editContract = (id, editdata)=>{
         return new Promise((resolve , reject)=>{
-            this.callPatchAPI(this.url,id, editdata).then(resp =>{
+            this.callPatchAPI(this.url_update,id, editdata).then(resp =>{
                 resolve(resp)
             }).catch(error =>{
                 reject(error)

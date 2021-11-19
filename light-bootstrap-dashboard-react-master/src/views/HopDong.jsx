@@ -184,7 +184,7 @@ class HopDong extends Component {
               Status:rent.Status
               
             })
-        }) 
+        })
         this.setState({ HDs: data })
       } 
     }
@@ -223,17 +223,8 @@ class HopDong extends Component {
       });
     }
   }
-  //  onHouseChange(e) {
-  //   this.setState({ selectedHouse: e.value._id, selectedShowHouse: e.value });
-  //   this.props.getRoomByHouseId(e.value._id);
-  // }
-  // onRoomChange(e) {
-  //   this.setState({ selectedRoom: e.value._id, selectedShowRoom: e.value });
-    
-  // }
   onCustomerChange(e) {
     this.setState({ selectedCustomer: e.value._id, selectedShowCustomer: e.value });
-
   }
   openNew() {
     this.setState({
@@ -262,19 +253,32 @@ class HopDong extends Component {
   saveHD() {
     let state = { submitted: true };
    // let HD = { ...this.state.HD };
-    let data=[];
-    data.push({
-      DateCreate:this.state.HD.CreateDay,
-      Lessor: this.state.HD.Lessor,
-      Renter:this.state.selectedCustomer,
-      RentalPeriod:this.state.selectedRentalPeriod.name,
-      ArrivalDate:this.state.selectedArrivalDate,
-      ExpirationDate:this.state.selectedExpirationDate,
-      Deposit: this.state.HD.Deposit,
-      Status:3,
-    })
-
-    this.props.createContract(data[0]);    
+    
+    if(this.state.HD._id){
+        let data=[];
+            data.push({
+              RentalPeriod:this.state.selectedRentalPeriod.name,
+              ArrivalDate:this.state.selectedArrivalDate,
+              ExpirationDate:this.state.selectedExpirationDate,
+              Deposit: this.state.HD.Deposit,
+            })
+        this.props.editContract(this.state.HD._id,data[0])
+    }
+    else{
+        let data=[];
+        data.push({
+          DateCreate:this.state.HD.CreateDay,
+          Lessor: this.state.HD.Lessor,
+          Renter:this.state.selectedCustomer,
+          RentalPeriod:this.state.selectedRentalPeriod.name,
+          ArrivalDate:this.state.selectedArrivalDate,
+          ExpirationDate:this.state.selectedExpirationDate,
+          Deposit: this.state.HD.Deposit,
+          Status:3,
+        })
+      this.props.createContract(data[0]);    
+        
+    }
     state = {
         ...state,
         HDDialog: false,

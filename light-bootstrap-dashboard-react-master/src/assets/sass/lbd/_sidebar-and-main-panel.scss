@@ -54,25 +54,27 @@
             margin-right: 15px;
 
             img{
-                width: 40px;
-                margin-left: -3px;
+                width: 222px;
+                margin-left: -23px;
                 display: block;
-                margin-top: 2px;
+                margin-top: -9px;
             }
         }
 
         a.logo-normal{
             display: block;
+            margin-left: 40%;
         }
 
         .logo-img{
-            width: 34px;
+            width: 218px;
+            height: 50px;
             display: inline-block;
-            height: 34px;
-            margin-left: -2px;
-            margin-top: -2px;
+            
+            margin-left: -24px;
+            margin-top: -1px;
             margin-right: 10px;
-            border-radius: 30px;
+           // border-radius: 30px;
             text-align: center;
         }
     }
@@ -98,7 +100,7 @@
         li{
             > a{
                 color: #FFFFFF;
-                margin: 2px 2px;
+                //margin: 2px 2px;
                 opacity: .86;
                 border-radius: 4px;
             }
@@ -148,7 +150,7 @@
 .sidebar,
 body > .navbar-collapse{
     .logo{
-        padding: 10px 30px;
+        padding: 2px 30px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
         p{
@@ -244,7 +246,7 @@ body > .navbar-collapse{
     > .content{
         padding: 10px 15px;
         min-height: calc(100% - 123px);
-        height: 625px;
+        height: 600px;
     }
 
     > .footer{

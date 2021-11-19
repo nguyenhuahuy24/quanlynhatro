@@ -301,7 +301,7 @@ class Dien extends Component {
           icon="pi pi-file-o"
           className="p-button-warning p-mr-2"
           onClick={this.exportExcel}
-          
+          disabled
         />
         
         </span>

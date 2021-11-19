@@ -9,16 +9,26 @@
 }
 
 .appAside {
-  width: 65%;
+  justify-content: flex-end;
+  width: 100%;
+  display: flex;
   background-image: url(./assets/img/Welcomel_1.png);
   //background-image: "./assets/img/Welcomel_to.jpg";
 }
 
 .appForm {
-  width: 35%;
-  background-color: #1a1a1a;
-  padding: 25px 40px;
+  margin: 25px;
+  margin-right: 150px;
+  border-radius: 25px;
+  background-color: #90cecb;
+  padding-top: 20px;
+  padding-right: 20px;
+  padding-left: 20px;
+  box-shadow: 0 0 46px -4px #160e0e;                     
   overflow: auto;
+  align-items:flex-end;
+  width: 399px;
+  height: 555px;
 }
 
 .pageSwitcher {
@@ -54,13 +64,22 @@
 }
 
 .formCenter {
-  margin-bottom: 100px;
+ // margin-bottom: 100px;
 }
 
 .formTitle {
   color: #707c8b;
   font-weight: 300;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
+  text-align: center;
+  
+}
+.formTitle-home {
+  color: #707c8b;
+  font-weight: 300;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 18px;
 }
 
 .formTitleLink {
@@ -70,6 +89,11 @@
   font-size: 1.7em;
   margin: 0 10px;
   padding-bottom: 5px;
+  font-weight: bold;
+}
+.formTitleLink:hover {
+  color: #000;
+  
 }
 
 .formTitleLink:first-child {
@@ -80,15 +104,18 @@
   color: white;
   border-bottom: 1px solid #6b5b95;
 }
+.formTitleLink-active:hover {
+  color: #000;
+}
 
 .formField {
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .formFieldLabel {
   display: block;
   text-transform: uppercase;
-  font-size: 13px;
+  font-size: 15px;
   color: white;
   
 }
@@ -96,10 +123,10 @@
   width: 85%;
   background-color: transparent;
   border: none;
-  color: white;
+  color: #000;
   outline: none;
   border-bottom: 1px solid #445366;
-  font-size: 1em;
+  font-size: 15px;
   font-weight: 300;
   padding-bottom: 10px;
   margin-top: 10px;
@@ -110,14 +137,29 @@
 }
 
 .formFieldButton {
-  background-color: #b3e6ff;
-  color: #404040;
+  
   border: none;
   outline: none;
   border-radius: 25px;
   padding: 15px 70px;
   font-size: 0.9em;
   font-weight: 700;
+}
+.formFieldButton {
+  background: linear-gradient(to left, #b3e6ff 50%, #6b5b95 50%);
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: background-position 0.3s ease-out;
+  color: #000;
+}
+.formFieldButton:hover {
+  background-position: left bottom;
+color: #ffff;
+}
+
+.formFieldButton:focus {
+  box-shadow: #6b5b95;
+  
 }
 
 .formFieldLink {
@@ -126,6 +168,11 @@
   display: inline-block;
   border-bottom: 1.5px solid #6b5b95;
   padding-bottom: 5px;
+  font-weight: bold;
+}
+.formFieldLink:hover {
+  color: #000000;
+  
 }
 
 .formFieldTermsLink {
@@ -165,4 +212,7 @@
 }
 .btn1{
   text-align: center;
+}
+.template {
+  padding-top: 10px;
 }
