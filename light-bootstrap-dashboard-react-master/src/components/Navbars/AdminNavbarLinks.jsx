@@ -11,6 +11,10 @@ import { withGlobalContext } from '../../GlobalContextProvider';
 import { connect } from 'react-redux';
 
 class AdminNavbarLinks extends Component {
+  constructor(props) {
+        super(props);     
+       
+    }
   static contextType = UserContext
   render() {
     
@@ -22,7 +26,9 @@ class AdminNavbarLinks extends Component {
         user:undefined,
       });
       localStorage.clear();
-       <Link to ="/"></Link>
+      //  <Link to="/signin"></Link>
+     
+
     }
     return (
       <div>

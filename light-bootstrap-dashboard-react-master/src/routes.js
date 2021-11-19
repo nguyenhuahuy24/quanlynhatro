@@ -56,8 +56,8 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/tinhtien",
-    name: "Tính tiền",
+    path: "/hoadon",
+    name: "Hóa Đơn",
     icon: "pe-7s-cash",
     component: TinhTien,
     layout: "/admin"

@@ -466,6 +466,9 @@ body {
 .header-sp {
   border-bottom: 1px solid;
 }
+.body-sp {
+  max-height: 100%;
+}
 .social-mini-button a {
   padding-left: 12px;
   padding-right: 12px;
@@ -473,4 +476,79 @@ body {
 
 .social-mini-button a:not(:last-child) {
   border-right: 1px solid #dfe1eb;
+}
+.sp {
+text-align: center;
+
+}
+.title-radius::after{
+    content: '';
+    height: 3px;
+    width: 83%;
+    position: absolute;
+    background-color: rgba(2, 2, 2, 0.8);
+    top: 31px;
+    left:202px;
+    z-index: 4;
+    transform: translateY(-100%);
+  
+}
+.title-radius-2::after{
+    content: '';
+    height: 3px;
+    width: 89%;
+    position: absolute;
+    background-color: rgba(2, 2, 2, 0.8);
+    top: 31px;
+    left:287px;
+    z-index: 4;
+    transform: translateY(-100%);
+  
+}
+
+
+.radius {
+  font-size: 22px;
+    border-radius: 50%!important;
+    display: inline-block;
+    margin: auto auto 5px;
+    padding: 9px;
+    border: 3px solid #26C281;
+    position: relative;
+    z-index: 5;
+    height: 60px;
+    width: 60px;
+    text-align: center;
+   
+}
+.radius-2 {
+  font-size: 22px;
+    border-radius: 50%!important;
+    display: inline-block;
+    margin: auto auto 5px;
+    padding: 9px;
+    border: 3px solid #E7505A;
+    position: relative;
+    z-index: 5;
+    height: 60px;
+    width: 60px;
+    text-align: center;
+}
+.radius-3 {
+  font-size: 22px;
+    border-radius: 50%!important;
+    display: inline-block;
+    margin: auto auto 5px;
+    padding: 9px;
+    border: 3px solid #d6e418;
+    position: relative;
+    z-index: 5;
+    height: 60px;
+    width: 60px;
+    text-align: center;
+}
+.form-step {
+  margin-Bottom:"2px";
+  margin-Top:"15px";
+  height: 240px;
 }

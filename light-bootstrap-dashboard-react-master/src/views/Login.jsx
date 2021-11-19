@@ -68,7 +68,7 @@ class Login extends Component {
                     })
                     userProfile.userId = response.data.userId
                     this.props.getUser();
-                    this.props.history.push("/admin/dashboard")
+                    this.props.history.push("/admin/support")
                 }
             })
             .catch(error => {
