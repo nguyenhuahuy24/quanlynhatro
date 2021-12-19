@@ -10,3 +10,4 @@ Tiến độ làm việc:
 + 24/10/2021 bắt đầu làm App
 + github App: https://github.com/nguyenhuahuy24/mobileApp
 + github Back-end: https://github.com/truong30999/khoaluantotnghiep
++ 17/12/2021: xong chức năng ĐĂNG/THU tin cho thuê phòng trọ phóng của chủ trọ
