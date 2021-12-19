@@ -366,20 +366,18 @@ class DichVu extends Component {
            className="p-button-danger"
           onClick={this.hideDialog}
         />
-        <Button
+        {this.state.edit !=false && <Button
           label="Lưu"
           icon="pi pi-check"
           className="p-button-success"
           onClick={this.saveDV}
-          disabled ={this.state.edit !=true}  
-        />
-        <Button
+        />}
+        {this.state.edit != true && <Button
           label="Chỉnh sửa"
           icon="pi pi-pencil"
           className="p-button-warning"
-          disabled ={this.state.edit !=false}
           onClick={()=>this.setState({edit:true})}
-        />
+        />}
       </React.Fragment>
     );
     const deleteDVDialogFooter = (

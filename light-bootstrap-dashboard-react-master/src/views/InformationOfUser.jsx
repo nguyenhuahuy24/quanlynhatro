@@ -47,7 +47,7 @@ class InformationOfUser extends Component {
                 } else {
                     this.setState({ Image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' })
                 }
-                if (this.props.user.data.Age) this.setState({ Age: this.props.user.data.Age });
+                if (this.props.user.data.Age) this.setState({ Age: new Date(this.props.user.data.Age) });
                 if (this.props.user.data.Phone) this.setState({ Phone: this.props.user.data.Phone });
                 if (this.props.user.data.PermanentAddress) this.setState({ PermanentAddress: this.props.user.data.PermanentAddress });
                 if (this.props.user.data.Cmnd) this.setState({ Cmnd: this.props.user.data.Cmnd });
@@ -59,19 +59,19 @@ class InformationOfUser extends Component {
             if (this.props.editStatus.status === dataStatus.SUCCESS) {
                  this.props.getUser();
                  this.toast.show({
-              severity: "success",
-              summary: "Successful",
-              detail: "Cập nhật thành công",
-              life: 2500
-            });
+                    severity: "success",
+                    summary: "Successful",
+                    detail: "Cập nhật thành công",
+                    life: 2500
+                });
             }
             else{
                 this.toast.show({
-              severity: "error",
-              summary: "Fail",
-              detail: "Cập nhật thất bại",
-              life: 3000
-            });
+                    severity: "error",
+                    summary: "Fail",
+                    detail: "Cập nhật thất bại",
+                    life: 3000
+                });
             }
         }
     }
@@ -131,15 +131,18 @@ class InformationOfUser extends Component {
                                                 required />
                                             </div>
                                             <div className="col-md-2">
-                                                  <label >Tuổi</label>
-                                            <input
-                                                className="form-control"
-                                                type="Age"
-                                                name="Age"
-                                                
-                                                value={this.state.Age}
-                                                onChange={this.handleChange}
-                                                required />
+                                                  <label >Ngày Sinh</label>
+                                            <div>
+                                                <Calendar 
+                                                    id="navigatorstemplate"
+                                                    monthNavigator 
+                                                    yearNavigator 
+                                                    dateFormat="dd/mm/yy"
+                                                    yearRange="1950:2010"
+                                                    value={this.state.Age}
+                                                    onChange={(e) => this.setState({ Age: e.value })} 
+                                                    showIcon />
+                                                    </div>
                                             </div>
                                         </div>
                                         <div className="form-group">
@@ -185,7 +188,8 @@ class InformationOfUser extends Component {
                                                 <Calendar 
                                                     id="navigatorstemplate"
                                                     monthNavigator 
-                                                    yearNavigator 
+                                                    yearNavigator
+                                                    dateFormat="dd/mm/yy" 
                                                     yearRange="1950:2010"
                                                     value={this.state.DateCmnd}
                                                     onChange={(e) => this.setState({ DateCmnd: e.value })} 

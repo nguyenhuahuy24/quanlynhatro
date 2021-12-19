@@ -61,7 +61,17 @@ const roomState = {
     status: dataStatus.NONE,
     message: '',
     data: {},
-  }
+  },
+  postRoomStatus: {
+    status: dataStatus.NONE,
+    message: '',
+    data: {},
+  },
+  unpostRoomStatus: {
+    status: dataStatus.NONE,
+    message: '',
+    data: {},
+  },
 };
 const RoomReducer = (state = roomState, action) => {
   switch (action.type) {
@@ -250,7 +260,7 @@ const RoomReducer = (state = roomState, action) => {
         }
       }
       break;
-     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM:
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM:
       state = {
         ...state,
         removeServiceStatus: {
@@ -260,7 +270,7 @@ const RoomReducer = (state = roomState, action) => {
         }
       }
       break;
-     case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM_FAILED:
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_REMOVE_SERVICE_TO_ROOM_FAILED:
       state = {
         ...state,
         removeServiceStatus: {
@@ -305,6 +315,46 @@ const RoomReducer = (state = roomState, action) => {
       state = {
         ...state,
         listNotEmptyRoom: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_POST_ROOM:
+      state = {
+        ...state,
+        postRoomStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_POST_ROOM_FAILED:
+      state = {
+        ...state,
+        postRoomStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: []
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_UN_POST_ROOM:
+      state = {
+        ...state,
+        unpostRoomStatus: {
+          status: action.data.status,
+          message: action.data.message,
+          data: action.data.data
+        }
+      }
+      break;
+    case NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_UN_POST_ROOM_FAILED:
+      state = {
+        ...state,
+        unpostRoomStatus: {
           status: action.data.status,
           message: action.data.message,
           data: []

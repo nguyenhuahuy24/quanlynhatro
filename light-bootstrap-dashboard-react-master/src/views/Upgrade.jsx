@@ -9,6 +9,7 @@ import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
 import {changePassWord} from '../redux/action/userAction/UserAction'
 import { dataStatus } from "../utility/config";
+import { Toast } from 'primereact/toast';
 
 
 
@@ -35,9 +36,21 @@ componentDidUpdate(prevProps){
    if (this.props.changPasswordStatus !== prevProps.changPasswordStatus) {
         if (this.props.changPasswordStatus.status === dataStatus.SUCCESS) {
             if(this.props.changPasswordStatus.data.err){
-                return alert(this.props.changPasswordStatus.data.err)}
+                this.toast.show({
+                    severity: "error",
+                    summary: "Fail",
+                    detail: this.props.changPasswordStatus.data.err,
+                    life: 3000
+                });
+              }
             else{
-                alert("Đổi mật khẩu thành công")
+                 this.toast.show({
+                    severity: "success",
+                    summary: "Successful",
+                    detail: "Đổi mật khẩu",
+                    life: 2500
+                });
+                this.setState({currentPassWord:"",newPassWord:""})
               }
         } 
   }
@@ -54,6 +67,8 @@ handleSubmit(event) {
   render() {
     return (
       <div className="content">
+                  <Toast ref={(el) => (this.toast = el)} />
+
         <Grid fluid>
           <Row>
             <Col md={8} mdOffset={2}>

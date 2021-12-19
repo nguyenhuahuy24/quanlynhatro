@@ -167,8 +167,9 @@
 }
 
 .navbar-nav-home .nav-link {
-  padding-right: 0;
-  padding-left: 0;
+    display: block;
+    padding: 0.5rem 1rem;
+    
 }
 .navbar-home {
   position: relative;
@@ -238,4 +239,18 @@
 
   padding-right: 10px;
   padding-left: 10px;
+}
+.img-caption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  padding: 0 16px;
+  width: auto;
+  text-align: right;
+  color: #fff;
+  margin-top: 43%;
+  margin-right: 10%;
 }

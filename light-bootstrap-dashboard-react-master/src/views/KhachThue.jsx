@@ -58,7 +58,8 @@ class KhachThue extends Component {
       user: this.emptyUser,
       selectedusers: null,
       submitted: false,
-   
+      
+      selectedAge:new Date(),
       selectedDateCMND:new Date(),
       globalFilter: null,
       selectedHouse: "",
@@ -107,24 +108,47 @@ class KhachThue extends Component {
     if (this.props.listCustomer !== prevProps.listCustomer) {
       if (this.props.listCustomer.status === dataStatus.SUCCESS) {
         const customers = Object.values(this.props.listCustomer.data)
+     
         let data=[];
         customers.forEach(customer=>{
-          data.push({
-            _id: customer._id,
-            Age: customer.Age,
-            Cmnd: customer.Cmnd,
-            DateCmnd: customer.DateCmnd,
-            Email: customer.Email,
-            Image: customer.Image,
-            Name: customer.Name,
-            PermanentAddress: customer.PermanentAddress,
-            Phone: customer.Phone,
-            PlaceCmnd: customer.PlaceCmnd,
-            Room: customer.RoomId.RoomNumber,
-            House: customer.RoomId.HouseId.Name,
-          })
+          if(customer.RoomId != null){
+            data.push({
+              _id: customer._id,
+              Age: customer.Age,
+              Cmnd: customer.Cmnd,
+              DateCmnd: customer.DateCmnd,
+              Email: customer.Email,
+              Image: customer.Image,
+              Name: customer.Name,
+              PermanentAddress: customer.PermanentAddress,
+              Phone: customer.Phone,
+              PlaceCmnd: customer.PlaceCmnd,
+              Room: customer.RoomId.RoomNumber,
+              House: customer.RoomId.HouseId.Name,
+
+            })
+          }
+          else{
+             data.push({
+              _id: customer._id,
+              Age: customer.Age,
+              Cmnd: customer.Cmnd,
+              DateCmnd: customer.DateCmnd,
+              Email: customer.Email,
+              Image: customer.Image,
+              Name: customer.Name,
+              PermanentAddress: customer.PermanentAddress,
+              Phone: customer.Phone,
+              PlaceCmnd: customer.PlaceCmnd,
+              Room: "Trống",
+              House: "Trống",
+            })
+          }
+         
+          
         })
         this.setState({ users: data })
+     
       } 
     }
     if (this.props.createStatus !== prevProps.createStatus) {
@@ -201,6 +225,7 @@ class KhachThue extends Component {
                 });
             }else
             {
+              this.props.getAllCustomerOfUser();
               this.setState({
               AddtoRoomDialog: false
               });
@@ -211,7 +236,8 @@ class KhachThue extends Component {
               life: 3000
             });
             }
-              
+            
+
         
       }
     }
@@ -321,7 +347,9 @@ class KhachThue extends Component {
       
       const fd = new FormData();
       fd.append("Name", this.state.user.Name);
-      fd.append("Age", this.state.user.Age);
+      if(this.state.selectedAge!=""){
+         fd.append("Age", this.state.selectedAge);
+      }
       fd.append("Email", this.state.user.Email);
       fd.append("Phone", this.state.user.Phone);
       fd.append("PermanentAddress", this.state.user.PermanentAddress);
@@ -351,6 +379,7 @@ class KhachThue extends Component {
         ...state,
         //  users,
         selectedDateCMND:"",
+        selectedAge:"",
         selectedFile:[],
         userDialog: false,
         user: this.emptyUser,
@@ -364,6 +393,7 @@ class KhachThue extends Component {
     this.setState({
       userDialog: true,
         selectedDateCMND:new Date(user.DateCmnd),
+        selectedAge:new Date(user.Age),
        user: { ...user },
        edit:false
     });
@@ -471,20 +501,20 @@ class KhachThue extends Component {
           className="p-button-danger"
           onClick={this.hideDialog}
         />
-        <Button
+        {this.state.edit !=false && <Button
           label="Lưu"
           icon="pi pi-check"
           className="p-button-success"
           onClick={this.saveUser}
           disabled ={this.state.edit !=true}  
-        />
-        <Button
+        /> }
+        
+        {this.state.edit != true && <Button
           label="Chỉnh sửa"
           icon="pi pi-pencil"
           className="p-button-warning"
-          disabled ={this.state.edit !=false}
           onClick={()=>this.setState({edit:true})}
-        />
+        />}
       </React.Fragment>
     );
     const deleteUserDialogFooter = (
@@ -549,8 +579,8 @@ class KhachThue extends Component {
       
             <Column field="Name" header="Tên Khách Hàng" ></Column>
             <Column field="Phone" header="Số điện thoại" ></Column>
-            <Column field="Age" header="Tuổi" ></Column>
-            <Column field="PermanentAddress" header="Địa chỉ thường trú" ></Column>
+            <Column field="House" header="Nhà thuê" ></Column>
+            <Column field="Room" header="Thuê Phòng" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
          
           </DataTable>
@@ -584,14 +614,18 @@ class KhachThue extends Component {
               )}
             </div>
             <div className="p-field p-col">
-              <label htmlFor="Age">Tuổi</label>
-              <InputNumber
-                id="Age"
-                value={this.state.user.Age}
-                onChange={(e) => this.onInputNumberChange(e, "Age")}
-                required
-                 disabled ={this.state.edit !=true}  
-              /> </div>
+              <label htmlFor="Age">Ngày Sinh</label>
+              <Calendar
+              dateFormat="dd/mm/yy"
+              id="navigatorstemplate"
+              monthNavigator 
+              yearNavigator 
+              yearRange="1950:2020"
+              value={this.state.selectedAge} 
+              onChange={(e) => this.setState({ selectedAge: e.value })}
+               showIcon
+                disabled ={this.state.edit !=true}  
+                 /> </div>
           </div>
           <div className="p-formgrid p-grid">
             <div className="p-field p-col">
@@ -690,7 +724,7 @@ class KhachThue extends Component {
               id="navigatorstemplate"
               monthNavigator 
               yearNavigator 
-              yearRange="1950:2010"
+              yearRange="1950:2020"
               value={this.state.selectedDateCMND} 
               onChange={(e) => this.setState({ selectedDateCMND: e.value })}
                showIcon

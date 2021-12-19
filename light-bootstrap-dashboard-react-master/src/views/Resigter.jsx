@@ -3,6 +3,7 @@ import { Link ,NavLink} from 'react-router-dom';
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../assets/css/animate.min.css";
+import { Toast } from 'primereact/toast';
 
 import "../assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
 import "../assets/css/demo.css";
@@ -47,7 +48,12 @@ class Resigter extends Component {
             .then(response => {
                 console.log(response)
                 if (response.data.Status === 0) {
-                    alert("Vui lòng xác thực bằng Email")
+                     this.toast.show({
+                        severity: "success",
+                        summary: "Đăng kí",
+                        detail: "Vui lòng xác thực bằng Email",
+                        life: 4000
+                        });
                     state = {
                       ...state,
                     // rooms,
@@ -60,16 +66,30 @@ class Resigter extends Component {
             })
             .catch(error => {
                 console.log("registration error", error);
+                this.toast.show({
+                        severity: "error",
+                        summary: "Đăng kí",
+                        detail: error,
+                        life: 4000
+                        });
             });
         }
         else{
-            alert("Vui lòng nhập lại mật khẩu!")
+            this.toast.show({
+                        severity: "error",
+                        summary: "Đăng kí",
+                        detail: "Vui lòng nhập lại mật khẩu!",
+                        life: 4000
+                        });
+            
         }
         event.preventDefault();
     }
    render() {
     return (
       <div className="App">
+                      <Toast ref={(el) => (this.toast = el)} />
+
           <div className="appAside">
             <div className="appForm">
                

@@ -21,7 +21,7 @@ import UserContext from "../context/UserContext";
 //redux
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
-import {removePersonToRoom,getServiceInRoom,removeServiceToRoom, getPersonInRoom,getRoomByHouseId ,createRoom, editRoom, deleteRoom} from '../redux/action/roomAction/RoomAction'
+import {postRoom,unpostRoom,removePersonToRoom,getServiceInRoom,removeServiceToRoom, getPersonInRoom,getRoomByHouseId ,createRoom, editRoom, deleteRoom} from '../redux/action/roomAction/RoomAction'
 import { getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 
 import { dataStatus } from "../utility/config";
@@ -58,6 +58,11 @@ class PhongTro extends Component {
       submitted: false,
       selectedServices: "",
       selectedCustomer: "",
+      //dang tin
+      deletePostDialog:false,
+      deleteRemoveDialog:false,
+      RemoveHouseForRentDialog:false,
+      PostHouseForRentDialog:false,
       //khi khi click vào room sẽ lưu tạm thời roomID
       selectedRoom:"",
 
@@ -82,6 +87,7 @@ class PhongTro extends Component {
     this.saveRoom = this.saveRoom.bind(this);
     this.editRoom = this.editRoom.bind(this);
     this.confirmDeleteRoom = this.confirmDeleteRoom.bind(this);
+    this.confirmPostRemove = this.confirmPostRemove.bind(this);
     this.confirmDeleteCustomer = this.confirmDeleteCustomer.bind(this);
     this.deleteRoom = this.deleteRoom.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
@@ -95,6 +101,8 @@ class PhongTro extends Component {
     this.removeService = this.removeService.bind(this);
     this.onHide =this.onHide.bind(this);
     this.confirm =this.confirm.bind(this);
+    this.confirmPost =this.confirmPost.bind(this);
+    this.confirmRemove =this.confirmRemove.bind(this);
   }
   componentDidMount() {
     this.props.getHouseByUserId();
@@ -105,7 +113,7 @@ class PhongTro extends Component {
         this.toast.show({
           severity: "success",
           summary: "Thành Công",
-          detail: "Room Created",
+          detail: "Tạo phòng",
           life: 3000
         });
          this.props.getRoomByHouseId(this.state.selectedKhuTro);
@@ -114,7 +122,7 @@ class PhongTro extends Component {
         this.toast.show({
           severity: "error",
           summary: "Thất Bại",
-          detail: "Room Created",
+          detail: "Tạo phòng",
           life: 3000
         });
       }
@@ -137,7 +145,7 @@ class PhongTro extends Component {
         this.toast.show({
           severity: "success",
           summary: "Thành Công",
-          detail: "Room Updated",
+          detail: "Cập nhật phòng",
           life: 3000
         });
          this.props.getRoomByHouseId(this.state.selectedKhuTro);
@@ -146,7 +154,7 @@ class PhongTro extends Component {
           this.toast.show({
           severity: "error",
           summary: "Thất bại",
-          detail: "Room Updated",
+          detail: "Cập nhật phòng",
           life: 3000
         });
       }
@@ -156,7 +164,7 @@ class PhongTro extends Component {
                   this.toast.show({
                   severity: "success",
                   summary: "Thành công",
-                  detail: "Xóa khách thuê",
+                  detail: "Xóa khách thuê ra khỏi phòng",
                   life: 3000
                 });
               this.props.getPersonInRoom(this.state.selectedRoom);
@@ -169,7 +177,7 @@ class PhongTro extends Component {
                   this.toast.show({
                   severity: "success",
                   summary: "Thành công",
-                  detail: "Xóa dịch vụ",
+                  detail: "Xóa dịch vụ ra khỏi phòng",
                   life: 3000
                 });
               this.props.getServiceInRoom(this.state.selectedRoom);
@@ -185,19 +193,57 @@ class PhongTro extends Component {
                   room: this.emptyRoom });
                   this.toast.show({
                       severity: "success",
-                      summary: "Successful",
-                      detail: "Phòng Deleted",
+                      summary: "Thành công",
+                      detail: "Xóa phòng",
                       life: 3000
                   });
           }else {
                 this.toast.show({
-                    severity: "success",
-                    summary: "Fail",
-                    detail: "Phòng Deleted",
+                    severity: "error",
+                    summary: "Thất bại",
+                    detail: "Xóa phòng",
                     life: 3000
                   });
           }
         this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+    }
+    if (this.props.postRoomStatus !== prevProps.postRoomStatus) {
+      if (this.props.postRoomStatus.status === dataStatus.SUCCESS) {
+                  this.toast.show({
+                      severity: "success",
+                      summary: "Thành công",
+                      detail: "Đăng tin cho thuê phòng",
+                      life: 3000
+                  });
+        this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+      else{
+                  this.toast.show({
+                      severity: "error",
+                      summary: "Thất bại",
+                      detail: "Đăng tin cho thuê phòng",
+                      life: 3000
+                  });
+      }
+    }
+    if (this.props.unpostRoomStatus !== prevProps.unpostRoomStatus) {
+      if (this.props.unpostRoomStatus.status === dataStatus.SUCCESS) {
+                  this.toast.show({
+                      severity: "success",
+                      summary: "Thành công",
+                      detail: "Thu hồi tin cho thuê phòng",
+                      life: 3000
+                  });
+        this.props.getRoomByHouseId(this.state.selectedKhuTro);
+      }
+      else{
+                  this.toast.show({
+                      severity: "error",
+                      summary: "Thất bại",
+                      detail: "Thu hồi tin cho thuê phòng",
+                      life: 3000
+                  });
       }
     }
     if (this.props.listRoom !== prevProps.listRoom) {
@@ -268,6 +314,16 @@ class PhongTro extends Component {
       currency: "VND"
     });
   }
+  confirmPost(){
+    console.log("dang tin")
+    this.props.postRoom(this.state.room._id)
+    this.setState({PostHouseForRentDialog:false})
+  }
+  confirmRemove(){
+    console.log("xoa tin")
+    this.props.unpostRoom(this.state.room._id)
+    this.setState({RemoveHouseForRentDialog:false})
+  }
   onKhuTroChange(e) {
     this.setState({ selectedKhuTro: e.value._id,selectedShow:e.value });
     this.props.getRoomByHouseId(e.value._id);
@@ -307,6 +363,7 @@ class PhongTro extends Component {
       return <span className={`product-badge status-1`}>{"Đã thuê"}</span>;
     }
     if (rowData.Status == "0") { return <span className={`product-badge status-0`}>{"Trống"}</span>; }
+    if (rowData.Status == "3") { return <span className={`product-badge status-2`}>{"Đã đăng tin"}</span>; }
   }
   saveRoom() {
     let state = { submitted: true };
@@ -379,6 +436,12 @@ class PhongTro extends Component {
   confirm(name) {
         this.setState({
             [`${name}`]: true
+        });
+    }
+  confirmPostRemove(name,room) {
+        this.setState({
+            [`${name}`]: true,
+            room: { ...room },
         });
     }
   onHide(name) {
@@ -455,23 +518,41 @@ class PhongTro extends Component {
   actionBodyTemplate(rowData) {
     return (
       <React.Fragment>
+        {rowData.Status == "0" &&  <Button
+          icon="pi pi-send"
+          className="p-button-rounded p-button p-mr-1"
+          style={{backgroundColor:"#0d29ef"}}
+          tooltip="Đăng tin cho thuê phòng" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+          onClick={() => this.confirmPostRemove('PostHouseForRentDialog',rowData)}
+        /> }
+        {rowData.Status == "3" &&  <Button
+          icon="pi pi-times"
+          className="p-button-rounded p-button p-mr-1"
+          style={{backgroundColor:"#827f83"}}
+          tooltip="Thu hồi tin cho thuê nhà" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+          onClick={() => this.confirmPostRemove('RemoveHouseForRentDialog',rowData)}
+
+        /> }
+       
         <Button
           icon="pi pi-pencil"
-          className="p-button-rounded p-button-success p-mr-2"
+          className="p-button-rounded p-button-success p-mr-1"
           tooltip="Chỉnh sửa thông tin phòng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.editRoom(rowData)}
         />
         <Button
           icon="pi pi-user"
-          className="p-button-rounded p-button-warning p-mr-2"
+          className="p-button-rounded p-button-warning p-mr-1"
           tooltip="Thành viên trong phòng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.PersonRoom(rowData)}
         />
         <Button
           icon="pe-7s-box2"
-          className="p-button-rounded p-button p-mr-2"
+          className="p-button-rounded p-button p-mr-1"
           tooltip="Dịch vụ của phòng sử dụng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={() => this.ServiceRoom(rowData)}
@@ -510,20 +591,19 @@ class PhongTro extends Component {
           className="p-button-danger"
           onClick={this.hideDialog}
         />
-        <Button
+        {this.state.edit !=false &&  <Button
           label="Lưu"
           icon="pi pi-check"
          className="p-button-success"
           onClick={this.saveRoom}
-          disabled ={this.state.edit !=true} 
-        />
-        <Button
+        /> }
+        {this.state.edit != true && <Button
           label="Chỉnh sửa"
           icon="pi pi-pencil"
           className="p-button-warning"
-          disabled ={this.state.edit !=false}
           onClick={()=>this.setState({edit:true})}
-        />
+        /> }
+        
       </React.Fragment>
     );
     const deleteRoomDialogFooter = (
@@ -571,6 +651,38 @@ class PhongTro extends Component {
           icon="pi pi-check"
           className="p-button-success"
           onClick={this.removeService}
+        />
+      </React.Fragment>
+    );
+    const postDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="Không"
+          icon="pi pi-times"
+          className="p-button-danger"
+          onClick={()=>this.onHide('PostHouseForRentDialog')}
+        />
+        <Button
+          label="Có"
+          icon="pi pi-check"
+          className="p-button-success"
+          onClick={this.confirmPost}
+        />
+      </React.Fragment>
+    );
+    const removeDialogFooter = (
+      <React.Fragment>
+        <Button
+          label="Không"
+          icon="pi pi-times"
+          className="p-button-danger"
+          onClick={()=>this.onHide('RemoveHouseForRentDialog')}
+        />
+        <Button
+          label="Có"
+          icon="pi pi-check"
+          className="p-button-success"
+          onClick={this.confirmRemove}
         />
       </React.Fragment>
     );
@@ -778,7 +890,6 @@ class PhongTro extends Component {
             dataKey="_id"
           >
             <Column field="Name" header="Tên" ></Column>
-            <Column field="Age" header="Tuổi" ></Column>
             <Column field="Phone" header="Số điện thoại" ></Column>
           </DataTable>    
         </div>
@@ -825,8 +936,48 @@ class PhongTro extends Component {
           onClick={() => this.confirm('deleteServiceDialog')}
           disabled={!this.state.selectedService}/>
         </Dialog>
-      
-      
+              {/* dialog đăng tin */}
+        <Dialog
+          visible={this.state.PostHouseForRentDialog}
+          style={{ width: "450px" }}
+          header="Đăng tin cho thuê phòng trọ"
+          modal
+          footer={postDialogFooter}
+         onHide={()=>this.onHide("PostHouseForRentDialog")}
+        >
+          <div className="confirmation-content">
+            <i
+              className="pi pi-exclamation-triangle p-mr-3"
+              style={{ fontSize: "2rem" }}
+            />
+            {this.state.room && (
+              <span>
+                Bạn muốn đăng tin cho thuê ???  
+              </span>
+            )}
+          </div>
+        </Dialog>
+              {/* dialog xoa dang tin */}
+              <Dialog
+          visible={this.state.RemoveHouseForRentDialog}
+          style={{ width: "450px" }}
+          header="Thu hồi tin cho thuê phòng trọ"
+          modal
+          footer={removeDialogFooter}
+          onHide={()=>this.onHide("RemoveHouseForRentDialog")}
+        >
+          <div className="confirmation-content">
+            <i
+              className="pi pi-exclamation-triangle p-mr-3"
+              style={{ fontSize: "2rem" }}
+            />
+            {this.state.room && (
+              <span>
+                Bạn muốn thu hồi tin cho thuê ???  
+              </span>
+            )}
+          </div>
+        </Dialog>
       
       
       
@@ -854,9 +1005,12 @@ function mapStateToProps(state) {
     createStatus: state.RoomReducer.createStatus,
     editStatus: state.RoomReducer.editStatus,
     deleteStatus: state.RoomReducer.deleteStatus,
+
+    postRoomStatus: state.RoomReducer.postRoomStatus,
+    unpostRoomStatus: state.RoomReducer.unpostRoomStatus,
     //customer
   };
 }
 export default withGlobalContext(
-  connect(mapStateToProps, {removePersonToRoom,getPersonInRoom,getServiceInRoom,removeServiceToRoom, getHouseByUserId,getRoomByHouseId ,createRoom, editRoom, deleteRoom})(PhongTro),
+  connect(mapStateToProps, {postRoom,unpostRoom,removePersonToRoom,getPersonInRoom,getServiceInRoom,removeServiceToRoom, getHouseByUserId,getRoomByHouseId ,createRoom, editRoom, deleteRoom})(PhongTro),
 );

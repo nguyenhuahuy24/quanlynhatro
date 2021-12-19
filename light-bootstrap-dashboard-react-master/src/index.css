@@ -459,9 +459,27 @@ body {
   margin-bottom: 8px;
   font-size: 15px;
 }
-
+.nav-item-active{
+  background-color:#ff1616;
+  border-radius: 0.43rem;
+    
+}
+.nav-item-active .navbar-a  {
+  font-size: 20px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+}
+.nav-item-active .navbar-a:hover {
+  font-size: 20px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+}
 .navbar-a {
   font-size: 20px;
+  padding: 0.5rem 1rem;
+}
+.navbar-a:hover {
+  color: #ff1616;
 }
 .header-sp {
   border-bottom: 1px solid;

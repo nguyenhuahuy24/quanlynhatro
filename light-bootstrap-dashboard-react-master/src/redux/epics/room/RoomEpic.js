@@ -150,6 +150,28 @@ const resolver = (action) => {
                     reject(new Error(NAME_ACTIONS.ROOM_SCREEN.GET_NOT_EMPTY_ROOM_FAILED));
                 })
                 break;
+            case NAME_ACTIONS.ROOM_SCREEN.POST_ROOM:
+                roomBusiness.postRoom(action.data, success => {
+                    resolve({
+                        actionType: NAME_ACTIONS.ROOM_SCREEN.POST_ROOM,
+                        data: success
+                    });
+                }, failed => {
+                    messageError = failed;
+                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.POST_ROOM_FAILED));
+                })
+                break;
+            case NAME_ACTIONS.ROOM_SCREEN.UN_POST_ROOM:
+                roomBusiness.unpostRoom(action.data, success => {
+                    resolve({
+                        actionType: NAME_ACTIONS.ROOM_SCREEN.UN_POST_ROOM,
+                        data: success
+                    });
+                }, failed => {
+                    messageError = failed;
+                    reject(new Error(NAME_ACTIONS.ROOM_SCREEN.UN_POST_ROOM_FAILED));
+                })
+                break;
             default:
                 console.error('Error when resolver Room Epic.');
                 break;
@@ -218,6 +240,16 @@ const dispatch = (data) => {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_NOT_EMPTY_ROOM,
                 data: data.data
             };
+        case NAME_ACTIONS.ROOM_SCREEN.POST_ROOM:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_POST_ROOM,
+                data: data.data
+            };
+        case NAME_ACTIONS.ROOM_SCREEN.UN_POST_ROOM:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_UN_POST_ROOM,
+                data: data.data
+            };
         default:
             console.error('Error when dispatch Room Epic.');
             return new Error('Error when dispatch Room Epic.');
@@ -284,6 +316,16 @@ const dispatchError = (error, action) => {
         case NAME_ACTIONS.ROOM_SCREEN.GET_NOT_EMPTY_ROOM_FAILED:
             return {
                 type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_GET_NOT_EMPTY_ROOM_FAILED,
+                data: messageError
+            }
+        case NAME_ACTIONS.ROOM_SCREEN.POST_ROOM_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_POST_ROOM_FAILED,
+                data: messageError
+            }
+        case NAME_ACTIONS.ROOM_SCREEN.UN_POST_ROOM_FAILED:
+            return {
+                type: NAME_EPICS.EPIC_ROOM_SCREEN.EPIC_UN_POST_ROOM_FAILED,
                 data: messageError
             }
         default:

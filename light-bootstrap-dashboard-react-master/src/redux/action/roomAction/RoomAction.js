@@ -101,3 +101,17 @@ export function getNotEmptyRoom() {
     data: {}
   };
 }
+export function postRoom(id){   
+    return {
+        type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
+        typeAction: NAME_ACTIONS.ROOM_SCREEN.POST_ROOM,
+        data: id
+      };
+}
+export function unpostRoom(id){   
+    return {
+        type: NAME_ACTIONS.ROOM_SCREEN.ROOM_SCREEN,
+        typeAction: NAME_ACTIONS.ROOM_SCREEN.UN_POST_ROOM,
+        data: id
+      };
+}

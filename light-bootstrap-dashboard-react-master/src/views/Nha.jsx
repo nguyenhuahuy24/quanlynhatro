@@ -9,6 +9,10 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import classNames from 'classnames';
+import { Dropdown } from "primereact/dropdown";
+import { Checkbox } from 'primereact/checkbox';
+
+import axios from "axios";
 import '../index.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -28,6 +32,9 @@ class Nha extends Component {
   emptyHouse = {
     Name: '',
     Address: "",
+    Province:"",
+    District:"",
+    Ward:"",
     UserId: userProfile.userId
   };
   constructor(props) {
@@ -44,8 +51,20 @@ class Nha extends Component {
       selectedHouses: null,
       submitted: false,
       globalFilter: null,
+      //
+      listProvince:"",
+      selectProvince:"",
+      //
+      listDistrict:"",
+      selectDistrict:"",
+      //
+      listWard:"",
+      selectWard:"",
+      //
+      checkBox:false
+      
     };
- 
+    
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.openNew = this.openNew.bind(this);
@@ -58,6 +77,11 @@ class Nha extends Component {
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.hideDeleteHouseDialog = this.hideDeleteHouseDialog.bind(this);
     this.hideDeleteHousesDialog = this.hideDeleteHousesDialog.bind(this);
+
+    this.onChangeProvince = this.onChangeProvince.bind(this);
+    this.onChangeDistrict = this.onChangeDistrict.bind(this);
+    this.onChangeWard = this.onChangeWard.bind(this);
+
   }
   // componentWillMount(){
   //   const{userData,setUserData}= this.context;
@@ -70,7 +94,7 @@ class Nha extends Component {
     //   .getHouseByUserId()
     //   .then(data =>this.setState({ houses: data }));
     this.props.getHouseByUserId();
-    
+    axios.get(`https://provinces.open-api.vn/api/p/`).then(res => this.setState({ listProvince: res.data }))
   }
   componentDidUpdate(prevProps){
     if (this.props.createStatus !== prevProps.createStatus) {
@@ -115,7 +139,11 @@ class Nha extends Component {
             _id: house._id,
             Name:house.Name,
             Address:house.Address,
+            Province:house.Province,
+            District:house.District,
+            Ward:house.Ward,
             UserId:house.UserId,
+            Add: house.Address + ", "+ house.Ward+", "+house.District+", "+house.Province,
             Rooms:house.Rooms.length
           })
         })
@@ -137,6 +165,9 @@ class Nha extends Component {
   }
   hideDialog() {
     this.setState({
+      selectProvince:"",
+      selectDistrict:"",
+      selectWard:"",
       submitted: false,
       houseDialog: false
     });
@@ -153,39 +184,87 @@ class Nha extends Component {
     //  let houses = [...this.state.houses];
       let house = { ...this.state.house };
       if (this.state.house._id) {
-       let data =[];  
+        if(this.state.selectProvince ==="" || this.state.selectDistrict==="" || this.state.selectWard==="")
+        {
+            this.toast.show({
+                severity: "error",
+                summary: "Thất bại",
+                detail: "Thông tin bị trống",
+                life: 2500
+              });
+        }
+        else {
+          let data =[];  
           data.push({
             _id: house._id,
             Name:house.Name,
+            Province:this.state.selectProvince.name,
+            District:this.state.selectDistrict.name,
+            Ward:this.state.selectWard.name,
             Address:house.Address,
             UserId:house.UserId,
           })
-        this.props.editHouse(this.state.house._id, data[0]);
-        // houses[index] = house;
+
+        //console.log("edit: ",data[0])
+       this.props.editHouse(this.state.house._id, data[0]);
+  
         this.toast.show({
           severity: "success",
           summary: "Thành công",
           detail: "Cập nhật thông tin nhà ",
           life: 3000
         });
+          state = {
+        ...state,
+      // houses,
+        selectProvince:"",
+        selectDistrict:"",
+        selectWard:"",
+        houseDialog: false,
+        house: this.emptyHouse
+      };
+        }
       }
       else {
-       this.props.createHouse(house);
-       //this.houseService.createHouse(house).then();
-      // houses.push(house);
+          if(this.state.selectProvince ==="" || this.state.selectDistrict==="" || this.state.selectWard===""){
+              this.toast.show({
+                  severity: "error",
+                  summary: "Thất bại",
+                  detail: "Thông tin bị trống",
+                  life: 2500
+                });
+          }
+          else{
+             let data =[];  
+          data.push({
+            Name:house.Name,
+            Province:this.state.selectProvince.name,
+            District:this.state.selectDistrict.name,
+            Ward:this.state.selectWard.name,
+            Address:house.Address,
+            UserId:house.UserId,
+          })
+        
+      this.props.createHouse(data[0]);
+     
         this.toast.show({
           severity: "success",
           summary: "Thành công",
           detail: "Thêm thông tin nhà",
           life: 3000
         });
-      }
-      state = {
+        state = {
         ...state,
       // houses,
+        selectProvince:"",
+        selectDistrict:"",
+        selectWard:"",
         houseDialog: false,
         house: this.emptyHouse
       };
+          }
+      }
+      
     }
     this.setState(state);
   }
@@ -214,6 +293,18 @@ class Nha extends Component {
       }
     }
     return index;
+  }
+  onChangeWard(e){
+    this.setState({selectWard:e.value})
+  }
+  onChangeDistrict(e){
+    axios.get(`https://provinces.open-api.vn/api/d/${e.value.code}?depth=2`)
+        .then(res => { this.setState({ selectDistrict: e.value, listWard: res.data.wards }) })
+  }
+  onChangeProvince(e){
+    axios.get(`https://provinces.open-api.vn/api/p/${e.value.code}?depth=2`)
+        .then(res => { this.setState({ selectProvince: e.value, listDistrict: res.data.districts,listWard:"" }) })
+      
   }
   onInputChange(e, name) {
     const val = (e.target && e.target.value) || "";
@@ -289,20 +380,19 @@ class Nha extends Component {
           className="p-button-danger"
           onClick={this.hideDialog}
         />
-        <Button
+        {this.state.edit !=false && <Button
           label="Lưu"
           icon="pi pi-check"
           className="p-button-success"
           onClick={this.saveHouse}
-          disabled ={this.state.edit !=true}  
-        />
-         <Button
+        /> }
+        
+         {this.state.edit != true && <Button
           label="Chỉnh sửa"
           icon="pi pi-pencil"
           className="p-button-warning"
-          disabled ={this.state.edit !=false}
           onClick={()=>this.setState({edit:true})}
-        />
+        />}
       </React.Fragment>
     );
     const deleteHouseDialogFooter = (
@@ -349,14 +439,14 @@ class Nha extends Component {
             ></Column> */}
             <Column field="Name" header="Tên nhà trọ" ></Column>
             <Column field="Rooms" header="Tổng phòng" ></Column>
-            <Column field="Address" header="Địa chỉ" ></Column>
+            <Column field="Add" header="Địa chỉ" ></Column>
             <Column body={this.actionBodyTemplate}></Column>
           </DataTable>
         </div>
 
         <Dialog
           visible={this.state.houseDialog}
-          style={{ width: "450px" }}
+          style={{ width: "650px" }}
           header="Thông tin khu trọ"
           modal
           className="p-fluid"
@@ -381,19 +471,93 @@ class Nha extends Component {
               <small className="p-invalid">Tên không được trống.</small>
             )}
           </div>
-          <div className="p-field">
-            <label htmlFor="Address">Địa chỉ</label>
-            <InputTextarea
-              id="Address"
-              value={this.state.house.Address}
-              onChange={(e) => this.onInputChange(e, "Address")}
-              required
-              disabled ={this.state.edit !=true}
-              rows={3}
-              cols={10}
-            />
+         
+            <label htmlFor="Name">Địa Chỉ Nhà Trọ</label>
+          
+          {this.state.edit ==false && 
+           <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="Province">Tỉnh/Thành:</label>
+              <InputText
+                id="Province"
+                value={this.state.house.Province}
+                onChange={(e) => this.onInputChange(e, "Province")}
+                 //disabled ={this.state.edit !=true}  
+                 disabled
+              />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="District">Quận/Huyện:</label>
+              <InputText
+                id="District"
+                value={this.state.house.District}
+                onChange={(e) => this.onInputChange(e, "District")}
+                 //disabled ={this.state.edit !=true}
+                 disabled 
+              />
+            </div>
+          </div>}
+          {this.state.edit ==true && 
+           <div className="p-formgrid p-grid">
+            <div className="p-field p-col">
+              <label htmlFor="Province">Tỉnh/Thành:</label>
+              <Dropdown
+                  className="p-mr-2"
+                  value={this.state.selectProvince}
+                  options={this.state.listProvince}
+                  onChange={this.onChangeProvince}
+                  optionLabel="name"
+                  placeholder="Chọn tỉnh/thành...."
+                />
+            </div>
+            <div className="p-field p-col">
+              <label htmlFor="District">Quận/Huyện:</label>
+              <Dropdown
+                  className="p-mr-2"
+                  value={this.state.selectDistrict}
+                  options={this.state.listDistrict}
+                  onChange={this.onChangeDistrict}
+                  optionLabel="name"
+                  placeholder="Chọn quận/huyện...."
+                />
+            </div>
+          </div> 
+          }
+          
+          <div className="p-formgrid p-grid">
+            {this.state.edit ===false &&
+            <div className="p-field p-col">
+              <label htmlFor="Ward">Phường/Xã:</label>
+              <InputText
+                id="Ward"
+                
+                value={this.state.house.Ward}
+                onChange={(e) => this.onInputChange(e, "Ward")}
+                 disabled ={this.state.edit !=true}  
+              />
+            </div>}
+            {this.state.edit ===true &&
+            <div className="p-field p-col">
+              <label htmlFor="Ward">Phường/Xã:</label>
+              <Dropdown
+                  className="p-mr-2"
+                  value={this.state.selectWard}
+                  options={this.state.listWard}
+                  onChange={this.onChangeWard}
+                  optionLabel="name"
+                  placeholder="Chọn phường/xã...."
+                />
+            </div>}
+            <div className="p-field p-col">
+              <label htmlFor="Address">Số nhà, đường:</label>
+              <InputText
+                id="Address"
+                value={this.state.house.Address}
+                onChange={(e) => this.onInputChange(e, "Address")}
+                 disabled ={this.state.edit !=true}  
+              />
+            </div>
           </div>
-
         </Dialog>
         <Dialog
           visible={this.state.deleteHouseDialog}

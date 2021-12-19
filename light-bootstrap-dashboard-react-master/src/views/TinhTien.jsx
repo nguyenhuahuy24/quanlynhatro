@@ -52,16 +52,17 @@ class TinhTien extends Component {
       billDialog: false,
       ConfirmBillDialog:false,
       ViewBillDialog:false,
+      listRoomDialog:false,
       deleteBillDialog: false,
       deleteBillsDialog: false,
       bill: this.emptyBill,
       selectedBills: "",
-      submitted: false,
       globalFilter: null,
       selectedHouse: "",
       selectedShowHouse: "",
       selectedShowRoom:"",
       selectedRoom: "",
+      selectedRooms: null,
       selectedMonth: new Date(),
       
     };
@@ -75,9 +76,6 @@ class TinhTien extends Component {
     this.openNew = this.openNew.bind(this);
     this.onMonthChange = this.onMonthChange.bind(this);
     this.openViewBill = this.openViewBill.bind(this);
-    this.hideDialog = this.hideDialog.bind(this);
-    this.hideConfirmBillDialog = this.hideConfirmBillDialog.bind(this);
-    this.hideViewBillDialog = this.hideViewBillDialog.bind(this);
     this.ThanhToan = this.ThanhToan.bind(this);
     this.TinhBill = this.TinhBill.bind(this);
     
@@ -90,8 +88,8 @@ class TinhTien extends Component {
     this.onHousesChange = this.onHousesChange.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
-    this.hideDeleteBillDialog = this.hideDeleteBillDialog.bind(this);
-    this.hideDeleteBillsDialog = this.hideDeleteBillsDialog.bind(this);
+    this.onHide =this.onHide.bind(this);
+
   }
   componentDidMount() {
     this.props.getHouseByUserId();
@@ -255,31 +253,17 @@ class TinhTien extends Component {
   openNew() {
     this.setState({
       bill: this.emptyBill,
-      submitted: false,
       billDialog: true,
     });
   }
-  hideDialog() {
-    this.setState({
-      submitted: false,
-      billDialog: false
-    });
-  }
-  hideConfirmBillDialog() {
-    this.setState({
-      submitted: false,
-      ConfirmBillDialog: false
-    });
-  }
-  hideViewBillDialog() {
-    this.setState({
-      ViewBillDialog: false
-    });
-  }
-  hideDeleteBillDialog() {this.setState({ deleteBillDialog: false });}
-  hideDeleteBillsDialog() {this.setState({ deleteBillsDialog: false });}
+ 
+  onHide(name) {
+        this.setState({
+            [`${name}`]: false,
+        });
+    }
   ThanhToan() {
-    let state = { submitted: true }; 
+    let state = {}; 
     let a ={Status:this.state.bill.Status}
     this.props.editBill(this.state.bill._id,a);
     //this.billService.updateBill(this.state.bill._id,a).then();
@@ -297,7 +281,7 @@ class TinhTien extends Component {
     this.setState(state);
   }
   TinhBill() {
-    let state = { submitted: true };
+    let state = { };
     let a =[]
     a.push({
       RoomId: this.state.selectedRoom,
@@ -327,7 +311,7 @@ class TinhTien extends Component {
     });
   }
   RecalculateBill(){
-    let state = { submitted: true }; 
+    let state = { }; 
     this.props.recalculateBill(this.state.bill._id);
         
     state = {
@@ -413,25 +397,31 @@ class TinhTien extends Component {
           icon="pi pi-dollar"
           className="p-button-success p-mr-2"
           onClick={this.openNew}
+          tooltip="Tạo hóa đơn" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+          
         />
         <Button
-          label="SMS"
-          icon="pi pi-phone"
-          className="p-button-info p-mr-2"
-          disabled
+          label="Thông báo"
+          icon="pi pi-bell"
+          className="p-button-warning p-mr-2"
+          tooltip="Thông báo hóa đơn cho khách thuê" 
+          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
+          onClick={()=>this.setState({listRoomDialog:true})}
+          disabled={this.state.selectedHouse===""}
         />
-        <Button
+        {/* <Button
           label="Email"
           icon="pi pi-envelope"
           className="p-button-primary p-mr-2"
           disabled
-        />
-        <Button
+        /> */}
+        {/* <Button
           label="In danh sách"
           icon="pi pi-file-o"
           className="p-button-success p-mr-2"
           disabled
-        />
+        /> */}
       </React.Fragment>
     );
   }
@@ -481,7 +471,7 @@ class TinhTien extends Component {
           label="Hủy"
           icon="pi pi-times"
           className="p-button-danger"
-          onClick={this.hideDialog}
+          onClick={()=>this.onHide("billDialog")}
         />
         <Button
           label="Tính"
@@ -497,7 +487,7 @@ class TinhTien extends Component {
           label="Hủy"
           icon="pi pi-times"
           className="p-button-danger"
-          onClick={this.hideViewBillDialog}
+          onClick={()=>this.onHide("ViewBillDialog")}
         />
         <Button
           label="Tính lại bill"
@@ -507,13 +497,13 @@ class TinhTien extends Component {
         />
       </React.Fragment>
     );
-    const ConfrimDialogFooter = (
+    const ConfirmDialogFooter = (
       <React.Fragment>
         <Button
           label="Hủy"
           icon="pi pi-times"
           className="p-button-danger"
-          onClick={this.hideConfirmBillDialog}
+          onClick={()=>this.onHide("ConfirmBillDialog")}
         />
         <Button
           label="Xác nhận"
@@ -529,7 +519,7 @@ class TinhTien extends Component {
           label="Không"
           icon="pi pi-times"
           className="p-button-danger"
-          onClick={this.hideDeleteBillDialog}
+          onClick={()=> this.onHide("deleteBillDialog")}
         />
         <Button
           label="Có"
@@ -590,7 +580,7 @@ class TinhTien extends Component {
           modal
           className="p-fluid"
           footer={BillDialogFooter}
-          onHide={this.hideDialog}
+          onHide={()=>this.onHide("billDialog")}
         >   
         <div className="p-field">
             <label htmlFor="">Chọn tháng tính tiền:</label>
@@ -634,8 +624,8 @@ class TinhTien extends Component {
           header="Xác định thanh toán"
           modal
           className="p-fluid"
-          footer={ConfrimDialogFooter}
-          onHide={this.hideConfirmBillDialog}
+          footer={ConfirmDialogFooter}
+          onHide={()=>this.onHide("ConfirmBillDialog")}
         >
           <div className="p-field">
             <div className="p-formgrid p-grid">
@@ -669,7 +659,7 @@ class TinhTien extends Component {
           modal
           className="p-fluid"
           footer={RecalculateBillDialogFooter}
-          onHide={this.hideViewBillDialog}
+          onHide={()=>this.onHide("ViewBillDialog")}
         >
            <div className="p-field">
             <label htmlFor="RoomNumber">Phòng số</label>
@@ -747,13 +737,14 @@ class TinhTien extends Component {
           </div>
         
         </Dialog>
+        {/* Xoa bill */}
         <Dialog
           visible={this.state.deleteBillDialog}
           style={{ width: "450px" }}
           header="Confirm"
           modal
           footer={deleteBillDialogFooter}
-          onHide={this.hideDeleteBillDialog}
+          onHide={()=>this.onHide("deleteBillDialog")}
         >
           <div className="confirmation-content">
             <i
@@ -767,8 +758,38 @@ class TinhTien extends Component {
             )}
           </div>
         </Dialog>
-
-     
+          {/* Thong bao  */}
+        <Dialog
+          visible={this.state.listRoomDialog}
+          style={{ width: "250px",overflow: "auto" }}
+          header="Danh sách phòng"
+          modal
+          className="p-fluid"
+          onHide={()=>this.onHide('listRoomDialog')}
+        >
+        <div className="card1">
+          <DataTable
+            ref={(el) => (this.dt = el)}
+            value={this.props.listRoom.data}
+            dataKey="_id"
+            //selectionMode="multiple" 
+            selection={this.state.selectedRooms} 
+            onSelectionChange={(e) => this.setState({ selectedRooms: e.value })}
+            
+          >
+            <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
+            <Column field="RoomNumber" header="Tên Phòng" ></Column>
+            
+           
+          </DataTable>    
+        </div>
+        <Button
+          label="Thông báo"
+          icon="pi pi-bill"
+          className="p-button-success"
+          onClick={() => this.confirm('deleteServiceDialog')}
+          disabled={!this.state.selectedRooms || !this.state.selectedRooms.length}/>
+        </Dialog>
       </div>
     );
   }

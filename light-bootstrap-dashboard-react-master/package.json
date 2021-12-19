@@ -5,7 +5,9 @@
   "dependencies": {
     "axios": "^0.21.0",
     "bootstrap": "^3.3.7",
+    "chart.js": "^3.6.2",
     "file-saver": "^2.0.5",
+    "lottie-react-native": "^5.0.1",
     "primeflex": "^2.0.0",
     "primeicons": "^4.1.0",
     "primereact": "^5.0.2",

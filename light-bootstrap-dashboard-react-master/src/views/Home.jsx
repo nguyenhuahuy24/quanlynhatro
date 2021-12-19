@@ -3,7 +3,7 @@ import "../assets/css/maicons.css";
 import "../assets/css/bootstrap1.css";
 
 import logo from 'assets/img/logo_1.png'
-import logo1 from 'assets/img/Welcomel_1.png'
+import logo1 from 'assets/img/welcome3a.png'
 import bills from 'assets/img/icon/bills.png'
 import time from 'assets/img/icon/sand-clock.png'
 import building from 'assets/img/icon/building.png'
@@ -38,7 +38,13 @@ export default class Home extends Component {
       <div class="page-banner home-banner">
    
           <img class="img-banner" src={logo1}></img>
-
+          <div class="img-caption">
+            <div style={{fontSize: "30px",fontWeight: 700,color: "#ff1616"}}>Phần mềm giải pháp công nghệ 4.0</div>
+              <h1 style={{fontSize:30, marginRight:"2%",color: "#1650bb"}}>Quản lý nhà trọ tốt nhất hiện nay</h1>
+              <a href="signin" class="btn" style={{fontSize:23, fontWeight:'bold',color:'#ffff',borderRadius:10,backgroundColor:'#00802b',marginRight:"8%"}}>Sử dụng miễn phí tại đây</a>
+            
+       
+              </div>
         
       </div> 
     {/* body */}

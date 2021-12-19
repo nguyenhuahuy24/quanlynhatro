@@ -1,6 +1,6 @@
 import RoomService from '../service/RoomService'
 import { dataStatus,userProfile } from '../utility/config';
-
+import axios from 'axios';
 class RoomBusiness {
     getRoomByHouseId = async (data, success, failed) => {
         try {
@@ -174,6 +174,48 @@ class RoomBusiness {
             failed(error)
         }
     }
+    
+    postRoom = async (data,success, failed) => {
+        console.log("business data: ", data)
+        const response = await axios.patch(`http://localhost:8080/room/${data}/post`)
+        const resData = { ...response.data }
+        console.log("business post: ", resData)
+        if (!("error" in response.data)) {
+            success({
+                status: dataStatus.SUCCESS,
+                message: 'Get data success',
+                data: resData
+            })
+        }
+        else (
+            failed({
+                status: dataStatus.FAILED,
+                message: response.data["error"],
+                data: resData
+            })
+        )
+    }
+    unpostRoom = async (data,success, failed) => {
+        const response = await axios.patch(`http://localhost:8080/room/${data}/unpost`)
+        const resData = { ...response.data }
+        console.log("business uppost: ", resData)
+
+        if (!("error" in response.data)) {
+            success({
+                status: dataStatus.SUCCESS,
+                message: 'Get data success',
+                data: resData
+            })
+        }
+        else (
+            failed({
+                status: dataStatus.FAILED,
+                message: response.data["error"],
+                data: resData
+            })
+        )
+    }
+
 
 
 

@@ -44,13 +44,13 @@ class HomeNavbar extends Component {
 
         <div class="navbar-collapse-home collapse">
           <ul class="navbar-nav-home ml-auto pt-3 pt-lg-0">
-            <li class="nav-item active">
-              <a href="" class="nav-link navbar-a">Trang chủ</a>
+            <li class="nav-item-active">
+              <a href="" class="nav-link navbar-a ">Trang chủ</a>
             </li>
       
-            <li class="nav-item">
+            {/* <li class="nav-item">
               <a href="" class="nav-link navbar-a">Liên hệ</a>
-            </li>
+            </li> */}
             <li class="nav-item">
               <a href="signin" class="nav-link navbar-a">Đăng nhập</a>
             </li>
