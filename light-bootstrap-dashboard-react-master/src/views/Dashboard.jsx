@@ -1,7 +1,8 @@
 
 import React, { Component } from "react";
-import ReactDOM from 'react-dom';
 import { Grid, Row, Col } from "react-bootstrap";
+import { Card } from "components/Card/Card.jsx";
+
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 import UserContext from "../context/UserContext";
 //redux
@@ -9,67 +10,113 @@ import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
 import { getEmptyRoom ,getNotEmptyRoom} from '../redux/action/roomAction/RoomAction';
 import { getAllCustomerOfUser } from '../redux/action/customerAction/CustomerAction';
+import { getByYear } from '../redux/action/statisticalAction/StatisticalAction';
 
-import { Chart } from 'primereact/chart';
+import "../index.css"
+import { dataStatus } from "../utility/config";
 
+import ChartistGraph from "react-chartist";
+import ChartistTooltip from "chartist-plugin-tooltips-updated";
+var optionsBar = {
+  seriesBarDistance: 10,
+  axisX: {
+    showGrid: false,
+    
+  },
+  axisY: {
+    offset: 90,
+    
+    
+  },
+  height: "265px",
+  plugins: [
+        ChartistTooltip({
+          appendToBody: true,
+          style : 'currency', currency : 'đ'
+        })
+      ]
+};
+var responsiveBar = [
+  [
+    "screen and (max-width: 640px)",
+    {
+      seriesBarDistance: 10,
+      axisX: {
+        labelInterpolationFnc: function(value) {
+          return value[0];
+        }
+      }
+    }
+  ]
+];
 class Dashboard extends Component {
 
 
   static contextType = UserContext
   constructor(props){
     super(props);
-     this.basicData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'My First dataset',
-                    backgroundColor: '#42A5F5',
-                    data: [65, 59, 80, 81, 56, 55, 40]
-                },
-                {
-                    label: 'My Second dataset',
-                    backgroundColor: '#FFA726',
-                    data: [28, 48, 40, 19, 86, 27, 90]
-                }
-            ]
-        };
-    this.options = this.getLightTheme();
+    this.state={
+      data: {
+          labels: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "Mai",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+          ],
+          series: [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          ]
+        },
+        day:new Date().getFullYear(),
+    };
+    
+   
+    
   }
+  
   componentDidMount(){
     this.props.getEmptyRoom();
     this.props.getNotEmptyRoom();
     this.props.getAllCustomerOfUser();
+    this.props.getByYear(this.state.day);
   }
-     getLightTheme() {
-        let basicOptions = {
-            legend: {
-                labels: {
-                    fontColor: '#495057'
-                }
-            },
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        fontColor: '#495057'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        fontColor: '#495057'
-                    }
-                }]
-            }
-        };
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.listStatistical !== prevProps.listStatistical) {
+      if (this.props.listStatistical.status === dataStatus.SUCCESS) {
+          let test = {
+              labels: [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "Mai",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+              ],
+              series: [
+                Object.values(this.props.listStatistical.data)
+              ]
+            }     
+          this.setState({data:test})
 
-      
-
-        return {
-            basicOptions,
-          
-        }
+      }
     }
+  }
+  
   render() {
-    const { basicOptions } = this.options;
     return (
       <div className="content">
         <Grid fluid>
@@ -97,7 +144,26 @@ class Dashboard extends Component {
               />
             </Col>
           </Row>
-         
+          <Row>
+            <Col md={12}>
+              <Card
+                id="chartActivity"
+                title={"Năm "+ this.state.day} 
+                category="Tổng doanh thu của tất cả nhà trọ"
+                content={
+                  <div className="ct-chart">
+                    <ChartistGraph
+                      data={this.state.data}
+                      type="Bar"
+                      options={optionsBar}
+                      responsiveOptions={responsiveBar}
+                    />
+                  </div>
+                }
+                
+              />
+            </Col>
+          </Row>
 
         </Grid>
       </div>
@@ -111,8 +177,10 @@ function mapStateToProps(state) {
     listNotEmptyRoom: state.RoomReducer.listNotEmptyRoom,
     //customer
     listCustomer: state.CustomerReducer.listCustomer,
+    //statistical
+    listStatistical: state.StatisticalReducer.listStatistical,
   };
 }
 export default withGlobalContext(
-  connect(mapStateToProps, { getEmptyRoom,getNotEmptyRoom,getAllCustomerOfUser})(Dashboard),
+  connect(mapStateToProps, { getEmptyRoom,getNotEmptyRoom,getAllCustomerOfUser,getByYear})(Dashboard),
 );

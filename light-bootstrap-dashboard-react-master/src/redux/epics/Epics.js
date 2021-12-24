@@ -7,6 +7,8 @@ import CustomerEpic from '../epics/customer/CustomerEpic';
 import UtilityBillEpic from '../epics/utilityBill/UtilityBillEpic';
 import BillEpic from '../epics/bill/BillEpic';
 import UserEpic from '../epics/user/UserEpic';
+import StatisticalEpic from '../epics/statistical/StatisticalEpic';
+
 export default combineEpics(
-    HouseEpic, DichVuEpic, RoomEpic,CustomerEpic, UtilityBillEpic,BillEpic,UserEpic,ContractEpic
+    HouseEpic, DichVuEpic, RoomEpic,CustomerEpic, UtilityBillEpic,BillEpic,UserEpic,ContractEpic,StatisticalEpic
 )

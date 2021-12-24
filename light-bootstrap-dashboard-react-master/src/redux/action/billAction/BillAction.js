@@ -6,15 +6,12 @@ export function getBillInMonthOfUser(data){
         data: data
       };
 }
-export function editBill(id, editdata){
+export function editBill(id){
   return {
     
     type: NAME_ACTIONS.BILL_SCREEN.BILL_SCREEN,
     typeAction: NAME_ACTIONS.BILL_SCREEN.EDIT_BILL,
-    data: {
-      idBill:id,
-      editdata: editdata
-    }
+    data: id
   }
 }
 export function createBill(createData) {

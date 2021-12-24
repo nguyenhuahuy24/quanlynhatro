@@ -104,15 +104,6 @@ class BillsService extends Service {
             })
         });
     }
-    editBill = (id, editdata)=>{
-        return new Promise((resolve , reject)=>{
-            this.callPatchAPI(this.url,id, editdata).then(resp =>{
-                resolve(resp)
-            }).catch(error =>{
-                reject(error)
-            })
-        });
-    }
     deleteBill = (id)=>{
         return new Promise((resolve , reject)=>{
             this.callDeleteAPI(this.url,id).then(resp =>{

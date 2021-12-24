@@ -1,5 +1,7 @@
 import BillService from '../service/BillsService';
 import { dataStatus,userProfile } from '../utility/config';
+import axios from 'axios';
+
 class BillBusiness {
     getBillInMonthOfUser = async (data, success, failed) => {
         try {
@@ -51,22 +53,23 @@ class BillBusiness {
         }
     }
     editBill = async (data, success, failed)=>{
-        try {
-            const bill = new BillService()
-            const {idBill, editdata} = data
-            const id=[
-                idBill
-            ]
-            const result = await bill.editBill(id,editdata)
-            if (result.status === dataStatus.SUCCESS) {
-                success(result);
-            }
-            else {
-                failed(result);
-            }
-        } catch (error) {
-            failed(error)
+        const response = await axios.patch(`http://localhost:8080/bill/${data}/status`)
+        console.log("res: ",response)
+        const resData = { ...response.data }
+        if (!("error" in response.data)) {
+            success({
+                status: dataStatus.SUCCESS,
+                message: 'Get data success',
+                data: resData
+            })
         }
+        else (
+            failed({
+                status: dataStatus.FAILED,
+                message: response.data["error"],
+                data: resData
+            })
+        )
     }
     deleteBill = async (data, success, failed)=>{
         try {

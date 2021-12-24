@@ -9,6 +9,8 @@ import DichVu from "views/DichVu.jsx";
 import HopDong from "views/HopDong.jsx";
 import TinhTien from "views/TinhTien.jsx";
 import Support from "views/Support.jsx";
+import ChatRoom from "views/Chat/index.jsx";
+
 
 import InformationOfUser from "views/InformationOfUser.jsx"
 
@@ -74,6 +76,13 @@ const dashboardRoutes = [
     name: "Hợp Đồng",
     icon: "pi pi-book",
     component: HopDong,
+    layout: "/admin"
+  },
+  {
+    path: "/chat",
+    name: "Trò chuyện",
+    icon: "pe-7s-comment",
+    component: ChatRoom,
     layout: "/admin"
   },
   {

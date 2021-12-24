@@ -89,7 +89,7 @@ class TinhTien extends Component {
     this.onInputChange = this.onInputChange.bind(this);
     this.onInputNumberChange = this.onInputNumberChange.bind(this);
     this.onHide =this.onHide.bind(this);
-
+    this.confirmNotification = this.confirmNotification.bind(this);
   }
   componentDidMount() {
     this.props.getHouseByUserId();
@@ -98,6 +98,7 @@ class TinhTien extends Component {
     if (this.props.listBill !== prevProps.listBill) {
       if (this.props.listBill.status === dataStatus.SUCCESS) {
           const bills = this.props.listBill.data;
+          console.log("data:",bills)
           let data = [];
           bills.forEach(bill => {
             if (bill.ListBill.length !== 0) {
@@ -107,6 +108,7 @@ class TinhTien extends Component {
                 RoomId: bill.ListBill[0].RoomId,
                 TotalBill: bill.ListBill[0].TotalBill,
                 Status: bill.ListBill[0].Status,
+                RoomPrice: bill.ListBill[0].RoomPrice,
                 OtherCosts: bill.ListBill[0].OtherCosts,
                 WaterFee: bill.ListBill[0].WaterFee,
                 ElectricFee:bill.ListBill[0].ElectricFee,
@@ -141,7 +143,7 @@ class TinhTien extends Component {
          this.toast.show({
           severity: "success",
           summary: "Thành công",
-          detail: "Bill Created",
+          detail: "Tạo hóa đơn",
           life: 2500
         });
       }
@@ -156,13 +158,27 @@ class TinhTien extends Component {
     }
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
-          let data=[]
+          this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Xác nhận thanh toán",
+          life: 3000
+        });  
+        let data=[]
         data.push({
         HouseId: this.state.selectedHouse,
         Month:this.state.selectedMonth,
       })
           this.props.getBillInMonthOfUser(data[0]);
-      } 
+      }
+      else{
+          this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: this.props.editStatus.message,
+          life: 3000
+        });
+      }
     }
     if (this.props.recalculateBillStatus !== prevProps.recalculateBillStatus) {
       if (this.props.recalculateBillStatus.status === dataStatus.SUCCESS) {
@@ -174,7 +190,7 @@ class TinhTien extends Component {
       this.toast.show({
           severity: "success",
           summary: "Thành công",
-          detail: "Tính lại Bill",
+          detail: "Tính lại hóa đơn",
           life: 3000
         });
           this.props.getBillInMonthOfUser(data[0]);
@@ -182,7 +198,7 @@ class TinhTien extends Component {
         this.toast.show({
           severity: "error",
           summary: "Thất bại",
-          detail: "Tính lại Bill",
+          detail: "Tính lại hóa đơn",
           life: 3000
         });
       }
@@ -195,8 +211,8 @@ class TinhTien extends Component {
                     bill: this.emptyBill });
                 this.toast.show({
                   severity: "success",
-                  summary: "Successful",
-                  detail: "Xóa Bill",
+                  summary: "Thành công",
+                  detail: "Xóa hóa đơn",
                   life: 3000
                 });
             }else{
@@ -204,9 +220,9 @@ class TinhTien extends Component {
               deleteBillDialog: false
               });
               this.toast.show({
-          severity: "success",
-          summary: "Fail",
-          detail: "Xóa Bill",
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Xóa hóa đơn",
           life: 3000
         });
             }
@@ -262,17 +278,19 @@ class TinhTien extends Component {
             [`${name}`]: false,
         });
     }
+  confirmNotification(){
+    console.log("id room:",this.state.selectedRooms)
+    this.setState({
+      listRoomDialog:false,
+      selectedRooms:null,
+    })
+  }
   ThanhToan() {
     let state = {}; 
     let a ={Status:this.state.bill.Status}
-    this.props.editBill(this.state.bill._id,a);
+    this.props.editBill(this.state.bill._id);
     //this.billService.updateBill(this.state.bill._id,a).then();
-        this.toast.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Bill Update",
-          life: 3000
-        });
+      
     state = {
         ...state,
         ConfirmBillDialog: false,
@@ -546,7 +564,7 @@ class TinhTien extends Component {
             // onSelectionChange={(e) =>
             //   this.setState({ selectedBills: e.value })
             // }
-            dataKey="id"
+            dataKey="_id"
             paginator
             rows={5}
           //  rowsPerPageOptions={[5, 10, 25]}
@@ -654,7 +672,7 @@ class TinhTien extends Component {
         </Dialog>
         <Dialog
           visible={this.state.ViewBillDialog}
-          style={{ width: "450px" }}
+          style={{ width: "450px",overflow: "auto" }}
           header="Chi tiết hóa đơn"
           modal
           className="p-fluid"
@@ -676,6 +694,17 @@ class TinhTien extends Component {
               id="TotalBill"
               value={this.state.bill.TotalBill}
               onValueChange={(e) => this.onInputNumberChange(e, "TotalBill")}
+              mode="currency"
+              currency="Vnd"
+              disabled
+            />
+          </div>
+          <div className="p-field">
+            <label htmlFor="RoomPrice">Tiền Phòng</label>
+            <InputNumber
+              id="RoomPrice"
+              value={this.state.bill.RoomPrice}
+              onValueChange={(e) => this.onInputNumberChange(e, "RoomPrice")}
               mode="currency"
               currency="Vnd"
               disabled
@@ -769,7 +798,6 @@ class TinhTien extends Component {
         >
         <div className="card1">
           <DataTable
-            ref={(el) => (this.dt = el)}
             value={this.props.listRoom.data}
             dataKey="_id"
             //selectionMode="multiple" 
@@ -787,7 +815,7 @@ class TinhTien extends Component {
           label="Thông báo"
           icon="pi pi-bill"
           className="p-button-success"
-          onClick={() => this.confirm('deleteServiceDialog')}
+          onClick={() => this.confirmNotification()}
           disabled={!this.state.selectedRooms || !this.state.selectedRooms.length}/>
         </Dialog>
       </div>
