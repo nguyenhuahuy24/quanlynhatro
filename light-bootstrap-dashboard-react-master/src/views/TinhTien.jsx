@@ -419,15 +419,7 @@ class TinhTien extends Component {
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           
         />
-        <Button
-          label="Thông báo"
-          icon="pi pi-bell"
-          className="p-button-warning p-mr-2"
-          tooltip="Thông báo hóa đơn cho khách thuê" 
-          tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
-          onClick={()=>this.setState({listRoomDialog:true})}
-          disabled={this.state.selectedHouse===""}
-        />
+        
         {/* <Button
           label="Email"
           icon="pi pi-envelope"
@@ -788,36 +780,7 @@ class TinhTien extends Component {
           </div>
         </Dialog>
           {/* Thong bao  */}
-        <Dialog
-          visible={this.state.listRoomDialog}
-          style={{ width: "250px",overflow: "auto" }}
-          header="Danh sách phòng"
-          modal
-          className="p-fluid"
-          onHide={()=>this.onHide('listRoomDialog')}
-        >
-        <div className="card1">
-          <DataTable
-            value={this.props.listRoom.data}
-            dataKey="_id"
-            //selectionMode="multiple" 
-            selection={this.state.selectedRooms} 
-            onSelectionChange={(e) => this.setState({ selectedRooms: e.value })}
-            
-          >
-            <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
-            <Column field="RoomNumber" header="Tên Phòng" ></Column>
-            
-           
-          </DataTable>    
-        </div>
-        <Button
-          label="Thông báo"
-          icon="pi pi-bill"
-          className="p-button-success"
-          onClick={() => this.confirmNotification()}
-          disabled={!this.state.selectedRooms || !this.state.selectedRooms.length}/>
-        </Dialog>
+        
       </div>
     );
   }

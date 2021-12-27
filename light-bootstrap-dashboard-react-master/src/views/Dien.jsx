@@ -284,10 +284,10 @@ class Dien extends Component {
           <Button
             label="Nhập chỉ số mới"
             icon="pi pi-search-plus"
-            className="p-button-danger p-mr-2"
+            className="p-button-success p-mr-2"
             onClick={this.openNew}
           />
-          <Button
+          {/* <Button
           label="Đặt lịch"
           icon="pi pi-clock"
           className="p-button-info p-mr-2"
@@ -295,14 +295,14 @@ class Dien extends Component {
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={this.openDay}
           
-        />
-          <Button
+        /> */}
+          {/* <Button
           label="Xuất file excel"
           icon="pi pi-file-o"
           className="p-button-warning p-mr-2"
           onClick={this.exportExcel}
           disabled
-        />
+        /> */}
         
         </span>
       </React.Fragment>

@@ -17,7 +17,7 @@ class FooterNavbar extends Component {
       <div class="row_home">
         <div class="col-lg-4 py-3">
         <img class="img-footer" src={logo}></img>
-        <a>NHATROHUY – Phần mềm Quản lý Nhà trọ. Là một trong những ứng dụng hàng đầu về phần mềm quản lý bất động sản cho thuê số 1 của thị trường hiện nay.</a>
+        <a>NHATROHUY – Phần mềm Quản lý Nhà trọ. Là một trong những ứng dụng hàng đầu về phần mềm quản lý nhà cho thuê số 1 của thị trường hiện nay.</a>
         </div>
         <div class="col-lg-8 py-3 text-footer">
           <h5>Liên hệ</h5>
