@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Collapse, Typography, Button} from 'antd';
+import { Collapse, Typography, Button } from 'antd';
 import styled from 'styled-components';
 import { PlusSquareOutlined } from '@ant-design/icons';
 
-const {Panel} = Collapse
+const { Panel } = Collapse
 const PanelStyled = styled(Panel)`
   &&& {
     .ant-collapse-header,
@@ -33,27 +33,27 @@ const SidebarStyled = styled.div`
 `;
 class RoomList extends Component {
 
-    render() {
-        return(
-            <SidebarStyled>
-                <Collapse ghost defaultActiveKey={['1']}>
-                    <PanelStyled header='Danh sách các phòng' key='1'>
-                        <LinkStyled>Room 1</LinkStyled>
-                        <LinkStyled>Room 2</LinkStyled>
-                        <LinkStyled>Room 3</LinkStyled>
-                        <Button
-                            type='text'
-                            icon={<PlusSquareOutlined />}
-                            className='add-room'
-                            >
-                            Thêm phòng
-                        </Button>
-                 </PanelStyled>
-                </Collapse>
-                 
-            </SidebarStyled>
-       
-        )
-    }
+  render() {
+    return (
+      <SidebarStyled>
+        <Collapse ghost defaultActiveKey={['1']}>
+          <PanelStyled header='Danh sách chat' key='1'>
+            <LinkStyled>Room 1</LinkStyled>
+            <LinkStyled>Room 2</LinkStyled>
+            <LinkStyled>Room 3</LinkStyled>
+            <Button
+              type='text'
+              icon={<PlusSquareOutlined />}
+              className='add-room'
+            >
+              Thêm phòng
+            </Button>
+          </PanelStyled>
+        </Collapse>
+
+      </SidebarStyled>
+
+    )
+  }
 }
 export default RoomList
