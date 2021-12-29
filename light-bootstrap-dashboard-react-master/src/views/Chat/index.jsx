@@ -1,20 +1,17 @@
 import React, { Component } from "react";
-import { UserAddOutlined } from '@ant-design/icons';
-
 import { Row, Col, Button, Tooltip, Avatar, Form, Input, Alert, Collapse, Typography } from "antd";
 import 'antd/dist/antd.css';
 import axios from "axios"
 import Roomchat from './Roomchat';
-import { userProfile } from "../../utility/config"
 import Message from './Message';
 import styled from 'styled-components';
 import { PlusSquareOutlined } from '@ant-design/icons';
 import { io } from 'socket.io-client';
-import { isThisHour } from "date-fns";
 const URL = "http://localhost:8080"
 const { Panel } = Collapse
+import { InputText } from 'primereact/inputtext';
 
-class ChatRoom extends Component {
+class Conservation extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -23,18 +20,15 @@ class ChatRoom extends Component {
             messages: [],
             currentChat: null,
             newMessage: "",
-            arriveMessage: null
+            arriveMessage: {},
+            socket: io(URL)
         };
-        this.socket = React.createRef()
         this.scrollRef = React.createRef()
+
     }
 
     componentDidMount() {
-        axios.get(URL + "/roomchat/" + localStorage.getItem("userIDlogin")).then((response) => {
-            this.setState({ listRoomchat: response.data, currentChat: response.data[0], userId: localStorage.getItem("userIDlogin") })
-        })
-        this.socket.current = io(URL);
-        this.socket.current.on("getMessage", (data) => {
+        this.state.socket.on("getMessage", (data) => {
             this.setState({
                 arriveMessage: {
                     SenderId: data.senderId,
@@ -43,6 +37,10 @@ class ChatRoom extends Component {
                 }
             });
         });
+        axios.get(URL + "/roomchat/" + localStorage.getItem("userIDlogin")).then((response) => {
+            this.setState({ listRoomchat: response.data, currentChat: response.data[0], userId: localStorage.getItem("userIDlogin") })
+        })
+
     }
     componentDidUpdate(prevProps, prevState) {
         if (this.state.currentChat !== prevState.currentChat) {
@@ -52,16 +50,11 @@ class ChatRoom extends Component {
             axios.get(URL + "/roomchat/" + localStorage.getItem("userIDlogin")).then((response) => {
                 this.setState({ listRoomchat: response.data, currentChat: response.data[0] })
             })
-            this.socket.current.emit("addUser", this.state.userId);
-            // socket.on("getUsers", (users) => {
-            //     setOnlineUsers(
-            //         user.followings.filter((f) => users.some((u) => u.userId === f))
-            //     );
-            // });
+            this.state.socket.emit("addUser", this.state.userId);
         }
         if (this.state.arriveMessage !== prevState.arriveMessage) {
-            if (this.state.currentChat?.Members.includes(this.state.arriveMessage)) {
-                this.setState({ messages: [...prevState.messages, this.state.arriveMessage] })
+            if (this.state.currentChat?.Members.includes(this.state.arriveMessage.SenderId)) {
+                this.setState({ messages: [...this.state.messages, this.state.arriveMessage] })
             }
         }
         if (this.state.messages !== prevState.messages) {
@@ -73,28 +66,32 @@ class ChatRoom extends Component {
             this.setState({ messages: response.data })
         })
     }
-    handleSubmit = async () => {
+    handleSubmit = () => {
         if (this.state.newMessage !== "") {
             const message = {
                 SenderId: localStorage.getItem("userIDlogin"),
                 Roomchat: this.state.currentChat._id,
                 Text: this.state.newMessage
             }
-            const receiverId = this.state.currentChat.Members.find(
-                (member) => member !== this.state.userId
-            );
-            this.socket.current.emit("sendMessage", {
-                senderId: this.state.userId,
-                receiverId,
-                text: this.state.newMessage,
-            });
             try {
-                const res = await axios.post(URL + "/message", message);
-                this.setState({ messages: [...this.state.messages, res.data], newMessage: "" });
+                axios.post(URL + "/message", message).then((res) => {
+                    const receiverId = this.state.currentChat.Members.find(
+                        (member) => member !== this.state.userId
+                    );
+                    this.setState({ newMessage: "", messages: [...this.state.messages, res.data] });
+                    this.state.socket.emit("sendMessage", {
+                        senderId: this.state.userId,
+                        receiverId,
+                        messageId: res.data._id
+                    });
+                })
             } catch (err) {
                 console.log(err);
             }
         }
+    }
+    handleChange(event) {
+        this.setState({ newMessage: event.target.value });
     }
     render() {
         return (
@@ -135,11 +132,9 @@ class ChatRoom extends Component {
                                 </MessageListStyled>
                                 <FormStyled>
                                     <Form.Item name='message'>
-                                        <Input
+                                        <InputText
                                             placeholder='Nhập tin nhắn...'
-                                            bordered={false}
-                                            autoComplete='off'
-                                            onChange={(e) => this.setState({ newMessage: e.target.value })}
+                                            onChange={(e) => this.handleChange(e)}
                                             value={this.state.newMessage}
                                         />
                                     </Form.Item>
@@ -241,4 +236,4 @@ const SidebarStyled = styled.div`
   color: white;
   height: 90.8vh;
 `;
-export default ChatRoom
+export default Conservation
