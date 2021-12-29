@@ -35,7 +35,7 @@ class Nha extends Component {
     Province:"",
     District:"",
     Ward:"",
-    UserId: userProfile.userId
+    UserId: localStorage.getItem("userIDlogin")
   };
   constructor(props) {
     super(props);

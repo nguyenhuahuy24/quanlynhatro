@@ -1,9 +1,9 @@
-import { dataStatus,userProfile } from '../utility/config';
+import { dataStatus,userProfile,URL } from '../utility/config';
 import axios from 'axios';
 class StatisticalBusiness {
     
     getByYear = async (data,success, failed) => {
-        const response = await axios.get(`http://localhost:8080/statistical/`+data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})
+        const response = await axios.get(`${URL}/statistical/`+data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})
         const resData = { ...response.data }
         if (!("error" in response.data)) {
             success({

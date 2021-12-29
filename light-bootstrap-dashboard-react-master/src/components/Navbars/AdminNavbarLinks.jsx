@@ -34,7 +34,7 @@ class AdminNavbarLinks extends Component {
       <div>
         <Nav pullRight>
         <Nav style={{paddingTop:"15px"}}>
-          <label style={{fontWeight:"400"}}>Xin Chào! {this.props.user.data.Name && <label style={{fontWeight:"400"}}>{this.props.user.data.Name}</label>}</label>
+          <label style={{fontWeight:"400"}}>Xin Chào! {localStorage.getItem("username")}</label>
         </Nav>
         <NavItem eventKey={3}>
             <Button

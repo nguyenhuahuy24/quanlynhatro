@@ -3,8 +3,7 @@ import { Collapse, Typography, Button } from 'antd';
 import styled from 'styled-components';
 import { PlusSquareOutlined } from '@ant-design/icons';
 import axios from "axios";
-const URL = "http://localhost:8080"
-
+import { URL } from "utility/config";
 const { Panel } = Collapse
 const PanelStyled = styled(Panel)`
   &&& {

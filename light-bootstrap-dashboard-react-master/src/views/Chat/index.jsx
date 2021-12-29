@@ -7,7 +7,7 @@ import Message from './Message';
 import styled from 'styled-components';
 import { PlusSquareOutlined } from '@ant-design/icons';
 import { io } from 'socket.io-client';
-const URL = "http://localhost:8080"
+import { URL } from "../../utility/config";
 const { Panel } = Collapse
 import { InputText } from 'primereact/inputtext';
 
@@ -42,6 +42,7 @@ class Conservation extends Component {
         })
 
     }
+
     componentDidUpdate(prevProps, prevState) {
         if (this.state.currentChat !== prevState.currentChat) {
             this.getMessage()
@@ -60,13 +61,20 @@ class Conservation extends Component {
         if (this.state.messages !== prevState.messages) {
             this.scrollRef.current?.scrollIntoView({ behavior: "smooth" });
         }
+
+
     }
     getMessage() {
         axios.get(URL + "/message/" + this.state.currentChat._id).then((response) => {
             this.setState({ messages: response.data })
+            console.log("Message:", this.state.messages)
+
         })
     }
-    handleSubmit = () => {
+    ChangeInput = (e) => {
+        this.setState({ newMessage: e.target.value })
+    }
+    handleSubmit = async () => {
         if (this.state.newMessage !== "") {
             const message = {
                 SenderId: localStorage.getItem("userIDlogin"),
@@ -85,14 +93,13 @@ class Conservation extends Component {
                         messageId: res.data._id
                     });
                 })
+                document.getElementsByClassName("ant-form")[0].reset();
             } catch (err) {
                 console.log(err);
             }
         }
     }
-    handleChange(event) {
-        this.setState({ newMessage: event.target.value });
-    }
+
     render() {
         return (
             <div>
@@ -100,7 +107,7 @@ class Conservation extends Component {
                     <Col style={{ backgroundColor: "#fff" }} span={5}>
                         <SidebarStyled>
                             <Collapse ghost defaultActiveKey={['1']}>
-                                <PanelStyled header='Danh sách các phòng' key='1'>
+                                <PanelStyled header='Danh sách trò chuyện' key='1'>
                                     {this.state.listRoomchat.map((value) => (
                                         <LinkStyled type="text" onClick={() => this.setState({ currentChat: value })} >
                                             <Roomchat room={value} userId={this.state.userId} />
@@ -134,11 +141,13 @@ class Conservation extends Component {
                                     <Form.Item name='message'>
                                         <InputText
                                             placeholder='Nhập tin nhắn...'
-                                            onChange={(e) => this.handleChange(e)}
+                                            bordered={false}
+                                            autoComplete='off'
+                                            onChange={this.ChangeInput}
                                             value={this.state.newMessage}
                                         />
                                     </Form.Item>
-                                    <Button type='primary' onClick={() => { this.handleSubmit() }}>
+                                    <Button type='primary' onClick={() => this.handleSubmit()}>
                                         Gửi
                                     </Button>
                                 </FormStyled>
@@ -183,7 +192,7 @@ const WrapperStyled = styled.div`
 `;
 
 const ContentStyled = styled.div`
-  height: 90%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 11px;

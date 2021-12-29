@@ -35,7 +35,7 @@ class DichVu extends Component {
     ServiceName: "",
     Description: "",
     Price: 0,
-    UserId:""
+    UserId:localStorage.getItem("userIDlogin")
   };
 
   constructor(props) {
@@ -80,15 +80,9 @@ class DichVu extends Component {
     this.onRoomChange = this.onRoomChange.bind(this);
     this.hideServiceToRoomDialog = this.hideServiceToRoomDialog.bind(this);
   }
-  componentWillMount(){
-    const{userData,setUserData}= this.context;
-    this.emptyDV.UserId = userData.user;
-    this.state.house=this.emptyDV;
-  }
+  
   componentDidMount() {
-    // this.DVService
-    //   .getServiceOfUser()
-    //   .then(data => this.setState({ DVs: data }));
+    
     this.props.getServiceOfUser();
     this.props.getHouseByUserId();
   }

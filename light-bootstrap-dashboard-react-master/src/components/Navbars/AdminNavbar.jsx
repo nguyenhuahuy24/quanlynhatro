@@ -19,21 +19,7 @@ render() {
     return (
       <Navbar fluid>
         <Navbar.Header>
-           <Nav>
-          <NavDropdown
-            eventKey={2}
-            title={notification}
-            noCaret
-            style={{marginTop:"9px"}}
-            id="basic-nav-dropdown"
-          >
-            <MenuItem eventKey={2.1}>Notification 1</MenuItem>
-            <MenuItem eventKey={2.2}>Notification 2</MenuItem>
-            <MenuItem eventKey={2.3}>Notification 3</MenuItem>
-            <MenuItem eventKey={2.4}>Notification 4</MenuItem>
-            <MenuItem eventKey={2.5}>Another notifications</MenuItem>
-          </NavDropdown>
-        </Nav>
+           
           <Navbar.Brand>
          
             <a href="#pablo">{this.props.brandText}</a>
