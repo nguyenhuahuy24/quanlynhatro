@@ -1,10 +1,11 @@
 import axios from 'axios';
 import Service from './Service';
+import {URL} from '../utility/config';
 class DichVuService extends Service {  
     constructor() {
         super();
-        this.url =`http://localhost:8080/service/`
-        this.url2=`http://localhost:8080/service/user/`
+        this.url =`${URL}/service/`
+        this.url2=`${URL}/service/user/`
     }
 
     getServiceOfUser = () =>{

@@ -14,7 +14,7 @@ import axios from "axios";
 import UserContext from "../context/UserContext"
 import { withGlobalContext } from '../GlobalContextProvider';
 import { connect } from 'react-redux';
-import { dataStatus,userProfile } from "../utility/config";
+import { dataStatus,userProfile,URL } from "../utility/config";
 import "../index.css";
 
 class Login extends Component {
@@ -51,7 +51,7 @@ class Login extends Component {
         event.preventDefault();
         axios
             .post(
-                "http://localhost:8080/auth",
+                `${URL}/auth`,
                 {
                     Email: this.state.email,
                     PassWord: this.state.password

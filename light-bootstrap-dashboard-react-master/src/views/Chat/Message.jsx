@@ -6,7 +6,7 @@ import { format } from "timeago.js";
 import axios from "axios"
 import { useContext, useEffect, useRef, useState } from "react";
 import customer_1 from 'assets/img/download.png'
-const URL = "http://localhost:8080"
+import { URL } from 'utility/config';
 
 import { roundToNearestMinutesWithOptions } from 'date-fns/fp';
 const WrapperStyled = styled.div`

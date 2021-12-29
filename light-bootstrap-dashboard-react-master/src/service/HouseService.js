@@ -1,10 +1,10 @@
 import axios from 'axios';
 import Service from './Service';
-import { dataStatus, userProfile } from '../utility/config';
+import { dataStatus, userProfile,URL } from '../utility/config';
 class HouseService extends Service {  
     constructor() {
         super();
-        this.url =`http://localhost:8080/house/`
+        this.url =`${URL}/house/`
     }    
     getHouseByUserId = () =>{
         return new Promise((resolve, reject)=>{

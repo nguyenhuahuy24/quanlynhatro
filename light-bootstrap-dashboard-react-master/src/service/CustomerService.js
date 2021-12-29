@@ -1,10 +1,10 @@
 import axios from 'axios';
 import Service from './Service';
-import { dataStatus, userProfile } from '../utility/config';
+import { dataStatus, userProfile ,URL} from '../utility/config';
 class CustomerService extends Service {  
     constructor() {
         super();
-        this.url =`http://localhost:8080/customer/`
+        this.url =`${URL}/customer/`
     }
     getAllCustomerOfUser = () =>{
         return new Promise((resolve, reject)=>{

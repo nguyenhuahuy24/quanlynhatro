@@ -1,11 +1,11 @@
 import axios from 'axios';
 import Service from './Service';
-import { dataStatus, userProfile } from '../utility/config';
+import { dataStatus, userProfile,URL } from '../utility/config';
 class BillsService extends Service {  
     constructor() {
         super();
-        this.url =`http://localhost:8080/bill/`
-        this.url_recalculateBill=`http://localhost:8080/bill/recalculate/`
+        this.url =`${URL}/bill/`
+        this.url_recalculateBill=`${URL}/bill/recalculate/`
     }
     callGetAPIBill = async (data) => {
         try {

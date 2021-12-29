@@ -1,5 +1,5 @@
 import BillService from '../service/BillsService';
-import { dataStatus,userProfile } from '../utility/config';
+import { dataStatus,userProfile ,URL} from '../utility/config';
 import axios from 'axios';
 
 class BillBusiness {
@@ -53,7 +53,7 @@ class BillBusiness {
         }
     }
     editBill = async (data, success, failed)=>{
-        const response = await axios.patch(`http://localhost:8080/bill/${data}/status`)
+        const response = await axios.patch(`${URL}/bill/${data}/status`)
         console.log("res: ",response)
         const resData = { ...response.data }
         if (!("error" in response.data)) {

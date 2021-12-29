@@ -1,11 +1,11 @@
 import axios from 'axios';
 import Service from './Service';
-import { dataStatus, userProfile } from '../utility/config';
+import { dataStatus, userProfile,URL } from '../utility/config';
 class ContractService extends Service {  
     constructor() {
         super();
-        this.url =`http://localhost:8080/contract/`
-        this.url_update =`http://localhost:8080/contract/update/`
+        this.url =`${URL}/contract/`
+        this.url_update =`${URL}/contract/update/`
     }
 
     getContractOfUser = () =>{

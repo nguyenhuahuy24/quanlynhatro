@@ -1,13 +1,13 @@
 import axios from 'axios';
 import Service from './Service';
-import { dataStatus, userProfile } from '../utility/config';
+import { dataStatus, userProfile,URL } from '../utility/config';
 class DichVuService extends Service {  
     constructor() {
         super();
-        this.url =`http://localhost:8080/room/`
-        this.url_person= `http://localhost:8080/room/person/`
-        this.url_service= `http://localhost:8080/room/service/`
-        this.url_room=`http://localhost:8080/room/house/`
+        this.url =`${URL}/room/`
+        this.url_person= `${URL}/room/person/`
+        this.url_service= `${URL}/room/service/`
+        this.url_room=`${URL}/room/house/`
     }
     callGetAPI = async (url,id) => {
         try {

@@ -4,7 +4,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../assets/css/animate.min.css";
 import { Toast } from 'primereact/toast';
-
+import { URL } from "utility/config";
 import "../assets/sass/light-bootstrap-dashboard-react.scss?v=1.3.0";
 import "../assets/css/demo.css";
 import "../assets/css/pe-icon-7-stroke.css";
@@ -36,7 +36,7 @@ class Resigter extends Component {
         {
         axios
             .post(
-                "http://localhost:8080/register",
+                `${URL}/register`,
                 {
                    
                         Email: email,

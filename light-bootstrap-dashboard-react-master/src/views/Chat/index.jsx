@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { PlusSquareOutlined } from '@ant-design/icons';
 import { io } from 'socket.io-client';
 import { isThisHour } from "date-fns";
-const URL = "http://localhost:8080"
+import { URL } from "../../utility/config";
 const { Panel } = Collapse
 
 class ChatRoom extends Component {
@@ -44,6 +44,7 @@ class ChatRoom extends Component {
             });
         });
     }
+    
     componentDidUpdate(prevProps, prevState) {
         if (this.state.currentChat !== prevState.currentChat) {
             this.getMessage()
@@ -67,11 +68,18 @@ class ChatRoom extends Component {
         if (this.state.messages !== prevState.messages) {
             this.scrollRef.current?.scrollIntoView({ behavior: "smooth" });
         }
+
+
     }
     getMessage() {
         axios.get(URL + "/message/" + this.state.currentChat._id).then((response) => {
             this.setState({ messages: response.data })
+                            console.log("Message:",this.state.messages)
+
         })
+    }
+    ChangeInput=(e)=>{
+        this.setState({newMessage:e.target.value})
     }
     handleSubmit = async () => {
         if (this.state.newMessage !== "") {
@@ -91,11 +99,13 @@ class ChatRoom extends Component {
             try {
                 const res = await axios.post(URL + "/message", message);
                 this.setState({ messages: [...this.state.messages, res.data], newMessage: "" });
+                document.getElementsByClassName("ant-form")[0].reset();
             } catch (err) {
                 console.log(err);
             }
         }
     }
+    
     render() {
         return (
             <div>
@@ -103,7 +113,7 @@ class ChatRoom extends Component {
                     <Col style={{ backgroundColor: "#fff" }} span={5}>
                         <SidebarStyled>
                             <Collapse ghost defaultActiveKey={['1']}>
-                                <PanelStyled header='Danh sách các phòng' key='1'>
+                                <PanelStyled header='Danh sách trò chuyện' key='1'>
                                     {this.state.listRoomchat.map((value) => (
                                         <LinkStyled type="text" onClick={() => this.setState({ currentChat: value })} >
                                             <Roomchat room={value} userId={this.state.userId} />
@@ -139,11 +149,11 @@ class ChatRoom extends Component {
                                             placeholder='Nhập tin nhắn...'
                                             bordered={false}
                                             autoComplete='off'
-                                            onChange={(e) => this.setState({ newMessage: e.target.value })}
+                                            onChange={this.ChangeInput}
                                             value={this.state.newMessage}
                                         />
                                     </Form.Item>
-                                    <Button type='primary' onClick={() => { this.handleSubmit() }}>
+                                    <Button type='primary' onClick={() =>this.handleSubmit()}>
                                         Gửi
                                     </Button>
                                 </FormStyled>
@@ -188,7 +198,7 @@ const WrapperStyled = styled.div`
 `;
 
 const ContentStyled = styled.div`
-  height: 90%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 11px;
