@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Collapse, Typography, Button } from 'antd';
 import styled from 'styled-components';
 import { PlusSquareOutlined } from '@ant-design/icons';
+import axios from "axios";
+const URL = "http://localhost:8080"
 
 const { Panel } = Collapse
 const PanelStyled = styled(Panel)`
@@ -31,29 +33,26 @@ const SidebarStyled = styled.div`
   color: white;
   height: 90.8vh;
 `;
-class RoomList extends Component {
-
+class Roomchat extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      customer: {}
+    };
+  }
+  componentDidMount() {
+    const customerid = this.props.room.Members.find((m) => m !== this.props.userId);
+    axios.get(URL + "/customer/" + customerid).then((response) => {
+      this.setState({ customer: response.data })
+    })
+  }
   render() {
     return (
-      <SidebarStyled>
-        <Collapse ghost defaultActiveKey={['1']}>
-          <PanelStyled header='Danh sách chat' key='1'>
-            <LinkStyled>Room 1</LinkStyled>
-            <LinkStyled>Room 2</LinkStyled>
-            <LinkStyled>Room 3</LinkStyled>
-            <Button
-              type='text'
-              icon={<PlusSquareOutlined />}
-              className='add-room'
-            >
-              Thêm phòng
-            </Button>
-          </PanelStyled>
-        </Collapse>
-
-      </SidebarStyled>
+      <>
+        <p>{this.state.customer.Name}</p>
+      </>
 
     )
   }
 }
-export default RoomList
+export default Roomchat
