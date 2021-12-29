@@ -65,36 +65,7 @@ class ChatWindow extends Component {
     render() {
         return(
            <WrapperStyled>
-                <HeaderStyled>
-                    <div className='header__info'>
-                        <p className='header__title'>Room 1</p>
-                        <span className='header__description'>Đây là room 1</span>
-                    </div>
-            <ButtonGroupStyled>
-              <Button
-                icon={<UserAddOutlined />}
-                type='text'
-              >
-                Mời
-              </Button>
-              <Avatar.Group size='small' maxCount={2}>
-                
-                  <Tooltip title="A">
-                    <Avatar>A</Avatar>
-                  </Tooltip>
-                  <Tooltip title="A">
-                    <Avatar>B</Avatar>
-                  </Tooltip>
-                  <Tooltip title="A">
-                    <Avatar>C</Avatar>
-                  </Tooltip>
-                  <Tooltip title="A">
-                    <Avatar>D</Avatar>
-                  </Tooltip>
-                
-              </Avatar.Group>
-            </ButtonGroupStyled>
-          </HeaderStyled>
+               
           <ContentStyled>
             <MessageListStyled >
                 <Message
@@ -102,36 +73,23 @@ class ChatWindow extends Component {
                   text="Text"
                   photoURL={null}
                   displayName="Huy"
-                  createdAt={123123}
+                  createdAt={"5 giờ trước"}
                 />
                 <Message
                   //key={mes.id}
-                  text="Text 1"
+                  text="Vui ve"
                   photoURL={null}
                   displayName="tung"
-                  createdAt={123123}
+                  createdAt={"2 phút trước"}
                 />
                 <Message
                   //key={mes.id}
                   text="Text 123"
                   photoURL={null}
                   displayName="Huy"
-                  createdAt={123123}
+                  createdAt={"1 giây trước"}
                 />
-                <Message
-                  //key={mes.id}
-                  text="Text 123"
-                  photoURL={null}
-                  displayName="Huy"
-                  createdAt={123123}
-                />
-                <Message
-                  //key={mes.id}
-                  text="Text 123"
-                  photoURL={null}
-                  displayName="Huy"
-                  createdAt={123123}
-                />
+              
                 
                
 

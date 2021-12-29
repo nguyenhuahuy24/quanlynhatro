@@ -62,6 +62,7 @@ class Login extends Component {
                 if (response.data) {
                     localStorage.setItem("auth-token",response.data.accessToken)
                     localStorage.setItem("userIDlogin",response.data.userId)
+               
                     this.context.setUserData({
                         token: response.data.accessToken,
                         user: response.data.userId,
@@ -185,7 +186,7 @@ class Login extends Component {
 }
 function mapStateToProps(state) {
   return {
-
+      user: state.UserReducer.user,
   };
 }
 export default withGlobalContext(

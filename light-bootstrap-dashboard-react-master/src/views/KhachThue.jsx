@@ -43,7 +43,7 @@ class KhachThue extends Component {
     Image: [],
     Room:"",
     House:"",
-    UserId:"",
+    UserId:localStorage.getItem("userIDlogin"),
   };
 
   constructor(props) {
@@ -195,14 +195,14 @@ class KhachThue extends Component {
                 this.toast.show({
                   severity: "success",
                   summary: "Thành công",
-                  detail: "Xóa Bill",
+                  detail: "Xóa thông tin khách thuê",
                   life: 3000
                 });
           }else {
                       this.toast.show({
                 severity: "error",
                 summary: "Thất bại",
-                detail: "Xóa Bill",
+                detail: "Xóa thông tin khách thuê",
                 life: 3000
               });
           }
@@ -340,11 +340,18 @@ class KhachThue extends Component {
     this.setState({ AddtoRoomDialog: false });
   }
   saveUser() {
-    let state = { submitted: true };
-    
+    let state = { submitted: true };  
     if (this.state.user.Name.trim()) {
       // let users = [...this.state.users];
-      
+      if(this.state.selectedAge==""||this.state.selectedDateCMND==""||this.state.user.Name==""||this.state.user.Email==""||this.state.user.Phone==""||this.state.user.PermanentAddress==""||this.state.user.Cmnd==""||this.state.user.PlaceCmnd==""){
+          this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Không được để trống thông tin khách thuê",
+          life: 3000
+          });
+      }
+      else{
       const fd = new FormData();
       fd.append("Name", this.state.user.Name);
       if(this.state.selectedAge!=""){
@@ -357,7 +364,6 @@ class KhachThue extends Component {
       if(this.state.selectedDateCMND!=""){
          fd.append("DateCmnd", this.state.selectedDateCMND);
       }
-     
       fd.append("PlaceCmnd", this.state.user.PlaceCmnd);
       
       if(this.state.selectedFile.length>0){
@@ -365,27 +371,50 @@ class KhachThue extends Component {
           fd.append('Image',file)
         })
       }
+      
       if(this.state.selectedRoom!=""){
 
         fd.append("RoomId", this.state.selectedRoom);
       }
+
       if (this.state.user._id) {
       this.props.editCustomer(this.state.user._id, fd);
-        
+          state = {
+          ...state,
+          //  users,
+          selectedDateCMND:new Date(),
+          selectedAge:new Date(),
+          selectedFile:[],
+          userDialog: false,
+          user: this.emptyUser,
+          imageArray:[],
+        };
       } else {
-        this.props.createCustomer(fd);
-      }
-      state = {
-        ...state,
-        //  users,
-        selectedDateCMND:"",
-        selectedAge:"",
-        selectedFile:[],
-        userDialog: false,
-        user: this.emptyUser,
-        imageArray:[],
+        if(this.state.selectedRoom==""){
+           this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Không được để trống thông tin Phòng của khách thuê",
+          life: 3000
+          });
+        }
+        else{
+          this.props.createCustomer(fd);
+          state = {
+            ...state,
+            //  users,
+            selectedDateCMND: new Date(),
+            selectedAge:new Date(),
+            selectedFile:[],
+            userDialog: false,
+            user: this.emptyUser,
+            imageArray:[],
       };
+        }
+      }
+      
     }
+  }
 
     this.setState(state);
   }
@@ -407,9 +436,9 @@ class KhachThue extends Component {
   deleteUser() {
     this.props.deleteCustomer(this.state.user._id);
        this.setState({
-                  deleteUserDialog: false,
-                  user:this.emptyUser
-                });
+            deleteUserDialog: false,
+            user:this.emptyUser
+    });
   }
 
   AddtoRoom() {
@@ -711,8 +740,10 @@ class KhachThue extends Component {
               options={this.props.listRoom.data}
               onChange={this.onRoomChange}
               optionLabel="RoomNumber"
-              placeholder="Chọn phòng trọ" 
-            /> </div>}
+              placeholder="Chọn phòng trọ"
+              
+            />
+            </div>}
           </div>
           {this.state.user.Room !=""&& <label style={{paddingBottom:"10px"}}>Bạn muốn chỉnh sửa Phòng của Khách Thuê có thể dùng chức năng Chuyển Phòng !</label>
 }

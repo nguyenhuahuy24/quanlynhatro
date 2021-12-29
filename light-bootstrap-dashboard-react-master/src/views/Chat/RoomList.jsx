@@ -38,9 +38,8 @@ class RoomList extends Component {
             <SidebarStyled>
                 <Collapse ghost defaultActiveKey={['1']}>
                     <PanelStyled header='Danh sách các phòng' key='1'>
-                        <LinkStyled>Room 1</LinkStyled>
-                        <LinkStyled>Room 2</LinkStyled>
-                        <LinkStyled>Room 3</LinkStyled>
+                        <LinkStyled>Nhật Trường</LinkStyled>
+                        <LinkStyled>Băng Di</LinkStyled>
                         <Button
                             type='text'
                             icon={<PlusSquareOutlined />}

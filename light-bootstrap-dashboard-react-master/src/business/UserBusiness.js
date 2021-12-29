@@ -5,7 +5,9 @@ class UserBusiness {
         try {
             const userService = new UserService()
             const result = await userService.getUser();
+
             if (result.status === dataStatus.SUCCESS) {
+                localStorage.setItem("username",result.data.Name)
                 success(result)
             }
             else {
