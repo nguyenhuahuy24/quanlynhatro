@@ -139,12 +139,13 @@ class Conservation extends Component {
                                 </MessageListStyled>
                                 <FormStyled>
                                     <Form.Item name='message'>
-                                        <InputText
+                                        <Input
                                             placeholder='Nhập tin nhắn...'
                                             bordered={false}
                                             autoComplete='off'
                                             onChange={this.ChangeInput}
                                             value={this.state.newMessage}
+                                            onPressEnter={() => this.handleSubmit()}
                                         />
                                     </Form.Item>
                                     <Button type='primary' onClick={() => this.handleSubmit()}>
