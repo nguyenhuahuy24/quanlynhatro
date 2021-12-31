@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import {GoogleLogin} from "react-google-login";
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
 import {getUser } from '../redux/action/userAction/UserAction'
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../assets/css/animate.min.css";
@@ -31,6 +33,7 @@ class Login extends Component {
        
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+      
         this.loginTest = this.loginTest.bind(this);
     }
     loginTest(){
@@ -40,6 +43,20 @@ class Login extends Component {
       detail: "Chức năng đang cập nhật",
       life: 3000
       });
+    }
+    googleSuccess= async (res)=>{
+      console.log(res);
+      const result = res?.profileObj
+      const token = res?.tokenId
+    }
+    googleFailure=(res)=>{
+      console.log(res);
+      console.log("Google Sign thất bại")
+
+    }
+    facebookSuccess=async(res)=>{
+        console.log(res);
+
     }
     handleChange(event) {
         this.setState({
@@ -160,18 +177,37 @@ class Login extends Component {
         
               <div className="button-demo">
                   <div className="template">
-                       <Button className="facebook p-p-0" onClick={this.loginTest}>
-                  <i className="pi pi-facebook p-px-2"></i>
-                  <span className="p-px-3">Facebook</span>
-              </Button>
-              <Button className="twitter p-p-0" onClick={this.loginTest}>
-                  <i className="pi pi-twitter p-px-2"></i>
-                  <span className="p-px-3">Twitter</span>
-              </Button>
-              <Button className="google p-p-0" onClick={this.loginTest}>
-                  <i className="pi pi-google p-px-2"></i>
-                  <span className="p-px-3">Google</span>
-              </Button>
+                  <FacebookLogin
+                      appId="1042859006281800"
+                      autoLoad={false}
+                      fields="name,email,picture"
+                      render={(renderProps)=>(
+                          <Button className="facebook p-p-0" 
+                                  onClick={renderProps.onClick}
+                                  >
+                                  <i className="pi pi-facebook p-px-2"></i>
+                                  <span className="p-px-3">Facebook</span>
+                          </Button>
+                      )}
+                      callback={this.facebookSuccess} />
+                       
+              <GoogleLogin
+                clientId="917515198013-tf8flvn0gvpq8p5mj57chd3t1n284pod.apps.googleusercontent.com"
+                render={(renderProps)=>(
+                    <Button 
+                        className="google p-p-0" 
+                        onClick={renderProps.onClick}
+                        disabled={renderProps.disabled}
+                      >
+                      <i className="pi pi-google p-px-2"></i>
+                      <span className="p-px-3">Google</span>
+                    </Button>
+                )}
+                onSuccess={this.googleSuccess}
+                onFailure={this.googleFailure}
+                cookiePolicy="single_host_origin"
+              />      
+              
                   </div>
               </div>
       </div>

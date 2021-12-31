@@ -11,7 +11,7 @@ class VerifyEmail extends Component {
             <h2 >Email đã được xác thực!</h2>
             <h3>Vui lòng cập nhật thông tin cá nhân!</h3>
           
-           <Link className="btn btn-primary" to="/">Login</Link>
+           <Link className="btn btn-primary" to="/signin">Login</Link>
             
 
         </div>
