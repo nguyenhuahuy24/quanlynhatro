@@ -4,7 +4,7 @@ class Service {
 
     callGetAPI = async (url) => {
         try {
-            const response = await axios.get(url,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
+            const response = await axios.get(url, { headers: { Authorization: 'Bearer ' + localStorage.getItem("auth-token") } });
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -27,8 +27,8 @@ class Service {
     }
     callGetLocalAPI = async (url) => {
         try {
-            const response = await axios.get(url,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
-            
+            const response = await axios.get(url, { headers: { Authorization: 'Bearer ' + localStorage.getItem("auth-token") } })
+
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -49,11 +49,13 @@ class Service {
             }
         }
     }
-    callPostLocalAPI = async (url,data) => {
+    callPostLocalAPI = async (url, data) => {
         try {
-            const response = await axios.post(url,data,{headers:{
-            Authorization:'Bearer ' + localStorage.getItem("auth-token")
-        }}).then((res) => res.data);
+            const response = await axios.post(url, data, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem("auth-token")
+                }
+            }).then((res) => res.data);
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -74,9 +76,9 @@ class Service {
             }
         }
     }
-    callPostAPI = async (url,data) => {
+    callPostAPI = async (url, data) => {
         try {
-            const response = await axios.post(url, data).then((res) => res.data);    
+            const response = await axios.post(url, data).then((res) => res.data);
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
@@ -97,11 +99,11 @@ class Service {
             }
         }
     }
-    callPatchAPI = async (url,id,data) => {
+    callPatchAPI = async (url, id, data) => {
         try {
-           
+
             const response = await axios.patch(url + id, data).then((res) => res.data);
-            if (typeof (response) === 'object' && 'error' in response) {        
+            if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
                     message: response.error.data.message
@@ -121,10 +123,10 @@ class Service {
             }
         }
     }
-    callPatchLocalAPI = async (url,id,data) => {
+    callPatchLocalAPI = async (url, id, data) => {
         try {
-            const response = await axios.patch(url+id,data,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}});
-            if (typeof (response) === 'object' && 'error' in response) {        
+            const response = await axios.patch(url + id, data, { headers: { Authorization: 'Bearer ' + localStorage.getItem("auth-token") } });
+            if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
                     message: response.error.data.message
@@ -144,7 +146,7 @@ class Service {
             }
         }
     }
-    callDeleteAPI = async (url,id) => {
+    callDeleteAPI = async (url, id) => {
         try {
             const response = await axios.delete(url + id).then((res) => res.data);
             if (typeof (response) === 'object' && 'error' in response) {

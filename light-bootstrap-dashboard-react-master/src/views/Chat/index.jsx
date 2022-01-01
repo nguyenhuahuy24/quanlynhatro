@@ -38,7 +38,7 @@ class Conservation extends Component {
             });
         });
         axios.get(URL + "/roomchat/" + localStorage.getItem("userIDlogin")).then((response) => {
-            this.setState({ listRoomchat: response.data, currentChat: response.data[0], userId: localStorage.getItem("userIDlogin") })
+            this.setState({ listRoomchat: response.data, userId: localStorage.getItem("userIDlogin") })
         })
 
     }
@@ -49,7 +49,7 @@ class Conservation extends Component {
         }
         if (this.state.userId !== prevState.userId) {
             axios.get(URL + "/roomchat/" + localStorage.getItem("userIDlogin")).then((response) => {
-                this.setState({ listRoomchat: response.data, currentChat: response.data[0] })
+                this.setState({ listRoomchat: response.data })
             })
             this.state.socket.emit("addUser", this.state.userId);
         }
