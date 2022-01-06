@@ -27,7 +27,7 @@ import {getAllCustomerOfUser ,createCustomer, editCustomer, deleteCustomer} from
 import {getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 import {getRoomByHouseId} from '../redux/action/roomAction/RoomAction'
 
-import { dataStatus } from "../utility/config";
+import { dataStatus,URL } from "../utility/config";
 
 class KhachThue extends Component {
   static contextType = UserContext
@@ -263,7 +263,7 @@ class KhachThue extends Component {
         return <div className="img-holder">
       { 
           this.state.user.Image.map(imageURI =>
-            (<img className="img" src={`http://localhost:8080/uploads/images/`+imageURI} alt="Photo uploaded"/>)
+            (<img className="img" src={`${URL}/uploads/images/`+imageURI} alt="Photo uploaded"/>)
           ) 
         }
         </div>
