@@ -31,7 +31,7 @@ class HopDong extends Component {
   static contextType = UserContext
   emptyHD = {
     CreateDay: new Date(),
-    Lessor:userProfile.userId,
+    Lessor:localStorage.getItem("userIDlogin"),
     Renter: "",
     HouseId:"",
     RoomId:"",

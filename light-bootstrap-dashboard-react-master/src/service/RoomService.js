@@ -38,10 +38,10 @@ class DichVuService extends Service {
         try {
             const response = await axios.patch(this.url+roomId+`/addService/`+serviceId).then((res)=> res.data);
             if (typeof (response) === 'object' && 'error' in response) {
-                
+                console.log("vào error")
                 return {
                     status: dataStatus.FAILED,
-                    message: response.error.data.message
+                    message: response.error
                 }
             }
             else {

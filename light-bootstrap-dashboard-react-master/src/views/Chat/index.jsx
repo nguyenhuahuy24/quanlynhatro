@@ -109,17 +109,17 @@ class Conservation extends Component {
                             <Collapse ghost defaultActiveKey={['1']}>
                                 <PanelStyled header='Danh sách trò chuyện' key='1'>
                                     {this.state.listRoomchat.map((value) => (
-                                        <LinkStyled type="text" onClick={() => this.setState({ currentChat: value })} >
+                                        <Button style={{width:170,textAlign:"left"}} type="text" onClick={() => this.setState({ currentChat: value })} >
                                             <Roomchat room={value} userId={this.state.userId} />
-                                        </LinkStyled>
+                                        </Button>
                                     ))}
-                                    <Button
+                                    {/* <Button
                                         type='text'
                                         icon={<PlusSquareOutlined />}
                                         className='add-room'
                                     >
                                         Thêm phòng
-                                    </Button>
+                                    </Button> */}
                                 </PanelStyled>
                             </Collapse>
 

@@ -69,7 +69,9 @@ class KhachThue extends Component {
       selectedFile: [],
       imageArray:[],
     };
-    
+    this.RoomBodyTemplate = this.RoomBodyTemplate.bind(this);
+    this.HouseBodyTemplate = this.HouseBodyTemplate.bind(this);
+
     this.leftToolbarTemplate = this.leftToolbarTemplate.bind(this);
     this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
     this.editUser = this.editUser.bind(this);
@@ -476,6 +478,20 @@ class KhachThue extends Component {
       </React.Fragment>
     );
   }
+  RoomBodyTemplate(rowData) {
+    if (rowData.Room == "Trống") {
+      return <span className={`product-badge status-0`}>{"Trống"}</span>;
+    }
+    
+    else return <span>{rowData.Room}</span>
+  }
+  HouseBodyTemplate(rowData) {
+    if (rowData.House == "Trống") {
+      return <span className={`product-badge status-0`}>{"Trống"}</span>;
+    }
+    
+    else return <span>{rowData.House}</span>
+  }
   actionBodyTemplate(rowData) {
     return (
       <React.Fragment>
@@ -608,8 +624,8 @@ class KhachThue extends Component {
       
             <Column field="Name" header="Tên Khách Hàng" ></Column>
             <Column field="Phone" header="Số điện thoại" ></Column>
-            <Column field="House" header="Nhà thuê" ></Column>
-            <Column field="Room" header="Thuê Phòng" ></Column>
+            <Column field="House" header="Nhà thuê" body={this.HouseBodyTemplate} ></Column>
+            <Column field="Room" header="Thuê Phòng" body={this.RoomBodyTemplate} ></Column>
             <Column body={this.actionBodyTemplate}></Column>
          
           </DataTable>

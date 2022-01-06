@@ -451,7 +451,19 @@ class PhongTro extends Component {
         });
     }
   deleteRoom() {
-    this.props.deleteRoom(this.state.room._id);
+    if(this.state.room.Status==1){
+        this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Phòng đang cho thuê không xóa được",
+          life: 3000
+          });
+        this.setState({ 
+                  deleteRoomDialog: false,
+                  room: this.emptyRoom });
+        
+    }
+    else this.props.deleteRoom(this.state.room._id);
   }
   removePerson() {
     let customer =this.state.selectedCustomer

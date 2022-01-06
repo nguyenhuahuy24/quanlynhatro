@@ -164,19 +164,7 @@ class DichVu extends Component {
     if (this.props.addServiceStatus !== prevProps.addServiceStatus) {
       if (this.props.addServiceStatus.status === dataStatus.SUCCESS) {
           
-            if(this.props.addServiceStatus.data.err)
-              {
-                this.setState({
-                ServiceToRoomDialog: false
-                });
-                this.toast.show({
-                  severity: "error",
-                  summary: "Thất bại",
-                  detail: this.props.addPersonStatus.data.err,
-                  life: 6000
-                });
-            }else
-            {
+            
               this.setState({
               ServiceToRoomDialog: false
               });
@@ -186,10 +174,20 @@ class DichVu extends Component {
               detail: "Thêm dịch vụ",
               life: 3000
             });
-            }
              this.props.getServiceOfUser();
-        
-      }
+        }      
+      else{
+          this.setState({
+                ServiceToRoomDialog: false
+                });
+                this.toast.show({
+                  severity: "error",
+                  summary: "Thất bại",
+                  detail: this.props.addServiceStatus.message,
+                  life: 6000
+                });
+        }
+      
     }
   }
    onHouseChange(e) {

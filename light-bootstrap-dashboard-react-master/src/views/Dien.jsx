@@ -130,7 +130,7 @@ class Dien extends Component {
         this.toast.show({
           severity: "error",
           summary: "Thất bại",
-          detail: "Nhập chỉ số Điện/Nước",
+          detail: this.props.createStatus.message,
           life: 3000
         });
       }

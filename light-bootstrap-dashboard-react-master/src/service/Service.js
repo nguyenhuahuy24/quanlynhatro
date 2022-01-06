@@ -82,7 +82,7 @@ class Service {
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
-                    message: response.error.data.message
+                    message: response.error
                 }
             }
             else {
