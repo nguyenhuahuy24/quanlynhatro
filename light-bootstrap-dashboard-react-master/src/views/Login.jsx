@@ -205,7 +205,7 @@ class Login extends Component {
 
               <div className="button-demo">
                 <div className="template">
-                  <FacebookLogin
+                  {/* <FacebookLogin
                     appId="1042859006281800"
                     autoLoad={false}
                     fields="name,email,picture"
@@ -217,7 +217,7 @@ class Login extends Component {
                         <span className="p-px-3">Facebook</span>
                       </Button>
                     )}
-                    callback={this.facebookSuccess} />
+                    callback={this.facebookSuccess} /> */}
 
                   <GoogleLogin
                     clientId="917515198013-tf8flvn0gvpq8p5mj57chd3t1n284pod.apps.googleusercontent.com"
