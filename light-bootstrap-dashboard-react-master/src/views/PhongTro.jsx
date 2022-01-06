@@ -24,7 +24,7 @@ import { connect } from 'react-redux';
 import {postRoom,unpostRoom,removePersonToRoom,getServiceInRoom,removeServiceToRoom, getPersonInRoom,getRoomByHouseId ,createRoom, editRoom, deleteRoom} from '../redux/action/roomAction/RoomAction'
 import { getHouseByUserId} from '../redux/action/houseAction/HouseAction'
 
-import { dataStatus } from "../utility/config";
+import { dataStatus,URL } from "../utility/config";
 class PhongTro extends Component {
   static contextType = UserContext
   emptyRoom = {
@@ -257,7 +257,7 @@ class PhongTro extends Component {
         return <div className="img-holder">
       { 
           this.state.room.Image.map(imageURI =>
-            (<img className="img" src={`http://localhost:8080/uploads/images/`+imageURI} alt="Photo uploaded"/>)
+            (<img className="img" src={`${URL}/uploads/images/`+imageURI} alt="Photo uploaded"/>)
           ) 
         }
         </div>
