@@ -42,7 +42,7 @@ class InformationOfUser extends Component {
             if (this.props.user.status === dataStatus.SUCCESS) {
                 if (this.props.user.data.Name) this.setState({ Name: this.props.user.data.Name });
                 if (this.props.user.data.Image) {
-                    let image = `${URL}`+this.props.user.data.Image
+                    let image = `${URL}/`+this.props.user.data.Image
                     this.setState({ Image: image })
                 } else {
                     this.setState({ Image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' })
