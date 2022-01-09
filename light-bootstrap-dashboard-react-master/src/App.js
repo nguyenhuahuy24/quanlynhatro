@@ -11,7 +11,7 @@ import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
 // import "./assets/css/demo.css";
 // import "./assets/css/pe-icon-7-stroke.css";
 // import "./App.scss"
-
+import { URL } from './utility/config'
 import UserContext from "./context/UserContext"
 import Axios from "axios";
 import VerifyEmail from "views/VerifyEmail"
@@ -32,9 +32,9 @@ export default function App() {
                 localStorage.setItem("auth-token", "")
                 token = ""
             }
-            const tokenRes = await Axios.post("http://localhost:8080/auth/tokenIsValid", null, { headers: { "authorization": token } })
+            const tokenRes = await Axios.post(`${URL}/auth/tokenIsValid`, null, { headers: { "authorization": token } })
             if (tokenRes.data) {
-                const userRes = await Axios.get("http://localhost:8080/user/auth", { headers: { "authorization": token } });
+                const userRes = await Axios.get(`${URL}/user/auth`, { headers: { "authorization": token } });
                 //const userRes = await Axios.get("http://localhost:8080/user/auth",{headers :{"authorization": "Bearer" +" "+ token}});
                 setUserData({
                     token,
@@ -45,31 +45,31 @@ export default function App() {
         checkLoggedIn();
     }, [])
     return (
-      
-          <BrowserRouter>
-                <UserContext.Provider value={{ userData, setUserData }} >
-                   <Provider store={Store}>
-                        
-          
-          
+
+        <BrowserRouter>
+            <UserContext.Provider value={{ userData, setUserData }} >
+                <Provider store={Store}>
+
+
+
+                    <Switch>
+                        <Route path="/" exact component={Home} />
+                        <Route path="/signin" exact component={Login} />
+                        <Route path="/signup" exact component={Resigter} />
+                        <Route path="/verify" component={VerifyEmail} />
                         <Switch>
-                            <Route path="/" exact component={Home} />
-                            <Route path="/signin" exact component={Login} />
-                            <Route path="/signup" exact component={Resigter} />
-                            <Route path="/verify" component={VerifyEmail} />
-                            <Switch>
-                                <PrivateRoute path="/admin" component={AdminLayout} />   
-                            </Switch>
+                            <PrivateRoute path="/admin" component={AdminLayout} />
                         </Switch>
+                    </Switch>
                     {/* <Switch>
                         <Route path="/admin" render={props => <AdminLayout {...props} />} />
                         <Redirect from="/" to="/admin/dashboard" />
                     </Switch> */}
-         
-           </Provider>
-                </UserContext.Provider>
-            </BrowserRouter>
-        
+
+                </Provider>
+            </UserContext.Provider>
+        </BrowserRouter>
+
     );
 
 }
