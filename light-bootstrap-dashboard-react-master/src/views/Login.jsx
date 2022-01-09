@@ -220,7 +220,7 @@ class Login extends Component {
                     callback={this.facebookSuccess} /> */}
 
                   <GoogleLogin
-                    clientId="917515198013-tf8flvn0gvpq8p5mj57chd3t1n284pod.apps.googleusercontent.com"
+                    clientId="917515198013-n06ssubctrnebvakaulp7ub1c4mi4opt.apps.googleusercontent.com"
                     render={(renderProps) => (
                       <Button
                         className="google p-p-0"
