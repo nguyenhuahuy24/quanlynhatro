@@ -134,7 +134,7 @@ class DichVuService extends Service {
     }
     callEmptyRoom = async()=>{
         try {
-            const response = await axios.get(`http://localhost:8080/room/emptyRoom/`,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}}); 
+            const response = await axios.get(`${URL}/room/emptyRoom/`,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}}); 
           
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
@@ -158,7 +158,7 @@ class DichVuService extends Service {
     }
     callNoteEmptyRoom = async()=>{
         try {
-            const response = await axios.get(`http://localhost:8080/room/notemptyRoom/`,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
+            const response = await axios.get(`${URL}/room/notemptyRoom/`,{headers:{Authorization:'Bearer ' + localStorage.getItem("auth-token")}})  
             if (typeof (response) === 'object' && 'error' in response) {
                 return {
                     status: dataStatus.FAILED,
