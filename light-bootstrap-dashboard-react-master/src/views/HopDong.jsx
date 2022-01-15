@@ -136,6 +136,20 @@ class HopDong extends Component {
     if (this.props.editStatus !== prevProps.editStatus) {
       if (this.props.editStatus.status === dataStatus.SUCCESS) {
          this.props.getContractOfUser();
+          this.toast.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Chỉnh sửa Hợp Động",
+          life: 3000
+        });
+      }
+      else{
+         this.toast.show({
+          severity: "error",
+          summary: "Thất bại",
+          detail: "Chỉnh sửa Hợp Động",
+          life: 3000
+        });
       }
     }
     if (this.props.deleteStatus !== prevProps.deleteStatus) {
@@ -400,13 +414,13 @@ class HopDong extends Component {
           onClick={() => this.editHD(rowData)}
           disabled={rowData.Status !=3}
         />
-        <Button
+        {/* <Button
           icon="pi pi-plus"
           className="p-button-rounded p-button-warning p-mr-2"
            tooltip="Xác nhận hợp đồng" 
           tooltipOptions={{ className: 'blue-tooltip', position: 'top' }}
           onClick={()=>this.OpenConfirmStatus(rowData)}
-        />
+        /> */}
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-danger"
@@ -634,7 +648,8 @@ class HopDong extends Component {
             )}
           </div>
         </Dialog>
-        <Dialog
+        {/*  */}
+        {/* <Dialog
           visible={this.state.ConfirmHDDialog}
           style={{ width: "450px" }}
           header="Xác định hơp động"
@@ -667,7 +682,7 @@ class HopDong extends Component {
               </div>
             </div>
           </div>
-        </Dialog>
+        </Dialog> */}
             {/* view Hop dong dialog */}
         <Dialog
           visible={this.state.ViewHDDialog}
